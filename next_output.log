@@ -1,0 +1,4 @@
+Scope: 3 of 4 workspace projects
+packages/types dev$ tsc --watch
+packages/types dev: [2J[3J[H6:19:13 PM - Starting compilation in watch mode...
+packages/types dev: 6:19:14 PM - Found 0 errors. Watching for file changes.
