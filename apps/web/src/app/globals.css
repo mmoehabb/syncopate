@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian-night: #0B0E14;
+  --color-void-grey: #161B22;
+  --color-neon-pulse: #00F5FF;
+  --color-git-green: #2EA043;
+  --color-syntax-grey: #8B949E;
+
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-obsidian-night text-syntax-grey font-sans;
+    /* Force strict dark mode */
+    color-scheme: dark;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Common utility for Power User terminal-like surfaces */
+  .surface-panel {
+    @apply bg-void-grey border border-gray-800 rounded-md shadow-lg overflow-hidden;
+  }
+}
