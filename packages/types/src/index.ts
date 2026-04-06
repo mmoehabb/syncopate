@@ -1,7 +1,7 @@
 // Shared API Types
 
 export interface HealthResponse {
-  status: 'ok' | 'error';
+  status: "ok" | "error";
   timestamp: string;
   version: string;
   message?: string;

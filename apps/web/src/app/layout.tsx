@@ -16,7 +16,8 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Syncopate | Code-First Coordination",
-  description: "Your board, on autopilot. Stop updating tickets. Just push code.",
+  description:
+    "Your board, on autopilot. Stop updating tickets. Just push code.",
 };
 
 export default function RootLayout({
@@ -25,10 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetBrainsMono.variable} dark`}>
-      <body className="antialiased min-h-screen flex flex-col">
-        {children}
-      </body>
+    <html
+      lang="en"
+      className={`${inter.variable} ${jetBrainsMono.variable} dark`}
+    >
+      <body className="antialiased min-h-screen flex flex-col">{children}</body>
     </html>
   );
 }
