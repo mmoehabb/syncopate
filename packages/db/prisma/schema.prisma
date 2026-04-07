@@ -15,7 +15,7 @@ datasource db {
 // -----------------------------------------------------------------------------
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(uuid(7))
   userId            String
   type              String
   provider          String
@@ -34,7 +34,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid(7))
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -42,7 +42,7 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(uuid(7))
   name          String?
   email         String?   @unique
   emailVerified DateTime?
@@ -87,7 +87,7 @@ enum SubscriptionStatus {
 }
 
 model Plan {
-  id                 String   @id @default(cuid())
+  id                 String   @id @default(uuid(7))
   name               String // e.g., "Hobby", "Standard"
   maxBoards          Int
   maxMembersPerBoard Int
@@ -99,7 +99,7 @@ model Plan {
 }
 
 model Price {
-  id        String        @id @default(cuid())
+  id        String        @id @default(uuid(7))
   planId    String
   amount    Int // Stored in cents (e.g., 999 = $9.99)
   currency  String        @default("usd")
@@ -113,7 +113,7 @@ model Price {
 }
 
 model Subscription {
-  id                 String             @id @default(cuid())
+  id                 String             @id @default(uuid(7))
   userId             String
   priceId            String
   status             SubscriptionStatus @default(ACTIVE)
@@ -136,7 +136,7 @@ enum Role {
 }
 
 model Workspace {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid(7))
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,7 +146,7 @@ model Workspace {
 }
 
 model WorkspaceMember {
-  id          String   @id @default(cuid())
+  id          BigInt   @id @default(autoincrement())
   workspaceId String
   userId      String
   role        Role     @default(MEMBER)
@@ -160,7 +160,7 @@ model WorkspaceMember {
 }
 
 model Board {
-  id             String   @id @default(cuid())
+  id             String   @id @default(uuid(7))
   workspaceId    String
   name           String
   repositoryName String? // E.g., "owner/repo" from GitHub
@@ -177,7 +177,7 @@ model Board {
 }
 
 model BoardMember {
-  id        String   @id @default(cuid())
+  id        BigInt   @id @default(autoincrement())
   boardId   String
   userId    String
   role      Role     @default(MEMBER)
@@ -199,7 +199,7 @@ enum TaskStatus {
 }
 
 model Task {
-  id          String     @id @default(cuid())
+  id          BigInt     @id @default(autoincrement())
   boardId     String
   title       String
   description String?    @db.Text
@@ -215,7 +215,7 @@ model Task {
 }
 
 model Label {
-  id        String   @id @default(cuid())
+  id        BigInt   @id @default(autoincrement())
   boardId   String
   name      String
   color     String? // Hex color code
