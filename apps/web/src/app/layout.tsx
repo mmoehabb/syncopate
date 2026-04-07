@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     "Your board, on autopilot. Stop updating tickets. Just push code.",
 };
 
+import { CommandProvider } from "../context/CommandContext";
+import { CommandBar } from "../components/CommandBar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,7 +33,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetBrainsMono.variable} dark`}
     >
-      <body className="antialiased min-h-screen flex flex-col">{children}</body>
+      <body className="antialiased min-h-screen flex flex-col relative pb-16">
+        <CommandProvider>
+          {children}
+          <CommandBar />
+        </CommandProvider>
+      </body>
     </html>
   );
 }
