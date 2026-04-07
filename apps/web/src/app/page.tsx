@@ -10,20 +10,14 @@ export default function Home() {
           <div className="flex items-center gap-3">
             {/* Logo Mark: S-Branch Concept */}
             <div className="w-8 h-8 rounded bg-void-grey border border-white/10 flex items-center justify-center text-neon-pulse font-mono font-bold text-lg">
-              {"⑂"}
+              {'⑂'}
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight">
-              Syncopate
-            </h1>
+            <h1 className="text-xl font-bold text-white tracking-tight">Syncopate</h1>
           </div>
           <nav className="flex gap-6 font-mono text-sm">
             <span className="text-white">/board</span>
-            <span className="hover:text-white cursor-pointer transition-colors">
-              /pulls
-            </span>
-            <span className="hover:text-white cursor-pointer transition-colors">
-              /settings
-            </span>
+            <span className="hover:text-white cursor-pointer transition-colors">/pulls</span>
+            <span className="hover:text-white cursor-pointer transition-colors">/settings</span>
           </nav>
         </header>
 
@@ -61,16 +55,9 @@ export default function Home() {
             <div className="flex flex-col gap-3">
               <div className="font-mono text-xs uppercase tracking-wider text-syntax-grey mb-2 flex items-center gap-2">
                 <span>In Progress</span>
-                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">
-                  2
-                </span>
+                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">2</span>
               </div>
-              <Card
-                title="Implement Prisma Schema"
-                pr="—"
-                branch="feat/init-db"
-                status="dev"
-              />
+              <Card title="Implement Prisma Schema" pr="—" branch="feat/init-db" status="dev" />
               <Card
                 title="Design System Setup"
                 pr="#1"
@@ -83,9 +70,7 @@ export default function Home() {
             <div className="flex flex-col gap-3">
               <div className="font-mono text-xs uppercase tracking-wider text-syntax-grey mb-2 flex items-center gap-2">
                 <span>In Review</span>
-                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">
-                  1
-                </span>
+                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">1</span>
               </div>
               <Card
                 title="Authentication Service"
@@ -99,9 +84,7 @@ export default function Home() {
             <div className="flex flex-col gap-3">
               <div className="font-mono text-xs uppercase tracking-wider text-syntax-grey mb-2 flex items-center gap-2">
                 <span>Merged</span>
-                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">
-                  1
-                </span>
+                <span className="bg-void-grey px-1.5 py-0.5 rounded text-white">1</span>
               </div>
               <Card
                 title="Monorepo Initialization"
@@ -114,7 +97,7 @@ export default function Home() {
         </section>
       </main>
     </div>
-  );
+  )
 }
 
 // Mini Component for the skeleton
@@ -124,17 +107,17 @@ function Card({
   branch,
   status,
 }: {
-  title: string;
-  pr: string;
-  branch: string;
-  status: "dev" | "review" | "approved" | "merged";
+  title: string
+  pr: string
+  branch: string
+  status: 'dev' | 'review' | 'approved' | 'merged'
 }) {
   const statusConfig = {
-    dev: { color: "text-syntax-grey", label: "DEV" },
-    review: { color: "text-yellow-500", label: "REVIEW" },
-    approved: { color: "text-git-green", label: "APPROVED" },
-    merged: { color: "text-purple-500", label: "MERGED" },
-  };
+    dev: { color: 'text-syntax-grey', label: 'DEV' },
+    review: { color: 'text-yellow-500', label: 'REVIEW' },
+    approved: { color: 'text-git-green', label: 'APPROVED' },
+    merged: { color: 'text-purple-500', label: 'MERGED' },
+  }
 
   return (
     <div className="surface-panel p-4 flex flex-col gap-3 hover:border-white/20 transition-colors cursor-pointer group">
@@ -150,15 +133,9 @@ function Card({
       </div>
 
       <div className="flex items-center gap-3 font-mono text-xs text-syntax-grey">
-        {pr !== "—" && (
+        {pr !== '—' && (
           <div className="flex items-center gap-1">
-            <span
-              className={
-                status === "merged" ? "text-purple-500" : "text-git-green"
-              }
-            >
-              ⑂
-            </span>
+            <span className={status === 'merged' ? 'text-purple-500' : 'text-git-green'}>⑂</span>
             <span>{pr}</span>
           </div>
         )}
@@ -168,5 +145,5 @@ function Card({
         </div>
       </div>
     </div>
-  );
+  )
 }
