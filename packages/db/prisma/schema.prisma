@@ -55,6 +55,7 @@ model User {
   workspaceMembers WorkspaceMember[]
   boardMembers     BoardMember[]
   assignedTasks    Task[]            @relation("TaskAssignees")
+  subscriptions    Subscription[]
 }
 
 model VerificationToken {
@@ -68,6 +69,66 @@ model VerificationToken {
 // -----------------------------------------------------------------------------
 // App Models
 // -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Billing & Subscriptions
+// -----------------------------------------------------------------------------
+
+enum PriceInterval {
+  MONTH
+  YEAR
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  EXPIRED
+}
+
+model Plan {
+  id                 String   @id @default(cuid())
+  name               String // e.g., "Hobby", "Standard"
+  maxBoards          Int
+  maxMembersPerBoard Int
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  prices Price[]
+}
+
+model Price {
+  id        String        @id @default(cuid())
+  planId    String
+  amount    Int // Stored in cents (e.g., 999 = $9.99)
+  currency  String        @default("usd")
+  interval  PriceInterval
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  plan          Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String
+  priceId            String
+  status             SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  price Price @relation(fields: [priceId], references: [id])
+
+  // A user should realistically only have one active subscription at a time,
+  // but we might want to store history, so we don't unique constraint the userId alone.
+}
 
 enum Role {
   ADMIN
