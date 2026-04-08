@@ -31,6 +31,23 @@
 @layer components {
   /* Common utility for Power User terminal-like surfaces */
   .surface-panel {
-    @apply bg-void-grey border border-gray-800 rounded-md shadow-lg overflow-hidden;
+    @apply bg-void-grey border border-gray-800 rounded-md shadow-lg;
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(1000px);
+    opacity: 0;
   }
 }
