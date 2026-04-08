@@ -1,8 +1,10 @@
+import { ParticleNetwork } from "./ParticleNetwork";
+
 export default function LoginPage() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-screen p-8 bg-obsidian-night relative overflow-hidden">
+    <div className="flex-1 flex flex-col items-center justify-center h-screen w-full p-8 bg-obsidian-night relative overflow-hidden">
       {/* Dynamic Background */}
-      <GitGraphBackground />
+      <ParticleNetwork />
 
       <main className="w-full max-w-md z-10 flex flex-col gap-8 surface-panel p-8 bg-void-grey/80 backdrop-blur-md border-white/10">
         <div className="flex flex-col items-center text-center gap-4">
@@ -90,131 +92,5 @@ function ProviderButton({
       </span>
       <span>Continue with {provider}</span>
     </button>
-  );
-}
-
-function GitGraphBackground() {
-  return (
-    <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
-      {/* Base ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[500px] bg-neon-pulse/5 blur-[100px] rounded-full" />
-
-      {/* Animated Git Graph SVG */}
-      <svg
-        className="absolute w-full h-full opacity-20"
-        preserveAspectRatio="none"
-      >
-        <defs>
-          <linearGradient id="branch-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop
-              offset="0%"
-              stopColor="var(--color-neon-pulse)"
-              stopOpacity="0"
-            />
-            <stop
-              offset="50%"
-              stopColor="var(--color-neon-pulse)"
-              stopOpacity="0.8"
-            />
-            <stop
-              offset="100%"
-              stopColor="var(--color-neon-pulse)"
-              stopOpacity="0"
-            />
-          </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* Main Branch */}
-        <path
-          d="M 30% 10% L 30% 90%"
-          stroke="url(#branch-grad)"
-          strokeWidth="2"
-          strokeDasharray="4 4"
-          className="animate-pulse"
-        />
-
-        {/* Feature Branch */}
-        <path
-          d="M 30% 30% C 45% 40%, 45% 60%, 30% 70%"
-          stroke="var(--color-git-green)"
-          strokeWidth="1.5"
-          fill="none"
-          opacity="0.5"
-        />
-
-        {/* Another Feature Branch */}
-        <path
-          d="M 30% 50% C 15% 60%, 15% 75%, 30% 85%"
-          stroke="#a855f7"
-          strokeWidth="1.5"
-          fill="none"
-          opacity="0.4"
-        />
-
-        {/* Nodes */}
-        <circle
-          cx="30%"
-          cy="30%"
-          r="4"
-          fill="var(--color-obsidian-night)"
-          stroke="var(--color-neon-pulse)"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-        <circle
-          cx="30%"
-          cy="50%"
-          r="4"
-          fill="var(--color-obsidian-night)"
-          stroke="var(--color-neon-pulse)"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-        <circle
-          cx="30%"
-          cy="70%"
-          r="4"
-          fill="var(--color-obsidian-night)"
-          stroke="var(--color-neon-pulse)"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-        <circle
-          cx="30%"
-          cy="85%"
-          r="4"
-          fill="var(--color-obsidian-night)"
-          stroke="var(--color-neon-pulse)"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-
-        <circle
-          cx="41.5%"
-          cy="50%"
-          r="3.5"
-          fill="var(--color-obsidian-night)"
-          stroke="var(--color-git-green)"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-        <circle
-          cx="18.5%"
-          cy="68%"
-          r="3.5"
-          fill="var(--color-obsidian-night)"
-          stroke="#a855f7"
-          strokeWidth="2"
-          filter="url(#glow)"
-        />
-      </svg>
-    </div>
   );
 }
