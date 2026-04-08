@@ -59,7 +59,7 @@ function Hero() {
       </div>
       <p className="text-syntax-grey text-lg max-w-xl">
         Stop updating tickets. Just push code. Syncopate automatically syncs
-        your board state with repository activity to eliminate "stale ticket"
+        your board state with repository activity to eliminate &quot;stale ticket&quot;
         syndrome.
       </p>
       <div className="mt-4 flex flex-col items-center gap-2">
@@ -78,30 +78,56 @@ function Hero() {
 }
 
 function MatrixBackground() {
-  const [columns, setColumns] = useState<number[]>([]);
+  const [columns, setColumns] = useState<
+    {
+      col: number;
+      top: string;
+      animation: string;
+      animationDelay: string;
+      chars: string[];
+    }[]
+  >([]);
 
   useEffect(() => {
-    // Generate some random columns for the matrix effect
-    const colCount = Math.floor(window.innerWidth / 30);
-    setColumns(Array.from({ length: colCount }).map((_, i) => i));
+    // Generate some random columns for the matrix effect asynchronously
+    // to avoid synchronously triggering state updates inside useEffect
+    const timeoutId = setTimeout(() => {
+      const colCount = Math.floor(window.innerWidth / 30);
+      const newColumns = Array.from({ length: colCount }).map((_, i) => {
+        const chars = Array.from({ length: 20 }).map(() =>
+          String.fromCharCode(33 + Math.floor(Math.random() * 94)),
+        );
+
+        return {
+          col: i,
+          top: `-${Math.random() * 100}%`,
+          animation: `fall ${Math.random() * 5 + 5}s linear infinite`,
+          animationDelay: `-${Math.random() * 5}s`,
+          chars,
+        };
+      });
+      setColumns(newColumns);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20 z-0">
-      {columns.map((col) => (
+      {columns.map((columnData) => (
         <div
-          key={col}
+          key={columnData.col}
           className="absolute text-git-green font-mono text-sm"
           style={{
-            left: `${col * 30}px`,
-            top: `-${Math.random() * 100}%`,
-            animation: `fall ${Math.random() * 5 + 5}s linear infinite`,
-            animationDelay: `-${Math.random() * 5}s`,
+            left: `${columnData.col * 30}px`,
+            top: columnData.top,
+            animation: columnData.animation,
+            animationDelay: columnData.animationDelay,
           }}
         >
-          {Array.from({ length: 20 }).map((_, i) => (
+          {columnData.chars.map((char, i) => (
             <div key={i} className="my-1">
-              {String.fromCharCode(33 + Math.floor(Math.random() * 94))}
+              {char}
             </div>
           ))}
         </div>
@@ -142,9 +168,9 @@ function Idea() {
             <span className="text-neon-pulse">●</span> terminal
           </div>
           <div className="font-mono text-sm text-git-green space-y-2">
-            <p>{">"} git commit -m "feat: implement auth"</p>
+            <p>{">"} git commit -m &quot;feat: implement auth&quot;</p>
             <p className="text-syntax-grey">
-              [Syncopate] Card #42 moved to 'In Progress'
+              [Syncopate] Card #42 moved to &apos;In Progress&apos;
             </p>
             <p>{">"} gh pr create --fill</p>
             <p className="text-syntax-grey">
@@ -152,7 +178,7 @@ function Idea() {
             </p>
             <p>{">"} gh pr merge</p>
             <p className="text-syntax-grey">
-              [Syncopate] Card #42 moved to 'Done'
+              [Syncopate] Card #42 moved to &apos;Done&apos;
             </p>
           </div>
         </div>
