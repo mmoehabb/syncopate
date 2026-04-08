@@ -92,7 +92,7 @@ function MatrixBackground() {
     // Generate some random columns for the matrix effect asynchronously
     // to avoid synchronously triggering state updates inside useEffect
     const timeoutId = setTimeout(() => {
-      const colCount = Math.floor(window.innerWidth / 30);
+      const colCount = Math.floor(window.innerWidth / 15);
       const newColumns = Array.from({ length: colCount }).map((_, i) => {
         const chars = Array.from({ length: 20 }).map(() =>
           String.fromCharCode(33 + Math.floor(Math.random() * 94)),
@@ -119,7 +119,7 @@ function MatrixBackground() {
           key={columnData.col}
           className="absolute text-git-green font-mono text-sm"
           style={{
-            left: `${columnData.col * 30}px`,
+            left: `${columnData.col * 15}px`,
             top: columnData.top,
             animation: columnData.animation,
             animationDelay: columnData.animationDelay,
@@ -236,7 +236,7 @@ function Plans() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Free Tier */}
-        <div className="surface-panel p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
+        <div className="surface-panel overflow-hidden p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
           <h4 className="text-xl font-bold text-white mb-2">Solo</h4>
           <div className="text-3xl font-bold text-white mb-6">
             $0
@@ -268,7 +268,7 @@ function Plans() {
 
         {/* Team Tier */}
         <div className="surface-panel p-8 border border-neon-pulse/50 rounded-lg flex flex-col bg-obsidian-night relative shadow-[0_0_15px_rgba(0,245,255,0.1)]">
-          <div className="absolute top-0 right-8 -translate-y-1/2 bg-neon-pulse text-obsidian-night px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+          <div className="absolute -top-3 right-8 bg-neon-pulse text-obsidian-night px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
             Most Popular
           </div>
           <h4 className="text-xl font-bold text-white mb-2">Team</h4>
@@ -306,7 +306,7 @@ function Plans() {
         </div>
 
         {/* Enterprise Tier */}
-        <div className="surface-panel p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
+        <div className="surface-panel overflow-hidden p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
           <h4 className="text-xl font-bold text-white mb-2">Enterprise</h4>
           <div className="text-3xl font-bold text-white mb-6">
             ${enterprisePrice[duration]}
