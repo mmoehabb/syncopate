@@ -59,8 +59,8 @@ function Hero() {
       </div>
       <p className="text-syntax-grey text-lg max-w-xl">
         Stop updating tickets. Just push code. Syncopate automatically syncs
-        your board state with repository activity to eliminate &quot;stale ticket&quot;
-        syndrome.
+        your board state with repository activity to eliminate &quot;stale
+        ticket&quot; syndrome.
       </p>
       <div className="mt-4 flex flex-col items-center gap-2">
         <Link
