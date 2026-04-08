@@ -1,3 +1,5 @@
 node_modules
 dist
 .next
+pnpm-lock.yaml
+apps/*/pnpm-lock.yaml
