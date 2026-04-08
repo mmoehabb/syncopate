@@ -1,0 +1,21 @@
+
+> syncopate-monorepo@ dev /app
+> pnpm -r --parallel dev
+
+Scope: 3 of 4 workspace projects
+apps/web dev$ next dev
+packages/types dev$ tsc --watch
+packages/types dev: [2J[3J[H10:21:40 PM - Starting compilation in watch mode...
+apps/web dev: ▲ Next.js 16.2.2 (Turbopack)
+apps/web dev: - Local:         http://localhost:3000
+apps/web dev: - Network:       http://192.168.0.2:3000
+apps/web dev: ✓ Ready in 593ms
+apps/web dev: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+apps/web dev:  We detected multiple lockfiles and selected the directory of /app/pnpm-workspace.yaml as the root directory.
+apps/web dev:  To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+apps/web dev:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+apps/web dev:  Detected additional lockfiles:
+apps/web dev:    * /app/apps/web/pnpm-workspace.yaml
+packages/types dev: 10:21:41 PM - Found 0 errors. Watching for file changes.
+apps/web dev: ○ Compiling / ...
+apps/web dev:  GET / 200 in 5.7s (next.js: 5.0s, application-code: 716ms)

@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 import { CommandProvider } from "../context/CommandContext";
 import { CommandBar } from "../components/CommandBar";
+import { Cursor } from "../components/Cursor";
 
 export default function RootLayout({
   children,
@@ -34,6 +35,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetBrainsMono.variable} dark`}
     >
       <body className="antialiased min-h-screen flex flex-col relative pb-16">
+        <Cursor />
         <CommandProvider>
           {children}
           <CommandBar />
