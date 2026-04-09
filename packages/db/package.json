@@ -6,7 +6,11 @@
   "types": "./index.ts",
   "scripts": {
     "generate": "prisma generate",
-    "push": "prisma db push"
+    "push": "prisma db push",
+    "seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0"

@@ -75,8 +75,10 @@ model VerificationToken {
 // -----------------------------------------------------------------------------
 
 enum PriceInterval {
+  WEEK
   MONTH
   YEAR
+  LIFETIME
 }
 
 enum SubscriptionStatus {
@@ -87,26 +89,30 @@ enum SubscriptionStatus {
 }
 
 model Plan {
-  id                 String   @id @default(uuid(7))
-  name               String // e.g., "Hobby", "Standard"
-  maxBoards          Int
-  maxMembersPerBoard Int
-  isActive           Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                    String   @id @default(uuid(7))
+  name                  String // e.g., "Hobby", "Standard"
+  maxWorkspaces         Int
+  maxBoardsPerWorkspace Int
+  maxMembersPerBoard    Int
+  maxActiveBoards       Int
+  isTrial               Boolean  @default(false)
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   prices Price[]
 }
 
 model Price {
-  id        String        @id @default(uuid(7))
-  planId    String
-  amount    Int // Stored in cents (e.g., 999 = $9.99)
-  currency  String        @default("usd")
-  interval  PriceInterval
-  isActive  Boolean       @default(true)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id            String        @id @default(uuid(7))
+  planId        String
+  amount        Int // Stored in cents (e.g., 999 = $9.99)
+  currency      String        @default("usd")
+  interval      PriceInterval
+  intervalCount Int           @default(1)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   plan          Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
   subscriptions Subscription[]
