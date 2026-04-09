@@ -1,13 +1,11 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
-import GitLab from "next-auth/providers/gitlab";
-import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@syncopate/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [GitHub, GitLab, Google],
+  providers: [GitHub],
   pages: {
     signIn: "/login",
   },
