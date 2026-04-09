@@ -10,6 +10,7 @@
     "lint": "pnpm -r lint",
     "format": "pnpm prettier --write .",
     "check": "pnpm prettier --check .",
+    "db:push": "pnpm --filter @syncopate/db push",
     "db:generate": "pnpm --filter @syncopate/db generate",
     "db:migrate:dev": "pnpm --filter @syncopate/db migrate:dev",
     "db:migrate:deploy": "pnpm --filter @syncopate/db migrate:deploy",
