@@ -92,6 +92,7 @@ model Plan {
   maxBoards          Int
   maxMembersPerBoard Int
   isActive           Boolean  @default(true)
+  isTrial            Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
