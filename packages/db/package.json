@@ -7,7 +7,10 @@
   "scripts": {
     "generate": "prisma generate",
     "push": "prisma db push",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
