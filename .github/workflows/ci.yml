@@ -39,6 +39,8 @@ jobs:
         run: pnpm lint
 
       - name: Build
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/syncopate"
         run: pnpm build
 
       - name: Test
