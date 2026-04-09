@@ -1,15 +1,17 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { redirect } from "next/navigation";
+import { subscribeToFreePlan, getUserWorkspacesAndBoards } from "./actions";
+import { DashboardClient } from "./components/DashboardClient";
 
 export default async function DashboardPage() {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const userWithSubscriptions = await prisma.user.findUnique({
+  const userWithSubscriptions = await prisma.user.findFirst({
     where: { id: session.user.id },
     include: {
       subscriptions: {
@@ -24,69 +26,159 @@ export default async function DashboardPage() {
     userWithSubscriptions?.subscriptions &&
     userWithSubscriptions.subscriptions.length > 0;
 
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center h-screen w-full p-8 bg-obsidian-night relative overflow-hidden">
-      <main className="w-full h-full z-10 flex flex-col gap-8 surface-panel p-8 bg-void-grey/80 backdrop-blur-md border-white/10 relative">
-        <h1 className="text-3xl font-bold text-white tracking-tight">
-          Dashboard
-        </h1>
-        <p className="text-syntax-grey font-mono">
-          Welcome back, {session.user.name || session.user.email}
-        </p>
+  const workspaces = await getUserWorkspacesAndBoards(session.user.id);
 
-        {/* Dashboard Content */}
-        <div className="flex-1 border border-white/10 rounded-md p-4 mt-4 bg-obsidian-night/50">
-          <p className="text-syntax-grey font-mono text-sm opacity-50">
-            [Your workspace content here]
+  // Create the unclosable modal component to pass to the client
+  const SubscriptionModal = (
+    <div className="absolute inset-0 bg-obsidian-night/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="max-w-5xl w-full surface-panel p-8 bg-void-grey border border-neon-pulse/50 shadow-2xl rounded-md flex flex-col gap-8 max-h-[90vh] overflow-y-auto">
+        <div className="flex flex-col gap-2 text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-white tracking-tight">
+            Subscription Required
+          </h2>
+          <p className="text-syntax-grey text-sm font-mono leading-relaxed">
+            You do not have an active subscription. Please select a plan to
+            continue using Syncopate.
           </p>
         </div>
 
-        {/* Modal Overlay if no active subscription */}
-        {!hasActiveSubscription && (
-          <div className="absolute inset-0 bg-obsidian-night/90 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="max-w-md w-full surface-panel p-8 bg-void-grey border border-neon-pulse/50 shadow-2xl rounded-md flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-bold text-white">
-                  Subscription Required
-                </h2>
-                <p className="text-syntax-grey text-sm font-mono leading-relaxed">
-                  You do not have an active subscription. Please select a plan
-                  to continue using Syncopate.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <form
-                  action={async () => {
-                    "use server";
-                    // Logic to subscribe to Free plan
-                    // In a real app, this would create a subscription record
-                    console.log("Subscribing to Free Plan...");
-                  }}
-                >
-                  <button className="w-full bg-obsidian-night border border-white/10 hover:border-git-green hover:bg-white/5 transition-all rounded px-4 py-3 text-white font-mono text-sm group flex justify-between items-center">
-                    <span>Free Plan</span>
-                    <span className="text-git-green">$0 / forever</span>
-                  </button>
-                </form>
-
-                <form
-                  action={async () => {
-                    "use server";
-                    // Logic to subscribe to Trial plan
-                    console.log("Starting Trial...");
-                  }}
-                >
-                  <button className="w-full bg-obsidian-night border border-white/10 hover:border-neon-pulse hover:bg-white/5 transition-all rounded px-4 py-3 text-white font-mono text-sm group flex justify-between items-center">
-                    <span>1-Week Trial</span>
-                    <span className="text-neon-pulse">Free</span>
-                  </button>
-                </form>
-              </div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Free Plan */}
+          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative group transition-all hover:border-git-green/50">
+            <h3 className="text-xl font-bold text-white mb-2">Free</h3>
+            <div className="text-2xl text-git-green font-mono mb-6">$0</div>
+            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
+              <li className="flex items-center gap-2">
+                <span className="text-git-green">✓</span> 1 Workspace
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-git-green">✓</span> 1 Board per Workspace
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-git-green">✓</span> 1 Member per Board
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-git-green">✓</span> 1 Active Board Total
+              </li>
+            </ul>
+            <form action={subscribeToFreePlan} className="mt-auto">
+              <button className="w-full bg-void-grey border border-git-green/30 hover:border-git-green hover:bg-git-green/10 transition-all rounded py-2.5 text-white font-mono text-sm cursor-pointer">
+                Get Started
+              </button>
+            </form>
           </div>
-        )}
-      </main>
+
+          {/* Standard Plan */}
+          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
+            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
+              soon
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Standard</h3>
+            <div className="text-2xl text-white font-mono mb-6">
+              $12<span className="text-sm text-syntax-grey">/mo</span>
+            </div>
+            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 10 Workspaces
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 10 Boards/Workspace
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 20 Members/Board
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 5 Active Boards
+                Total
+              </li>
+            </ul>
+            <button
+              disabled
+              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
+            >
+              Unavailable
+            </button>
+          </div>
+
+          {/* Trial Plan */}
+          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
+            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
+              soon
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">1-Week Trial</h3>
+            <div className="text-2xl text-neon-pulse font-mono mb-6">Free</div>
+            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
+              <li className="flex items-center gap-2">
+                <span className="text-neon-pulse">✓</span> Full Standard
+                Features
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-neon-pulse">✓</span> Valid for 7 days
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-neon-pulse">✓</span> One-time use
+              </li>
+            </ul>
+            <button
+              disabled
+              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
+            >
+              Unavailable
+            </button>
+          </div>
+
+          {/* Premium Plan */}
+          <div className="flex flex-col border border-neon-pulse/20 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
+            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
+              soon
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+              Premium <span className="text-neon-pulse">★</span>
+            </h3>
+            <div className="text-2xl text-white font-mono mb-6">
+              $30<span className="text-sm text-syntax-grey">/mo</span>
+            </div>
+            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 25 Workspaces
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-syntax-grey">✓</span> 50 Boards/Workspace
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-neon-pulse">✓</span> Unlimited Members
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-neon-pulse">✓</span> Unlimited Active
+                Boards
+              </li>
+            </ul>
+            <button
+              disabled
+              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
+            >
+              Unavailable
+            </button>
+          </div>
+        </div>
+
+        <div className="text-center mt-4">
+          <a
+            href="/plans"
+            className="text-syntax-grey hover:text-white font-mono text-sm underline underline-offset-4 decoration-white/20 hover:decoration-white transition-colors"
+          >
+            View more detailed plan information &rarr;
+          </a>
+        </div>
+      </div>
     </div>
+  );
+
+  return (
+    <DashboardClient
+      workspaces={workspaces}
+      hasActiveSubscription={!!hasActiveSubscription}
+      modalComponent={SubscriptionModal}
+    />
   );
 }

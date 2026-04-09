@@ -7,6 +7,7 @@ import React, {
   useState,
   useRef,
   ReactNode,
+  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -15,12 +16,18 @@ import {
   NORMAL_ACTIONS_REGISTRY,
 } from "../lib/commands";
 
+type Pane = "sidebar" | "main";
+
 interface CommandContextType {
   mode: AppMode;
   setMode: (mode: AppMode) => void;
   outputHistory: string[];
   executeCommand: (commandStr: string) => void;
   clearHistory: () => void;
+
+  activePane: Pane;
+  paneFocus: Record<Pane, number>;
+  registerPaneItemsCount: (pane: Pane, count: number) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -29,6 +36,24 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AppMode>("normal");
   const [outputHistory, setOutputHistory] = useState<string[]>([]);
   const router = useRouter();
+
+  // Vim navigation state
+  const [activePane, setActivePane] = useState<Pane>("sidebar");
+  const [paneFocus, setPaneFocus] = useState<Record<Pane, number>>({
+    sidebar: 0,
+    main: 0,
+  });
+  const [paneItemsCount, setPaneItemsCount] = useState<Record<Pane, number>>({
+    sidebar: 0,
+    main: 0,
+  });
+
+  const registerPaneItemsCount = useCallback((pane: Pane, count: number) => {
+    setPaneItemsCount((prev) => {
+      if (prev[pane] === count) return prev;
+      return { ...prev, [pane]: count };
+    });
+  }, []);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -64,13 +89,11 @@ export function CommandProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Avoid intercepting when typing in normal input fields or textareas (unless we need to)
       const target = e.target as HTMLElement;
       const isInput =
         target.tagName === "INPUT" || target.tagName === "TEXTAREA";
 
       if (mode === "normal") {
-        // Switch to command mode
         if (e.key === "/") {
           if (!isInput) {
             e.preventDefault();
@@ -79,33 +102,63 @@ export function CommandProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        // Handle normal mode actions
         if (!isInput) {
-          // Track key buffer for multi-key commands like 'gg'
+          // Vim Pane switching
+          if (e.ctrlKey) {
+            if (e.key.toLowerCase() === "l") {
+              e.preventDefault();
+              setActivePane("main");
+              return;
+            }
+            if (e.key.toLowerCase() === "h") {
+              e.preventDefault();
+              setActivePane("sidebar");
+              return;
+            }
+          }
+
+          // Vim Navigation j / k
+          if (e.key === "j") {
+            e.preventDefault();
+            setPaneFocus((prev) => {
+              const max = Math.max(0, paneItemsCount[activePane] - 1);
+              return {
+                ...prev,
+                [activePane]: Math.min(prev[activePane] + 1, max),
+              };
+            });
+            return;
+          }
+          if (e.key === "k") {
+            e.preventDefault();
+            setPaneFocus((prev) => {
+              return {
+                ...prev,
+                [activePane]: Math.max(prev[activePane] - 1, 0),
+              };
+            });
+            return;
+          }
+
           keyBuffer.current += e.key;
 
           if (keyTimeout.current) {
             clearTimeout(keyTimeout.current);
           }
 
-          // Check for exact matches in normal actions (e.g., 'j', 'k', 'G')
           if (NORMAL_ACTIONS_REGISTRY[e.key]) {
             NORMAL_ACTIONS_REGISTRY[e.key].action();
             keyBuffer.current = "";
-          }
-          // Check for buffer matches (e.g., 'gg')
-          else if (NORMAL_ACTIONS_REGISTRY[keyBuffer.current]) {
+          } else if (NORMAL_ACTIONS_REGISTRY[keyBuffer.current]) {
             NORMAL_ACTIONS_REGISTRY[keyBuffer.current].action();
             keyBuffer.current = "";
           }
 
-          // Reset buffer after 500ms
           keyTimeout.current = setTimeout(() => {
             keyBuffer.current = "";
           }, 500);
         }
       } else if (mode === "command") {
-        // Handle exiting command mode
         if (e.key === "Escape") {
           e.preventDefault();
           setMode("normal");
@@ -118,11 +171,20 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", handleKeyDown);
       if (keyTimeout.current) clearTimeout(keyTimeout.current);
     };
-  }, [mode]);
+  }, [mode, activePane, paneItemsCount]);
 
   return (
     <CommandContext.Provider
-      value={{ mode, setMode, outputHistory, executeCommand, clearHistory }}
+      value={{
+        mode,
+        setMode,
+        outputHistory,
+        executeCommand,
+        clearHistory,
+        activePane,
+        paneFocus,
+        registerPaneItemsCount,
+      }}
     >
       {children}
     </CommandContext.Provider>
