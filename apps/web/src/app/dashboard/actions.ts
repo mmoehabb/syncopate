@@ -27,7 +27,6 @@ export async function subscribeToFreePlan() {
   await prisma.subscription.create({
     data: {
       userId: session.user.id,
-      planId: freePlan.id,
       priceId: freePlan.prices[0]?.id || "",
       status: "ACTIVE",
       currentPeriodStart: new Date(),
