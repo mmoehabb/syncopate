@@ -7,6 +7,7 @@ export interface Command {
     navigate: (path: string) => void;
     printOutput: (output: string[]) => void;
     setMode: (mode: AppMode) => void;
+    args?: string[];
   }) => void;
 }
 
@@ -44,6 +45,39 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       setMode("normal");
     },
   },
+  dashboard: {
+    name: "dashboard",
+    description: "Navigate to the dashboard view",
+    action: ({ navigate, setMode }) => {
+      navigate("/dashboard");
+      setMode("normal");
+    },
+  },
+  back: {
+    name: "back",
+    description: "Go back one page",
+    action: ({ setMode }) => {
+      window.history.back();
+      setMode("normal");
+    },
+  },
+  forward: {
+    name: "forward",
+    description: "Go forward one page",
+    action: ({ setMode }) => {
+      window.history.forward();
+      setMode("normal");
+    },
+  },
+  logout: {
+    name: "logout",
+    description: "Logout of the application",
+    action: async ({ printOutput }) => {
+      printOutput(["Logging out..."]);
+      const { signOut } = await import("next-auth/react");
+      await signOut({ callbackUrl: "/login" });
+    },
+  },
   pulls: {
     name: "pulls",
     description: "Navigate to the pull requests view",
@@ -58,6 +92,60 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     action: ({ navigate, setMode }) => {
       navigate("/settings");
       setMode("normal");
+    },
+  },
+  "add-board": {
+    name: "add-board",
+    description: "Open settings to add a new board",
+    action: ({ navigate, setMode }) => {
+      navigate("/settings");
+      setMode("normal");
+    },
+  },
+  "delete-board": {
+    name: "delete-board",
+    description:
+      "Delete a board (usage: /delete-board <workspace_name>/<board_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /delete-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const fullPath = args.join(" ");
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /delete-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import("./api/BoardApi").then(({ boardApi }) => {
+        boardApi
+          .deleteBoard(workspaceName.trim(), boardName.trim())
+          .then(() => {
+            printOutput([
+              `Successfully deleted board '${boardName}' from workspace '${workspaceName}'.`,
+            ]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to delete board.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
     },
   },
   clear: {

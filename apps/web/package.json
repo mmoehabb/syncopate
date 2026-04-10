@@ -12,6 +12,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@syncopate/db": "workspace:*",
     "@syncopate/types": "workspace:*",
+    "axios": "^1.15.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "next": "16.2.2",

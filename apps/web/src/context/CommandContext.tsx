@@ -7,6 +7,7 @@ import React, {
   useState,
   useRef,
   ReactNode,
+  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -15,12 +16,18 @@ import {
   NORMAL_ACTIONS_REGISTRY,
 } from "../lib/commands";
 
+type Pane = "sidebar" | "main";
+
 interface CommandContextType {
   mode: AppMode;
   setMode: (mode: AppMode) => void;
   outputHistory: string[];
   executeCommand: (commandStr: string) => void;
   clearHistory: () => void;
+
+  activePane: Pane;
+  paneFocus: Record<Pane, number>;
+  registerPaneItemsCount: (pane: Pane, count: number) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -30,8 +37,23 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [outputHistory, setOutputHistory] = useState<string[]>([]);
   const router = useRouter();
 
-  // Vim navigation DOM reference
-  const currentSelectedRef = useRef<HTMLElement | null>(null);
+  // Vim navigation state
+  const [activePane, setActivePane] = useState<Pane>("sidebar");
+  const [paneFocus, setPaneFocus] = useState<Record<Pane, number>>({
+    sidebar: 0,
+    main: 0,
+  });
+  const [paneItemsCount, setPaneItemsCount] = useState<Record<Pane, number>>({
+    sidebar: 0,
+    main: 0,
+  });
+
+  const registerPaneItemsCount = useCallback((pane: Pane, count: number) => {
+    setPaneItemsCount((prev) => {
+      if (prev[pane] === count) return prev;
+      return { ...prev, [pane]: count };
+    });
+  }, []);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -48,15 +70,18 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   };
 
   const executeCommand = (commandStr: string) => {
-    const cmdName = commandStr.trim().toLowerCase();
+    const parts = commandStr.trim().split(" ");
+    const cmdName = parts[0].toLowerCase();
+    const args = parts.slice(1);
 
-    printOutput([`$ /${cmdName}`]);
+    printOutput([`$ /${commandStr.trim()}`]);
 
     if (COMMAND_REGISTRY[cmdName]) {
       COMMAND_REGISTRY[cmdName].action({
         navigate: (path) => router.push(path),
         printOutput,
         setMode,
+        args,
       });
     } else {
       printOutput([
@@ -64,65 +89,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       ]);
     }
   };
-
-  // Helper to change selection
-  const setSelectedElement = (element: HTMLElement | null) => {
-    if (currentSelectedRef.current) {
-      currentSelectedRef.current.classList.remove("cmd-selected");
-    }
-    if (element) {
-      element.classList.add("cmd-selected");
-      // ensure we scroll it into view naturally
-      element.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-    currentSelectedRef.current = element;
-  };
-
-  // Setup initial selection on mount
-  useEffect(() => {
-    const initSelection = () => {
-      // Don't override if we already have one selected in the DOM
-      if (document.querySelector(".cmd-selected")) {
-        const existing = document.querySelector(".cmd-selected") as HTMLElement;
-        if (currentSelectedRef.current !== existing) {
-          currentSelectedRef.current = existing;
-        }
-        return;
-      }
-
-      const firstContainer = document.querySelector(
-        ".cmd-container",
-      ) as HTMLElement;
-      if (firstContainer) {
-        const firstSelectable = firstContainer.querySelector(
-          ".cmd-selectable",
-        ) as HTMLElement;
-        if (firstSelectable) {
-          setSelectedElement(firstSelectable);
-        }
-      }
-    };
-
-    // Run initially
-    initSelection();
-
-    // Re-run if DOM changes and we lost selection
-    const observer = new MutationObserver(() => {
-      if (
-        currentSelectedRef.current &&
-        !document.contains(currentSelectedRef.current)
-      ) {
-        // our selected element was removed from the DOM
-        initSelection();
-      } else if (!currentSelectedRef.current) {
-        initSelection();
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -140,94 +106,40 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         }
 
         if (!isInput) {
-          // Vim Pane/Container switching
+          // Vim Pane switching
           if (e.ctrlKey) {
-            if (["h", "j", "k", "l"].includes(e.key.toLowerCase())) {
+            if (e.key.toLowerCase() === "l") {
               e.preventDefault();
-              const containers = Array.from(
-                document.querySelectorAll(".cmd-container"),
-              ) as HTMLElement[];
-
-              if (containers.length === 0) return;
-
-              let currentContainerIndex = -1;
-              if (currentSelectedRef.current) {
-                const currentContainer =
-                  currentSelectedRef.current.closest(".cmd-container");
-                if (currentContainer) {
-                  currentContainerIndex = containers.indexOf(
-                    currentContainer as HTMLElement,
-                  );
-                }
-              }
-
-              let nextContainerIndex = currentContainerIndex;
-
-              if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "k") {
-                nextContainerIndex =
-                  currentContainerIndex > 0 ? currentContainerIndex - 1 : 0;
-              } else if (
-                e.key.toLowerCase() === "l" ||
-                e.key.toLowerCase() === "j"
-              ) {
-                nextContainerIndex =
-                  currentContainerIndex < containers.length - 1
-                    ? currentContainerIndex + 1
-                    : containers.length - 1;
-              }
-
-              if (
-                nextContainerIndex !== currentContainerIndex &&
-                nextContainerIndex >= 0
-              ) {
-                const nextContainer = containers[nextContainerIndex];
-                const firstSelectable = nextContainer.querySelector(
-                  ".cmd-selectable",
-                ) as HTMLElement;
-                if (firstSelectable) {
-                  setSelectedElement(firstSelectable);
-                }
-              }
+              setActivePane("main");
+              return;
+            }
+            if (e.key.toLowerCase() === "h") {
+              e.preventDefault();
+              setActivePane("sidebar");
               return;
             }
           }
 
-          // Vim Navigation inside container
-          if (["h", "j", "k", "l"].includes(e.key.toLowerCase())) {
+          // Vim Navigation j / k
+          if (e.key === "j") {
             e.preventDefault();
-
-            if (!currentSelectedRef.current) return;
-
-            const currentContainer =
-              currentSelectedRef.current.closest(".cmd-container");
-            if (!currentContainer) return;
-
-            const selectables = Array.from(
-              currentContainer.querySelectorAll(".cmd-selectable"),
-            ) as HTMLElement[];
-
-            if (selectables.length === 0) return;
-
-            const currentIndex = selectables.indexOf(
-              currentSelectedRef.current,
-            );
-            let nextIndex = currentIndex;
-
-            if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "k") {
-              nextIndex = currentIndex > 0 ? currentIndex - 1 : 0;
-            } else if (
-              e.key.toLowerCase() === "l" ||
-              e.key.toLowerCase() === "j"
-            ) {
-              nextIndex =
-                currentIndex < selectables.length - 1
-                  ? currentIndex + 1
-                  : selectables.length - 1;
-            }
-
-            if (nextIndex !== currentIndex && nextIndex >= 0) {
-              setSelectedElement(selectables[nextIndex]);
-            }
+            setPaneFocus((prev) => {
+              const max = Math.max(0, paneItemsCount[activePane] - 1);
+              return {
+                ...prev,
+                [activePane]: Math.min(prev[activePane] + 1, max),
+              };
+            });
+            return;
+          }
+          if (e.key === "k") {
+            e.preventDefault();
+            setPaneFocus((prev) => {
+              return {
+                ...prev,
+                [activePane]: Math.max(prev[activePane] - 1, 0),
+              };
+            });
             return;
           }
 
@@ -262,7 +174,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", handleKeyDown);
       if (keyTimeout.current) clearTimeout(keyTimeout.current);
     };
-  }, [mode]);
+  }, [mode, activePane, paneItemsCount]);
 
   return (
     <CommandContext.Provider
@@ -272,6 +184,9 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         outputHistory,
         executeCommand,
         clearHistory,
+        activePane,
+        paneFocus,
+        registerPaneItemsCount,
       }}
     >
       {children}

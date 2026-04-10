@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { useCommand } from "@/context/CommandContext";
+import { useEffect, useState } from "react";
+import { ChevronRight, ChevronDown, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Sidebar({ workspaces }: { workspaces: any[] }) {
+  const router = useRouter();
+  const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,14 +23,28 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
     }
   });
 
+  useEffect(() => {
+    registerPaneItemsCount("sidebar", flatItems.length);
+  }, [flatItems.length, registerPaneItemsCount]);
+
   const toggleWorkspace = (id: string) => {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const isFocused = activePane === "sidebar";
+  const focusIndex = paneFocus?.["sidebar"] ?? 0;
+
   return (
-    <div className="cmd-container w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all has-[.cmd-selected]:border-git-green has-[.cmd-selected]:shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]">
+    <div
+      className={`w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all ${
+        isFocused
+          ? "border-git-green shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]"
+          : ""
+      }`}
+    >
       <div className="p-4 border-b border-white/10 text-syntax-grey flex items-center justify-between">
         <span className="font-bold">Explorer</span>
+        {isFocused && <span className="text-git-green text-xs">focused</span>}
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {flatItems.length === 0 && (
@@ -34,27 +52,44 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
             No workspaces found
           </div>
         )}
-        {flatItems.map((item) => {
+        {flatItems.map((item, index) => {
+          const isItemFocused = isFocused && focusIndex === index;
           if (item.type === "workspace") {
             return (
-              <button
-                key={`ws-${item.id}`}
-                onClick={() => toggleWorkspace(item.id)}
-                className="cmd-selectable w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white outline-none"
-              >
-                {collapsed[item.id] ? (
-                  <ChevronRight size={14} />
-                ) : (
-                  <ChevronDown size={14} />
-                )}
-                <span className="font-bold">{item.label}</span>
-              </button>
+              <div key={`ws-${item.id}`} className="group relative">
+                <button
+                  onClick={() => toggleWorkspace(item.id)}
+                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
+                    isItemFocused
+                      ? "bg-white/10 text-white"
+                      : "text-syntax-grey"
+                  }`}
+                >
+                  {collapsed[item.id] ? (
+                    <ChevronRight size={14} />
+                  ) : (
+                    <ChevronDown size={14} />
+                  )}
+                  <span className="font-bold">{item.label}</span>
+                </button>
+                <button
+                  onClick={() => router.push("/settings")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded text-syntax-grey hover:text-white transition-all"
+                  title="Add Board"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             );
           }
           return (
             <button
               key={`b-${item.id}`}
-              className="cmd-selectable w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey border-l-2 border-transparent [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white [&.cmd-selected]:border-git-green outline-none"
+              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
+                isItemFocused
+                  ? "bg-white/10 text-white border-l-2 border-git-green"
+                  : "text-syntax-grey border-l-2 border-transparent"
+              }`}
             >
               # {item.label}
             </button>

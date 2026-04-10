@@ -55,10 +55,3 @@
     opacity: 0;
   }
 }
-
-@layer utilities {
-  .cmd-selected {
-    /* Base indicator that something is selected if specific component styles don't apply */
-    outline: none;
-  }
-}
