@@ -5,6 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { LogOut, Settings, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import Link from "next/link";
 
 export function Header() {
   const { data: session } = useSession();
@@ -46,10 +47,13 @@ export function Header() {
 
           {menuOpen && (
             <div className="absolute right-0 top-full mt-2 w-48 bg-void-grey border border-white/10 rounded-md shadow-xl py-1 font-mono text-sm">
-              <button className="w-full px-4 py-2 text-left text-syntax-grey hover:bg-white/5 hover:text-white flex items-center gap-2 transition-colors">
+              <Link
+                href={"/settings"}
+                className="w-full px-4 py-2 text-left text-syntax-grey hover:bg-white/5 hover:text-white flex items-center gap-2 transition-colors"
+              >
                 <Settings size={14} />
                 <span>Settings</span>
-              </button>
+              </Link>
               <div className="h-px bg-white/10 my-1"></div>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
