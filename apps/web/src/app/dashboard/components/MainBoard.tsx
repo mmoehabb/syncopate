@@ -1,8 +1,5 @@
 "use client";
 
-import { useCommand } from "@/context/CommandContext";
-import { useEffect } from "react";
-
 const mockTasks = [
   { id: "1", title: "Setup authentication", status: "DONE", label: "feature" },
   { id: "2", title: "Create layout shell", status: "IN_REVIEW", label: "ui" },
@@ -16,15 +13,6 @@ const mockTasks = [
 ];
 
 export function MainBoard() {
-  const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
-
-  useEffect(() => {
-    registerPaneItemsCount("main", mockTasks.length);
-  }, [registerPaneItemsCount]);
-
-  const isFocused = activePane === "main";
-  const focusIndex = paneFocus?.["main"] ?? 0;
-
   const columns = [
     { title: "TODO", status: "TODO" },
     { title: "IN PROGRESS", status: "IN_PROGRESS" },
@@ -33,16 +21,9 @@ export function MainBoard() {
   ];
 
   return (
-    <div
-      className={`flex-1 flex flex-col bg-obsidian-night transition-all ${
-        isFocused ? "shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]" : ""
-      }`}
-    >
+    <div className="cmd-container flex-1 flex flex-col bg-obsidian-night transition-all has-[.cmd-selected]:shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]">
       <div className="p-4 border-b border-white/10 flex items-center justify-between">
         <h2 className="text-white font-mono font-bold"># general</h2>
-        {isFocused && (
-          <span className="text-git-green font-mono text-xs">focused</span>
-        )}
       </div>
 
       <div className="flex-1 overflow-x-auto p-6 flex gap-6">
@@ -60,20 +41,11 @@ export function MainBoard() {
                 </span>
               </div>
               {tasks.map((task) => {
-                const globalTaskIndex = mockTasks.findIndex(
-                  (t) => t.id === task.id,
-                );
-                const isTaskFocused =
-                  isFocused && focusIndex === globalTaskIndex;
-
                 return (
                   <div
                     key={task.id}
-                    className={`surface-panel p-4 rounded-md border transition-all ${
-                      isTaskFocused
-                        ? "border-git-green bg-git-green/5 shadow-md scale-[1.02]"
-                        : "border-white/10 bg-void-grey hover:border-white/20"
-                    }`}
+                    className="cmd-selectable surface-panel p-4 rounded-md border transition-all border-white/10 bg-void-grey hover:border-white/20 [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5 [&.cmd-selected]:shadow-md [&.cmd-selected]:scale-[1.02] outline-none"
+                    tabIndex={0}
                   >
                     <div className="text-syntax-grey font-mono text-xs mb-2">
                       SYNC-{task.id}
