@@ -20,16 +20,19 @@ export async function GET() {
     if (!account?.access_token) {
       return NextResponse.json(
         { error: "No GitHub account linked" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const response = await fetch("https://api.github.com/user/repos?per_page=100&sort=updated", {
-      headers: {
-        Authorization: `Bearer ${account.access_token}`,
-        Accept: "application/vnd.github.v3+json",
+    const response = await fetch(
+      "https://api.github.com/user/repos?per_page=100&sort=updated",
+      {
+        headers: {
+          Authorization: `Bearer ${account.access_token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.statusText}`);
@@ -37,20 +40,26 @@ export async function GET() {
 
     const repos = await response.json();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedRepos = repos.map((repo: any) => ({
-      id: repo.id,
-      name: repo.full_name,
-      url: repo.html_url,
-      private: repo.private,
-    }));
+    const formattedRepos = repos.map(
+      (repo: {
+        id: number;
+        full_name: string;
+        html_url: string;
+        private: boolean;
+      }) => ({
+        id: repo.id,
+        name: repo.full_name,
+        url: repo.html_url,
+        private: repo.private,
+      }),
+    );
 
     return NextResponse.json({ repos: formattedRepos });
   } catch (error) {
     console.error("Error fetching GitHub repos:", error);
     return NextResponse.json(
       { error: "Failed to fetch repositories" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

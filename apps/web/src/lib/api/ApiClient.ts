@@ -17,25 +17,37 @@ export abstract class ApiClient {
       (error) => {
         console.error("API Error:", error.response?.data || error.message);
         return Promise.reject(error);
-      }
+      },
     );
   }
 
-  protected async get<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  protected async get<T>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.get<T>(url, config);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  protected async post<T, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.post<T>(url, data, config);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  protected async patch<T, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.patch<T>(url, data, config);
   }
 
-  protected async delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  protected async delete<T>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.delete<T>(url, config);
   }
 }

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     if (!workspaceId || !name) {
       return NextResponse.json(
         { error: "Workspace ID and Board name are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (!workspaceMember) {
       return NextResponse.json(
         { error: "Workspace not found or unauthorized" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     console.error("Error creating board:", error);
     return NextResponse.json(
       { error: "Failed to create board" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,7 +80,7 @@ export async function DELETE(req: Request) {
     if (!workspaceName || !boardName) {
       return NextResponse.json(
         { error: "Workspace name and Board name are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -99,7 +99,7 @@ export async function DELETE(req: Request) {
     if (!workspace) {
       return NextResponse.json(
         { error: "Workspace not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -112,10 +112,7 @@ export async function DELETE(req: Request) {
     });
 
     if (!board) {
-      return NextResponse.json(
-        { error: "Board not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Board not found" }, { status: 404 });
     }
 
     // Check if user is an ADMIN of the board or workspace
@@ -138,9 +135,9 @@ export async function DELETE(req: Request) {
     });
 
     if (boardMember?.role !== "ADMIN" && workspaceMember?.role !== "ADMIN") {
-       return NextResponse.json(
+      return NextResponse.json(
         { error: "Unauthorized to delete this board" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -153,7 +150,7 @@ export async function DELETE(req: Request) {
     console.error("Error deleting board:", error);
     return NextResponse.json(
       { error: "Failed to delete board" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

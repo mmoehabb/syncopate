@@ -1,10 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { redirect } from "next/navigation";
-import {
-  subscribeToFreePlan,
-  getUserWorkspacesAndBoards,
-} from "@/lib/actions/dashboard";
+import { subscribeToFreePlan, getUserWorkspacesAndBoards } from "./actions";
 import { DashboardClient } from "./components/DashboardClient";
 import { SessionProvider } from "next-auth/react";
 

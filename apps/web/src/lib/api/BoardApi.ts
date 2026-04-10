@@ -12,15 +12,15 @@ export class BoardApi extends ApiClient {
     super("/api/boards");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async createBoard(payload: CreateBoardPayload): Promise<any> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await this.post<{ board: any }>("", payload);
+  public async createBoard(payload: CreateBoardPayload): Promise<unknown> {
+    const response = await this.post<{ board: unknown }>("", payload);
     return response.data.board;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async deleteBoard(workspaceName: string, boardName: string): Promise<any> {
+  public async deleteBoard(
+    workspaceName: string,
+    boardName: string,
+  ): Promise<{ message: string }> {
     const response = await this.delete<{ message: string }>("", {
       params: {
         workspace: workspaceName,
