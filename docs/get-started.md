@@ -5,7 +5,7 @@ Welcome to the Syncopate monorepo! Follow these steps to get your local developm
 ## Prerequisites
 
 - Node.js (v20)
-- `pnpm` (v10 or later)
+- `bun` (latest stable)
 - PostgreSQL (or Docker to run it)
 
 ## Setup Instructions
@@ -15,7 +15,7 @@ Welcome to the Syncopate monorepo! Follow these steps to get your local developm
 Run the following command at the root of the project:
 
 ```bash
-pnpm install
+bun install
 ```
 
 ### 2. Environment Variables
@@ -34,13 +34,13 @@ Once your PostgreSQL database is running, you can apply the initial schema and s
 
 ```bash
 # Apply schema
-pnpm db:migrate:dev
+bun run db:migrate:dev
 
 # Or, if you need to push changes during prototyping
-pnpm db:push
+bun run db:push
 
 # Seed the database
-pnpm db:seed
+bun run db:seed
 ```
 
 ### 4. Start the Application
@@ -48,7 +48,7 @@ pnpm db:seed
 Start the frontend Next.js server locally:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the application.
