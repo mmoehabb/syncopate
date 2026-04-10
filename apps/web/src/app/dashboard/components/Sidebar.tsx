@@ -23,28 +23,14 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
     }
   });
 
-  useEffect(() => {
-    registerPaneItemsCount("sidebar", flatItems.length);
-  }, [flatItems.length, registerPaneItemsCount]);
-
   const toggleWorkspace = (id: string) => {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const isFocused = activePane === "sidebar";
-  const focusIndex = paneFocus?.["sidebar"] ?? 0;
-
   return (
-    <div
-      className={`w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all ${
-        isFocused
-          ? "border-git-green shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]"
-          : ""
-      }`}
-    >
+    <div className="cmd-container w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all has-[.cmd-selected]:border-git-green has-[.cmd-selected]:shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]">
       <div className="p-4 border-b border-white/10 text-syntax-grey flex items-center justify-between">
         <span className="font-bold">Explorer</span>
-        {isFocused && <span className="text-git-green text-xs">focused</span>}
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {flatItems.length === 0 && (
@@ -52,16 +38,13 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
             No workspaces found
           </div>
         )}
-        {flatItems.map((item, index) => {
-          const isItemFocused = isFocused && focusIndex === index;
+        {flatItems.map((item) => {
           if (item.type === "workspace") {
             return (
               <div key={`ws-${item.id}`} className="group relative">
                 <button
                   onClick={() => toggleWorkspace(item.id)}
-                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                    isItemFocused ? "bg-white/10 text-white" : "text-syntax-grey"
-                  }`}
+                  className="cmd-selectable w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white outline-none"
                 >
                   {collapsed[item.id] ? (
                     <ChevronRight size={14} />
@@ -83,11 +66,7 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
           return (
             <button
               key={`b-${item.id}`}
-              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                isItemFocused
-                  ? "bg-white/10 text-white border-l-2 border-git-green"
-                  : "text-syntax-grey border-l-2 border-transparent"
-              }`}
+              className="cmd-selectable w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey border-l-2 border-transparent [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white [&.cmd-selected]:border-git-green outline-none"
             >
               # {item.label}
             </button>
