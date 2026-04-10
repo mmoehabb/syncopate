@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "bun run --filter \"*\" dev",
+    "start": "bun run --filter \"*\" start",
     "build": "bun run --filter \"*\" generate && bun run --filter \"*\" build",
     "lint": "bun run --filter \"*\" lint",
     "format": "bun prettier --write .",

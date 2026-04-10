@@ -1,5 +1,6 @@
 import { signIn } from "@/lib/auth";
 import { ParticleNetwork } from "./ParticleNetwork";
+import { Logo } from "@/components/Logo";
 
 export default function LoginPage() {
   return (
@@ -11,7 +12,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center text-center gap-4">
           {/* Logo Mark: S-Branch Concept */}
           <div className="w-16 h-16 rounded bg-obsidian-night border border-white/10 flex items-center justify-center text-neon-pulse font-mono font-bold text-4xl mb-2">
-            {"⑂"}
+            <Logo />
           </div>
 
           <h1 className="text-2xl font-bold text-white tracking-tight">

@@ -5,7 +5,7 @@ import { prisma } from "@syncopate/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [GitHub],
+  providers: [GitHub({ issuer: "https://github.com/login/oauth" })],
   pages: {
     signIn: "/login",
   },
