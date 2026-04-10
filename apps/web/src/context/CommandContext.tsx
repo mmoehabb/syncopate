@@ -70,15 +70,18 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   };
 
   const executeCommand = (commandStr: string) => {
-    const cmdName = commandStr.trim().toLowerCase();
+    const parts = commandStr.trim().split(" ");
+    const cmdName = parts[0].toLowerCase();
+    const args = parts.slice(1);
 
-    printOutput([`$ /${cmdName}`]);
+    printOutput([`$ /${commandStr.trim()}`]);
 
     if (COMMAND_REGISTRY[cmdName]) {
       COMMAND_REGISTRY[cmdName].action({
         navigate: (path) => router.push(path),
         printOutput,
         setMode,
+        args,
       });
     } else {
       printOutput([

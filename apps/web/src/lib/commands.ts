@@ -7,6 +7,7 @@ export interface Command {
     navigate: (path: string) => void;
     printOutput: (output: string[]) => void;
     setMode: (mode: AppMode) => void;
+    args?: string[];
   }) => void;
 }
 
@@ -58,6 +59,47 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     action: ({ navigate, setMode }) => {
       navigate("/settings");
       setMode("normal");
+    },
+  },
+  "add-board": {
+    name: "add-board",
+    description: "Open settings to add a new board",
+    action: ({ navigate, setMode }) => {
+      navigate("/settings");
+      setMode("normal");
+    },
+  },
+  "delete-board": {
+    name: "delete-board",
+    description: "Delete a board (usage: /delete-board <workspace_name>/<board_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput(["Error: Missing arguments. Usage: /delete-board <workspace_name>/<board_name>"]);
+        return;
+      }
+
+      const fullPath = args.join(" ");
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput(["Error: Invalid format. Usage: /delete-board <workspace_name>/<board_name>"]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import('./api/BoardApi').then(({ boardApi }) => {
+        boardApi.deleteBoard(workspaceName.trim(), boardName.trim())
+          .then(() => {
+            printOutput([`Successfully deleted board '${boardName}' from workspace '${workspaceName}'.`]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err) => {
+            printOutput([`Error: ${err.response?.data?.error || err.message}`]);
+          });
+      });
     },
   },
   clear: {

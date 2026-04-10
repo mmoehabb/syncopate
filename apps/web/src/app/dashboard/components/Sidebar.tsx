@@ -2,10 +2,12 @@
 
 import { useCommand } from "@/context/CommandContext";
 import { useEffect, useState } from "react";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronRight, ChevronDown, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Sidebar({ workspaces }: { workspaces: any[] }) {
+  const router = useRouter();
   const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
@@ -54,20 +56,28 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
           const isItemFocused = isFocused && focusIndex === index;
           if (item.type === "workspace") {
             return (
-              <button
-                key={`ws-${item.id}`}
-                onClick={() => toggleWorkspace(item.id)}
-                className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                  isItemFocused ? "bg-white/10 text-white" : "text-syntax-grey"
-                }`}
-              >
-                {collapsed[item.id] ? (
-                  <ChevronRight size={14} />
-                ) : (
-                  <ChevronDown size={14} />
-                )}
-                <span className="font-bold">{item.label}</span>
-              </button>
+              <div key={`ws-${item.id}`} className="group relative">
+                <button
+                  onClick={() => toggleWorkspace(item.id)}
+                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
+                    isItemFocused ? "bg-white/10 text-white" : "text-syntax-grey"
+                  }`}
+                >
+                  {collapsed[item.id] ? (
+                    <ChevronRight size={14} />
+                  ) : (
+                    <ChevronDown size={14} />
+                  )}
+                  <span className="font-bold">{item.label}</span>
+                </button>
+                <button
+                  onClick={() => router.push("/settings")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded text-syntax-grey hover:text-white transition-all"
+                  title="Add Board"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             );
           }
           return (
