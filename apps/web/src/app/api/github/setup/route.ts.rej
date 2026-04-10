@@ -1,0 +1,13 @@
+--- route.ts
++++ route.ts
+@@ -52,7 +52,9 @@
+
+     const data = await validationResponse.json();
+     const userInstallations = data.installations || [];
+-    const hasAccess = userInstallations.some((inst: any) => inst.id.toString() === installationId);
++    const hasAccess = userInstallations.some(
++      (inst: { id: number | string }) => inst.id.toString() === installationId,
++    );
+
+     if (!hasAccess) {
+       return NextResponse.json(

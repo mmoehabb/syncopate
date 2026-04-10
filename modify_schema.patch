@@ -1,0 +1,9 @@
+--- packages/db/prisma/schema.prisma
++++ packages/db/prisma/schema.prisma
+@@ -149,6 +149,7 @@
+ model Workspace {
+   id        String   @id @default(uuid(7))
+   name      String
++  githubInstallationId String?
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt

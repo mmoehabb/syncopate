@@ -1,0 +1,63 @@
+--- apps/web/src/app/api/github/setup/route.ts
++++ apps/web/src/app/api/github/setup/route.ts
+@@ -20,6 +20,38 @@
+   }
+
+   try {
++    // Validate that the user actually has access to this installation_id
++    const account = await prisma.account.findFirst({
++      where: {
++        userId: session.user.id,
++        provider: "github",
++      },
++    });
++
++    if (!account?.access_token) {
++      return NextResponse.json(
++        { error: "No GitHub account linked" },
++        { status: 404 },
++      );
++    }
++
++    const validationResponse = await fetch(
++      "https://api.github.com/user/installations",
++      {
++        headers: {
++          Authorization: `Bearer ${account.access_token}`,
++          Accept: "application/vnd.github.v3+json",
++        },
++      },
++    );
++
++    if (!validationResponse.ok) {
++      throw new Error("Failed to validate installations");
++    }
++
++    const data = await validationResponse.json();
++    const userInstallations = data.installations || [];
++    const hasAccess = userInstallations.some((inst: any) => inst.id.toString() === installationId);
++
++    if (!hasAccess) {
++      return NextResponse.json(
++        { error: "Unauthorized access to this installation" },
++        { status: 403 }
++      );
++    }
++
+     // Find the user's first workspace (which should be their default workspace)
+     const userWorkspace = await prisma.workspaceMember.findFirst({
+       where: {
+@@ -34,6 +66,13 @@
+       },
+     });
+
++    if (!userWorkspace) {
++      return NextResponse.json(
++        { error: "No workspace found to attach installation" },
++        { status: 400 }
++      );
++    }
++
+     if (userWorkspace) {
+       // Save the installation ID to this workspace
+       await prisma.workspace.update({

@@ -1,0 +1,11 @@
+--- apps/web/src/lib/auth.ts
++++ apps/web/src/lib/auth.ts
+@@ -8,7 +8,7 @@
+   providers: [
+     GitHub({
+       issuer: "https://github.com/login/oauth",
+-      authorization: { params: { scope: "read:user user:email repo" } },
++      authorization: { params: { scope: "read:user user:email" } },
+     }),
+   ],
+   pages: {
