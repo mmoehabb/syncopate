@@ -143,6 +143,7 @@ enum Role {
 model Workspace {
   id        String   @id @default(uuid(7))
   name      String
+  githubInstallationId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

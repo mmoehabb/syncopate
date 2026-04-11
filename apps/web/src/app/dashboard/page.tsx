@@ -29,6 +29,27 @@ export default async function DashboardPage() {
 
   const workspaces = await getUserWorkspacesAndBoards(session.user.id);
 
+  // If the user has no workspaces at all yet, wait for the background creation
+  // rather than triggering an infinite redirect loop
+  if (workspaces.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center text-white font-mono">
+        Setting up your workspace...
+      </div>
+    );
+  }
+
+  // Check if any of the user's workspaces have a GitHub App installation
+  const hasGithubInstallation = workspaces.some(
+    (ws) => !!ws.githubInstallationId,
+  );
+
+  if (!hasGithubInstallation) {
+    const githubAppName =
+      process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate";
+    redirect(`https://github.com/apps/${githubAppName}/installations/new`);
+  }
+
   // Create the unclosable modal component to pass to the client
   const SubscriptionModal = (
     <div className="absolute inset-0 bg-obsidian-night/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">

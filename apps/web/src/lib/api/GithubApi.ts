@@ -12,8 +12,14 @@ export class GithubApi extends ApiClient {
     super("/api/github");
   }
 
-  public async getRepos(): Promise<GithubRepo[]> {
-    const response = await this.get<{ repos: GithubRepo[] }>("/repos");
+  public async getRepos(workspaceId?: string): Promise<GithubRepo[]> {
+    const params = new URLSearchParams();
+    if (workspaceId) {
+      params.append("workspaceId", workspaceId);
+    }
+    const response = await this.get<{ repos: GithubRepo[] }>(
+      `/repos?${params.toString()}`,
+    );
     return response.data.repos;
   }
 }

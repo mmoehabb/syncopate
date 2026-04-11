@@ -51,6 +51,7 @@ erDiagram
     Workspace {
         uuid id PK
         string name
+        string githubInstallationId
     }
     Board {
         uuid id PK
