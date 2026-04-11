@@ -28,6 +28,9 @@ interface CommandContextType {
   activePane: Pane;
   paneFocus: Record<Pane, number>;
   registerPaneItemsCount: (pane: Pane, count: number) => void;
+
+  selectedTaskId: string | null;
+  setSelectedTaskId: (id: string | null) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -47,6 +50,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
     sidebar: 0,
     main: 0,
   });
+
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const registerPaneItemsCount = useCallback((pane: Pane, count: number) => {
     setPaneItemsCount((prev) => {
@@ -82,6 +87,10 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         printOutput,
         setMode,
         args,
+        selectedTaskId,
+        activeBoardId: window.location.pathname.startsWith("/dashboard/b/")
+          ? window.location.pathname.split("/dashboard/b/")[1]
+          : undefined,
       });
     } else {
       printOutput([
@@ -187,6 +196,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         activePane,
         paneFocus,
         registerPaneItemsCount,
+        selectedTaskId,
+        setSelectedTaskId,
       }}
     >
       {children}
