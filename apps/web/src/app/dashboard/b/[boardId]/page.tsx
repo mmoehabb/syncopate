@@ -8,15 +8,20 @@ import { SessionProvider } from "next-auth/react";
 export default async function BoardPage({
   params,
 }: {
-  params: { boardId: string };
+  params: Promise<{ boardId: string }>;
 }) {
+  const resolvedParams = await params;
+  const boardId = resolvedParams.boardId;
+
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const { boardId } = params;
+  if (!boardId) {
+    redirect("/dashboard");
+  }
 
   // Verify access to the board
   const board = await prisma.board.findUnique({

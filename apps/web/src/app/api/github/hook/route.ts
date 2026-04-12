@@ -16,7 +16,8 @@ function verifySignature(req: NextRequest, bodyText: string) {
 
   try {
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
-  } catch (_e) {
+  } catch (e) {
+    console.error(e);
     return false;
   }
 }
