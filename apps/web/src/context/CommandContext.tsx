@@ -10,11 +10,9 @@ import React, {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import {
-  AppMode,
-  COMMAND_REGISTRY,
-  NORMAL_ACTIONS_REGISTRY,
-} from "../lib/commands";
+import { AppMode } from "../types/commands";
+import { COMMAND_REGISTRY } from "../lib/command-registry";
+import { NORMAL_ACTIONS_REGISTRY } from "../lib/normal-actions-registry";
 
 type Pane = "sidebar" | "main";
 

@@ -1,23 +1,5 @@
-export type AppMode = "normal" | "command";
-
-export interface Command {
-  name: string;
-  description: string;
-  action: (args: {
-    navigate: (path: string) => void;
-    printOutput: (output: string[]) => void;
-    setMode: (mode: AppMode) => void;
-    args?: string[];
-    selectedTaskId?: string | null;
-    activeBoardId?: string;
-  }) => void;
-}
-
-export interface NormalAction {
-  key: string;
-  description: string;
-  action: () => void;
-}
+import { Command } from "../types/commands";
+import { NORMAL_ACTIONS_REGISTRY } from "./normal-actions-registry";
 
 export const COMMAND_REGISTRY: Record<string, Command> = {
   help: {
@@ -266,37 +248,6 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
             printOutput([`Error: ${errorMessage}`]);
           });
       });
-    },
-  },
-};
-
-export const NORMAL_ACTIONS_REGISTRY: Record<string, NormalAction> = {
-  j: {
-    key: "j",
-    description: "Scroll down",
-    action: () => {
-      window.scrollBy({ top: 100, behavior: "smooth" });
-    },
-  },
-  k: {
-    key: "k",
-    description: "Scroll up",
-    action: () => {
-      window.scrollBy({ top: -100, behavior: "smooth" });
-    },
-  },
-  gg: {
-    key: "gg",
-    description: "Go to top",
-    action: () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    },
-  },
-  G: {
-    key: "G",
-    description: "Go to bottom",
-    action: () => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     },
   },
 };
