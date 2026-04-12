@@ -8,6 +8,8 @@ export interface Command {
     printOutput: (output: string[]) => void;
     setMode: (mode: AppMode) => void;
     args?: string[];
+    selectedTaskId?: string | null;
+    activeBoardId?: string;
   }) => void;
 }
 
@@ -22,16 +24,43 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     name: "help",
     description: "List all available commands and shortcuts",
     action: ({ printOutput }) => {
+      const commands = Object.values(COMMAND_REGISTRY);
+
+      const navCommands = commands.filter((c) =>
+        [
+          "dashboard",
+          "pulls",
+          "settings",
+          "back",
+          "forward",
+          "logout",
+          "clear",
+        ].includes(c.name),
+      );
+      const boardCommands = commands.filter((c) =>
+        ["add-board", "delete-board"].includes(c.name),
+      );
+      const taskCommands = commands.filter((c) =>
+        ["add-task", "update-task", "delete-task"].includes(c.name),
+      );
+
+      const formatCmd = (cmd: Command) =>
+        `  /${cmd.name.padEnd(12)} - ${cmd.description}`;
+
       const output = [
         "--- SYNC-OS v1.0.0 ---",
-        "Available Commands:",
-        ...Object.values(COMMAND_REGISTRY).map(
-          (cmd) => `  /${cmd.name.padEnd(10)} - ${cmd.description}`,
-        ),
+        "Navigation & System:",
+        ...navCommands.map(formatCmd),
+        "",
+        "Boards:",
+        ...boardCommands.map(formatCmd),
+        "",
+        "Tasks:",
+        ...taskCommands.map(formatCmd),
         "",
         "Normal Mode Shortcuts:",
         ...Object.values(NORMAL_ACTIONS_REGISTRY).map(
-          (act) => `  ${act.key.padEnd(11)} - ${act.description}`,
+          (act) => `  ${act.key.padEnd(13)} - ${act.description}`,
         ),
       ];
       printOutput(output);
@@ -153,6 +182,90 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     description: "Clear terminal output",
     action: ({ printOutput }) => {
       printOutput([]); // A special case, we'll handle this in the context to clear history
+    },
+  },
+  "add-task": {
+    name: "add-task",
+    description:
+      "Add a new task to the current board (usage: /add-task <title>)",
+    action: ({ args, printOutput, activeBoardId, setMode }) => {
+      if (!activeBoardId) {
+        printOutput(["Error: You must be on a board to add a task."]);
+        return;
+      }
+      if (!args || args.length === 0) {
+        printOutput(["Error: Missing task title. Usage: /add-task <title>"]);
+        return;
+      }
+      const title = args.join(" ");
+      import("./actions/tasks").then(({ addTask }) => {
+        addTask(activeBoardId, title)
+          .then(() => {
+            printOutput([`Successfully added task: '${title}'`]);
+            setMode("normal");
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as Error).message || "Failed to add task.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "update-task": {
+    name: "update-task",
+    description:
+      "Update the selected task's status (usage: /update-task <status>)",
+    action: ({ args, printOutput, selectedTaskId, setMode }) => {
+      if (!selectedTaskId) {
+        printOutput([
+          "Error: No task selected. Navigate to a task first using j/k.",
+        ]);
+        return;
+      }
+      if (!args || args.length === 0) {
+        printOutput(["Error: Missing status. Usage: /update-task <status>"]);
+        return;
+      }
+      const status = args[0].toUpperCase();
+      import("./actions/tasks").then(({ updateTaskStatus }) => {
+        updateTaskStatus(selectedTaskId, status)
+          .then(() => {
+            printOutput([
+              `Successfully updated task SYNC-${selectedTaskId} to ${status}`,
+            ]);
+            setMode("normal");
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as Error).message || "Failed to update task status.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "delete-task": {
+    name: "delete-task",
+    description: "Delete the selected task",
+    action: ({ printOutput, selectedTaskId, setMode }) => {
+      if (!selectedTaskId) {
+        printOutput([
+          "Error: No task selected. Navigate to a task first using j/k.",
+        ]);
+        return;
+      }
+      import("./actions/tasks").then(({ deleteTask }) => {
+        deleteTask(selectedTaskId)
+          .then(() => {
+            printOutput([`Successfully deleted task SYNC-${selectedTaskId}`]);
+            setMode("normal");
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as Error).message || "Failed to delete task.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
     },
   },
 };

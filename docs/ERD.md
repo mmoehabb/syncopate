@@ -90,7 +90,7 @@ erDiagram
         uuid boardId FK
         string title
         string description
-        TaskStatus status
+        TaskStatus status "TODO | IN_PROGRESS | IN_REVIEW | CHANGES_REQUESTED | DONE | CLOSED"
         int prNumber
         string branchName
     }

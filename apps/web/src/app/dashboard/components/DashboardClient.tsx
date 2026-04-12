@@ -10,11 +10,14 @@ export function DashboardClient({
   workspaces,
   hasActiveSubscription,
   modalComponent,
+  board,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   workspaces: any[];
   hasActiveSubscription: boolean;
   modalComponent: ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  board?: any;
 }) {
   return (
     <CommandProvider>
@@ -22,8 +25,8 @@ export function DashboardClient({
         <Header />
 
         <div className="flex-1 flex overflow-hidden relative">
-          <Sidebar workspaces={workspaces} />
-          <MainBoard />
+          <Sidebar workspaces={workspaces} activeBoardId={board?.id} />
+          <MainBoard board={board} />
           {!hasActiveSubscription && modalComponent}
         </div>
       </div>

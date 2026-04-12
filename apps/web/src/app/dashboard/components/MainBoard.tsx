@@ -1,98 +1,180 @@
 "use client";
 
 import { useCommand } from "@/context/CommandContext";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { TaskDetailsPanel } from "./TaskDetailsPanel";
 
-const mockTasks = [
-  { id: "1", title: "Setup authentication", status: "DONE", label: "feature" },
-  { id: "2", title: "Create layout shell", status: "IN_REVIEW", label: "ui" },
-  {
-    id: "3",
-    title: "Implement vim keybindings",
-    status: "IN_PROGRESS",
-    label: "core",
-  },
-  { id: "4", title: "Add Postgres connection", status: "TODO", label: "db" },
-];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function MainBoard({ board }: { board?: any }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const taskIdParam = searchParams.get("taskId");
 
-export function MainBoard() {
-  const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
+  const { activePane, paneFocus, registerPaneItemsCount, setSelectedTaskId } =
+    useCommand();
+
+  const tasks = useMemo(() => {
+    if (!board?.tasks) return [];
+
+    // Sort tasks by status to match the visual grouping
+    const statusOrder: Record<string, number> = {
+      TODO: 0,
+      IN_PROGRESS: 1,
+      IN_REVIEW: 2,
+      CHANGES_REQUESTED: 3,
+      DONE: 4,
+      CLOSED: 5,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return [...board.tasks].sort((a: any, b: any) => {
+      const orderA = statusOrder[a.status] ?? 99;
+      const orderB = statusOrder[b.status] ?? 99;
+      if (orderA !== orderB) return orderA - orderB;
+      // Secondary sort by updatedAt desc
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  }, [board]);
+
+  const selectedTask = useMemo(() => {
+    if (!taskIdParam) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return tasks.find((t: any) => t.id.toString() === taskIdParam) || null;
+  }, [taskIdParam, tasks]);
 
   useEffect(() => {
-    registerPaneItemsCount("main", mockTasks.length);
-  }, [registerPaneItemsCount]);
+    registerPaneItemsCount("main", tasks.length);
+  }, [registerPaneItemsCount, tasks.length]);
 
   const isFocused = activePane === "main";
   const focusIndex = paneFocus?.["main"] ?? 0;
 
-  const columns = [
-    { title: "TODO", status: "TODO" },
-    { title: "IN PROGRESS", status: "IN_PROGRESS" },
-    { title: "IN REVIEW", status: "IN_REVIEW" },
-    { title: "DONE", status: "DONE" },
+  useEffect(() => {
+    if (tasks.length > 0 && isFocused) {
+      const task = tasks[focusIndex];
+      if (task) {
+        setSelectedTaskId(task.id.toString());
+      }
+    }
+  }, [focusIndex, isFocused, tasks, setSelectedTaskId]);
+
+  const statusGroups = [
+    { title: "TODO", status: "TODO", color: "text-syntax-grey" },
+    { title: "IN PROGRESS", status: "IN_PROGRESS", color: "text-neon-pulse" },
+    { title: "IN REVIEW", status: "IN_REVIEW", color: "text-git-green" },
+    {
+      title: "CHANGES REQUESTED",
+      status: "CHANGES_REQUESTED",
+      color: "text-red-400",
+    },
+    { title: "DONE", status: "DONE", color: "text-git-green opacity-50" },
+    { title: "CLOSED", status: "CLOSED", color: "text-syntax-grey opacity-50" },
   ];
 
+  if (!board) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-obsidian-night">
+        <div className="text-syntax-grey font-mono text-sm">
+          Select a board to view tasks
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={`flex-1 flex flex-col bg-obsidian-night transition-all ${
-        isFocused ? "shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]" : ""
-      }`}
-    >
-      <div className="p-4 border-b border-white/10 flex items-center justify-between">
-        <h2 className="text-white font-mono font-bold"># general</h2>
-        {isFocused && (
-          <span className="text-git-green font-mono text-xs">focused</span>
-        )}
-      </div>
+    <div className="flex-1 flex overflow-hidden">
+      <div
+        className={`flex-1 flex flex-col bg-obsidian-night transition-all ${
+          isFocused ? "shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]" : ""
+        }`}
+      >
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-white font-mono font-bold"># {board.name}</h2>
+          {isFocused && (
+            <span className="text-git-green font-mono text-xs">focused</span>
+          )}
+        </div>
 
-      <div className="flex-1 overflow-x-auto p-6 flex gap-6">
-        {columns.map((col) => {
-          const tasks = mockTasks.filter((t) => t.status === col.status);
-          return (
-            <div
-              key={col.status}
-              className="flex-1 min-w-[280px] flex flex-col gap-3"
-            >
-              <div className="text-syntax-grey font-mono text-sm font-bold flex items-center justify-between mb-2">
-                <span>{col.title}</span>
-                <span className="bg-white/5 px-2 py-0.5 rounded">
-                  {tasks.length}
-                </span>
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+          {statusGroups.map((group) => {
+            const groupTasks = tasks.filter(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (t: any) => t.status === group.status,
+            );
+            if (groupTasks.length === 0) return null;
+
+            return (
+              <div key={group.status} className="flex flex-col gap-3">
+                <div
+                  className={`font-mono text-sm font-bold flex items-center justify-between border-b border-white/10 pb-2 ${group.color}`}
+                >
+                  <span>{group.title}</span>
+                  <span className="bg-white/5 px-2 py-0.5 rounded text-syntax-grey text-xs">
+                    {groupTasks.length}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {groupTasks.map((task: any) => {
+                    const globalTaskIndex = tasks.findIndex(
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (t: any) => t.id === task.id,
+                    );
+                    const isTaskFocused =
+                      isFocused && focusIndex === globalTaskIndex;
+
+                    return (
+                      <div
+                        key={task.id.toString()}
+                        onClick={() =>
+                          router.push(`?taskId=${task.id.toString()}`)
+                        }
+                        className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex items-center justify-between ${
+                          isTaskFocused || selectedTask?.id === task.id
+                            ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]"
+                            : "border-white/10 bg-void-grey hover:border-white/20"
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <div className="text-syntax-grey font-mono text-xs mb-1">
+                            SYNC-{task.id.toString()}{" "}
+                            {task.prNumber && `| PR #${task.prNumber}`}
+                          </div>
+                          <div
+                            className={`font-mono text-sm leading-relaxed ${task.status === "DONE" || task.status === "CLOSED" ? "text-syntax-grey line-through" : "text-white"}`}
+                          >
+                            {task.title}
+                          </div>
+                        </div>
+                        {task.branchName && (
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-full bg-neon-pulse/10 text-neon-pulse text-[10px] font-mono lowercase">
+                              {task.branchName}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              {tasks.map((task) => {
-                const globalTaskIndex = mockTasks.findIndex(
-                  (t) => t.id === task.id,
-                );
-                const isTaskFocused =
-                  isFocused && focusIndex === globalTaskIndex;
-
-                return (
-                  <div
-                    key={task.id}
-                    className={`surface-panel p-4 rounded-md border transition-all ${
-                      isTaskFocused
-                        ? "border-git-green bg-git-green/5 shadow-md scale-[1.02]"
-                        : "border-white/10 bg-void-grey hover:border-white/20"
-                    }`}
-                  >
-                    <div className="text-syntax-grey font-mono text-xs mb-2">
-                      SYNC-{task.id}
-                    </div>
-                    <div className="text-white font-mono text-sm mb-4 leading-relaxed">
-                      {task.title}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-full bg-neon-pulse/10 text-neon-pulse text-[10px] font-mono uppercase">
-                        {task.label}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            );
+          })}
+          {tasks.length === 0 && (
+            <div className="text-syntax-grey font-mono text-sm text-center py-10 italic">
+              No tasks found. Use /add-task to create one.
             </div>
-          );
-        })}
+          )}
+        </div>
       </div>
+
+      {selectedTask && (
+        <TaskDetailsPanel
+          task={selectedTask}
+          onClose={() => router.push(`/dashboard/b/${board.id}`)}
+        />
+      )}
     </div>
   );
 }

@@ -5,8 +5,14 @@ import { useEffect, useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function Sidebar({ workspaces }: { workspaces: any[] }) {
+export function Sidebar({
+  workspaces,
+  activeBoardId,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  workspaces: any[];
+  activeBoardId?: string;
+}) {
   const router = useRouter();
   const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -85,8 +91,9 @@ export function Sidebar({ workspaces }: { workspaces: any[] }) {
           return (
             <button
               key={`b-${item.id}`}
+              onClick={() => router.push(`/dashboard/b/${item.id}`)}
               className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                isItemFocused
+                isItemFocused || activeBoardId === item.id
                   ? "bg-white/10 text-white border-l-2 border-git-green"
                   : "text-syntax-grey border-l-2 border-transparent"
               }`}
