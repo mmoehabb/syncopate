@@ -14,6 +14,21 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: syncopate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,5 +55,9 @@ jobs:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/syncopate"
         run: bun run build
 
+      - name: Setup test environment
+        run: |
+          echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/syncopate_test"' > packages/db/.env.test
+
       - name: Test
-        run: bun run --if-present --filter "*" test
+        run: bun run test

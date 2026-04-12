@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@syncopate/db";
 import stringSimilarity from "string-similarity";
 import { TaskStatus } from "@prisma/client";
+import { PullRequestEvent } from "@octokit/webhooks-types";
 
 function verifySignature(req: NextRequest, bodyText: string) {
   const signature = req.headers.get("x-hub-signature-256");
@@ -15,7 +16,12 @@ function verifySignature(req: NextRequest, bodyText: string) {
   const digest = `sha256=${hmac.update(bodyText).digest("hex")}`;
 
   try {
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+    const sigBuf = Buffer.from(signature);
+    const digestBuf = Buffer.from(digest);
+    if (sigBuf.length !== digestBuf.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(sigBuf, digestBuf);
   } catch (e) {
     console.error(e);
     return false;
@@ -37,9 +43,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Ignored event type" });
     }
 
-    const action = payload.action;
-    const pr = payload.pull_request;
-    const repo = payload.repository;
+    const prEvent = payload as PullRequestEvent;
+
+    const action = prEvent.action;
+    const pr = prEvent.pull_request;
+    const repo = prEvent.repository;
 
     if (!pr || !repo) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
