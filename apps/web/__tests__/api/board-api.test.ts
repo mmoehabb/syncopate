@@ -1,26 +1,5 @@
-import { describe, it, expect, mock, beforeEach } from "bun:test";
-
-const mockAxiosInstance = {
-  post: mock(),
-  get: mock(),
-  patch: mock(),
-  delete: mock(),
-  interceptors: {
-    response: {
-      use: mock(),
-    },
-  },
-};
-
-mock.module("axios", () => {
-  return {
-    default: {
-      create: () => mockAxiosInstance,
-    },
-  };
-});
-
-// Import after mocking axios
+import { describe, it, expect, beforeEach } from "bun:test";
+import { mockAxiosInstance } from "../mocks/axios";
 import { BoardApi } from "@/lib/api/BoardApi";
 
 describe("BoardApi", () => {
