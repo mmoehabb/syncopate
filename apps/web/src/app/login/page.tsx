@@ -1,6 +1,7 @@
 import { ParticleNetwork } from "./ParticleNetwork";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "./LoginForm";
+import { AlphaBadge } from "@/components/AlphaBadge";
 
 export default function LoginPage() {
   return (
@@ -15,9 +16,12 @@ export default function LoginPage() {
             <Logo />
           </div>
 
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Syncopate
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Syncopate
+            </h1>
+            <AlphaBadge />
+          </div>
           <p className="text-syntax-grey text-sm font-mono">
             If the code moves, the card moves.
           </p>

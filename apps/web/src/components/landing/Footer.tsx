@@ -1,5 +1,6 @@
 import React from "react";
 import { Logo } from "@/components/Logo";
+import { AlphaBadge } from "@/components/AlphaBadge";
 
 export function Footer() {
   return (
@@ -7,9 +8,11 @@ export function Footer() {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <Logo className="w-6 h-6" />
-          <span className="text-syntax-grey font-mono text-sm">
-            © {new Date().getFullYear()} Syncopate. All rights reserved.
-          </span>
+          <div className="flex items-center gap-2 text-syntax-grey font-mono text-sm">
+            <span>© {new Date().getFullYear()} Syncopate.</span>
+            <AlphaBadge />
+            <span>All rights reserved.</span>
+          </div>
         </div>
         <div className="flex gap-6 font-mono text-sm text-syntax-grey">
           <a
