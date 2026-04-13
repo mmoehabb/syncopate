@@ -7,7 +7,6 @@ import React, {
   useState,
   useRef,
   ReactNode,
-  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import { AppMode } from "../types/commands";
@@ -133,7 +132,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
             e.preventDefault();
 
             // Find active container, default to first one if none is active
-            let containers = Array.from(
+            const containers = Array.from(
               document.querySelectorAll(".cmd-container"),
             );
             let activeContainer = document.querySelector(

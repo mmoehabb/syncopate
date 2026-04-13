@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -45,7 +45,7 @@ export function Sidebar({
             No workspaces found
           </div>
         )}
-        {flatItems.map((item, index) => {
+        {flatItems.map((item) => {
           if (item.type === "workspace") {
             return (
               <div key={`ws-${item.id}`} className="group relative">
