@@ -47,7 +47,11 @@ describe("BoardApi", () => {
 
       const result = await boardApi.createBoard(payload);
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledWith("", payload, undefined);
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith(
+        "",
+        payload,
+        undefined,
+      );
       expect(result).toEqual(mockBoard);
     });
 
@@ -63,7 +67,11 @@ describe("BoardApi", () => {
 
       const result = await boardApi.createBoard(payload);
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledWith("", payload, undefined);
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith(
+        "",
+        payload,
+        undefined,
+      );
       expect(result).toEqual(mockBoard);
     });
 
@@ -75,7 +83,9 @@ describe("BoardApi", () => {
       const error = new Error("Network Error");
       mockAxiosInstance.post.mockRejectedValue(error);
 
-      await expect(boardApi.createBoard(payload)).rejects.toThrow("Network Error");
+      await expect(boardApi.createBoard(payload)).rejects.toThrow(
+        "Network Error",
+      );
     });
   });
 
@@ -105,9 +115,9 @@ describe("BoardApi", () => {
       const error = new Error("Delete failed");
       mockAxiosInstance.delete.mockRejectedValue(error);
 
-      await expect(boardApi.deleteBoard(workspaceName, boardName)).rejects.toThrow(
-        "Delete failed",
-      );
+      await expect(
+        boardApi.deleteBoard(workspaceName, boardName),
+      ).rejects.toThrow("Delete failed");
     });
   });
 });
