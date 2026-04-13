@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { BoardApi as BoardApiType } from "@/lib/api/BoardApi";
 
 describe("BoardApi", () => {
-  let boardApi: any;
+  let boardApi: BoardApiType;
 
   beforeEach(async () => {
     mockAxiosInstance.post.mockClear();
