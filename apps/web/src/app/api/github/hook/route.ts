@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@syncopate/db";
 import stringSimilarity from "string-similarity";
 import { TaskStatus } from "@prisma/client";
+import { SIMILARITY_THRESHOLD } from "@/lib/constants";
 import { PullRequestEvent } from "@octokit/webhooks-types";
 
 function verifySignature(req: NextRequest, bodyText: string) {
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
         const titles = unlinkedTasks.map((t) => t.title);
         const match = stringSimilarity.findBestMatch(pr.title, titles);
 
-        if (match.bestMatch.rating >= 0.9) {
+        if (match.bestMatch.rating >= SIMILARITY_THRESHOLD) {
           const matchedTask = unlinkedTasks[match.bestMatchIndex];
           await prisma.task.update({
             where: { id: matchedTask.id },
