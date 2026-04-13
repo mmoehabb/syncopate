@@ -74,18 +74,19 @@ export async function addTask(boardId: string, title: string) {
   }
 
   // Verify user has access to this board
-  const boardMember = await prisma.boardMember.findUnique({
-    where: {
-      boardId_userId: {
-        boardId: boardId,
-        userId: session.user.id,
+  const [boardMember, board] = await Promise.all([
+    prisma.boardMember.findUnique({
+      where: {
+        boardId_userId: {
+          boardId: boardId,
+          userId: session.user.id,
+        },
       },
-    },
-  });
-
-  const board = await prisma.board.findUnique({
-    where: { id: boardId },
-  });
+    }),
+    prisma.board.findUnique({
+      where: { id: boardId },
+    }),
+  ]);
 
   if (!board) {
     throw new Error("Board not found");
