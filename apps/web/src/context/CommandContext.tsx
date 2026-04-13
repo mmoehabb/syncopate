@@ -7,14 +7,11 @@ import React, {
   useState,
   useRef,
   ReactNode,
-  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import { AppMode } from "../types/commands";
 import { COMMAND_REGISTRY } from "../lib/command-registry";
 import { NORMAL_ACTIONS_REGISTRY } from "../lib/normal-actions-registry";
-
-type Pane = "sidebar" | "main";
 
 interface CommandContextType {
   mode: AppMode;
@@ -22,10 +19,6 @@ interface CommandContextType {
   outputHistory: string[];
   executeCommand: (commandStr: string) => void;
   clearHistory: () => void;
-
-  activePane: Pane;
-  paneFocus: Record<Pane, number>;
-  registerPaneItemsCount: (pane: Pane, count: number) => void;
 
   selectedTaskId: string | null;
   setSelectedTaskId: (id: string | null) => void;
@@ -38,25 +31,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [outputHistory, setOutputHistory] = useState<string[]>([]);
   const router = useRouter();
 
-  // Vim navigation state
-  const [activePane, setActivePane] = useState<Pane>("sidebar");
-  const [paneFocus, setPaneFocus] = useState<Record<Pane, number>>({
-    sidebar: 0,
-    main: 0,
-  });
-  const [paneItemsCount, setPaneItemsCount] = useState<Record<Pane, number>>({
-    sidebar: 0,
-    main: 0,
-  });
-
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-
-  const registerPaneItemsCount = useCallback((pane: Pane, count: number) => {
-    setPaneItemsCount((prev) => {
-      if (prev[pane] === count) return prev;
-      return { ...prev, [pane]: count };
-    });
-  }, []);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -101,9 +76,16 @@ export function CommandProvider({ children }: { children: ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       const isInput =
-        target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT";
 
       if (mode === "normal") {
+        if (isInput && e.key === "Escape") {
+          target.blur();
+          return;
+        }
+
         if (e.key === "/") {
           if (!isInput) {
             e.preventDefault();
@@ -113,40 +95,143 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         }
 
         if (!isInput) {
-          // Vim Pane switching
+          // Vim Pane switching via DOM
           if (e.ctrlKey) {
-            if (e.key.toLowerCase() === "l") {
-              e.preventDefault();
-              setActivePane("main");
-              return;
-            }
-            if (e.key.toLowerCase() === "h") {
-              e.preventDefault();
-              setActivePane("sidebar");
-              return;
+            const containers = Array.from(
+              document.querySelectorAll(".cmd-container"),
+            );
+            if (containers.length > 0) {
+              const activeContainerIndex = containers.findIndex((c) =>
+                c.classList.contains("cmd-active-container"),
+              );
+
+              if (e.key.toLowerCase() === "l") {
+                e.preventDefault();
+                const nextIndex =
+                  activeContainerIndex < containers.length - 1
+                    ? activeContainerIndex + 1
+                    : 0;
+                containers.forEach((c) =>
+                  c.classList.remove("cmd-active-container"),
+                );
+                containers[nextIndex].classList.add("cmd-active-container");
+                return;
+              }
+              if (e.key.toLowerCase() === "h") {
+                e.preventDefault();
+                const prevIndex =
+                  activeContainerIndex > 0
+                    ? activeContainerIndex - 1
+                    : containers.length - 1;
+                containers.forEach((c) =>
+                  c.classList.remove("cmd-active-container"),
+                );
+                const targetContainer = containers[prevIndex] || containers[0];
+                if (targetContainer)
+                  targetContainer.classList.add("cmd-active-container");
+                return;
+              }
             }
           }
 
-          // Vim Navigation j / k
-          if (e.key === "j") {
+          // Container scrolling via Alt + j/k
+          if (
+            e.altKey &&
+            (e.key === "j" ||
+              e.key === "k" ||
+              e.code === "KeyJ" ||
+              e.code === "KeyK" ||
+              e.key === "∆" ||
+              e.key === "˚")
+          ) {
             e.preventDefault();
-            setPaneFocus((prev) => {
-              const max = Math.max(0, paneItemsCount[activePane] - 1);
-              return {
-                ...prev,
-                [activePane]: Math.min(prev[activePane] + 1, max),
-              };
-            });
+            const activeContainer = document.querySelector(
+              ".cmd-container.cmd-active-container",
+            );
+            if (activeContainer) {
+              const scrollAmount = 100;
+              const isDown =
+                e.key === "j" || e.code === "KeyJ" || e.key === "∆";
+              activeContainer.scrollBy({
+                top: isDown ? scrollAmount : -scrollAmount,
+                behavior: "smooth",
+              });
+            }
             return;
           }
-          if (e.key === "k") {
+
+          // DOM based j / k navigation
+          if (e.key === "j" || e.key === "k") {
             e.preventDefault();
-            setPaneFocus((prev) => {
-              return {
-                ...prev,
-                [activePane]: Math.max(prev[activePane] - 1, 0),
-              };
-            });
+
+            // Find active container, default to first one if none is active
+            const containers = Array.from(
+              document.querySelectorAll(".cmd-container"),
+            );
+            let activeContainer = document.querySelector(
+              ".cmd-container.cmd-active-container",
+            );
+
+            if (!activeContainer && containers.length > 0) {
+              activeContainer = containers[0];
+              activeContainer.classList.add("cmd-active-container");
+            }
+
+            if (activeContainer) {
+              const selectables = Array.from(
+                activeContainer.querySelectorAll(".cmd-selectable"),
+              );
+              if (selectables.length > 0) {
+                const selectedIndex = selectables.findIndex((s) =>
+                  s.classList.contains("cmd-selected"),
+                );
+
+                let nextIndex = 0;
+                if (e.key === "j") {
+                  nextIndex =
+                    selectedIndex < selectables.length - 1
+                      ? selectedIndex + 1
+                      : selectedIndex === -1
+                        ? 0
+                        : selectedIndex;
+                } else if (e.key === "k") {
+                  nextIndex = selectedIndex > 0 ? selectedIndex - 1 : 0;
+                }
+
+                // Remove from all in document to be safe, or just this container
+                document
+                  .querySelectorAll(".cmd-selected")
+                  .forEach((el) => el.classList.remove("cmd-selected"));
+
+                const nextSelected = selectables[nextIndex];
+                if (nextSelected) {
+                  nextSelected.classList.add("cmd-selected");
+                  nextSelected.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                  });
+                }
+              }
+            }
+            return;
+          }
+
+          if (e.key === "Enter") {
+            const selectedElement = document.querySelector(
+              ".cmd-selected",
+            ) as HTMLElement;
+            if (selectedElement) {
+              e.preventDefault();
+              if (
+                selectedElement.tagName === "INPUT" ||
+                selectedElement.tagName === "TEXTAREA" ||
+                selectedElement.tagName === "SELECT"
+              ) {
+                selectedElement.focus();
+              } else {
+                selectedElement.click();
+              }
+            }
             return;
           }
 
@@ -181,7 +266,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", handleKeyDown);
       if (keyTimeout.current) clearTimeout(keyTimeout.current);
     };
-  }, [mode, activePane, paneItemsCount]);
+  }, [mode]);
 
   return (
     <CommandContext.Provider
@@ -191,9 +276,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         outputHistory,
         executeCommand,
         clearHistory,
-        activePane,
-        paneFocus,
-        registerPaneItemsCount,
         selectedTaskId,
         setSelectedTaskId,
       }}

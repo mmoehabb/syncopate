@@ -93,7 +93,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
           <select
             value={selectedWorkspace}
             onChange={(e) => setSelectedWorkspace(e.target.value)}
-            className="w-full bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors cmd-selectable"
+            className="w-full bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5"
           >
             {workspaces.map((ws) => (
               <option key={ws.id} value={ws.id}>
@@ -112,7 +112,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
             value={boardName}
             onChange={(e) => setBoardName(e.target.value)}
             placeholder="e.g. Frontend Refactor"
-            className="w-full bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors cmd-selectable"
+            className="w-full bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5"
             required
           />
         </div>
@@ -130,7 +130,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
               <select
                 value={selectedRepo}
                 onChange={(e) => setSelectedRepo(e.target.value)}
-                className="flex-1 min-w-0 bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors truncate cmd-selectable"
+                className="flex-1 min-w-0 bg-obsidian-night border border-white/10 text-white font-mono p-2 focus:border-git-green focus:outline-none transition-colors truncate cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5"
               >
                 <option value="">-- No Repository --</option>
                 {repos.map((repo) => (
@@ -143,7 +143,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
                 href={`https://github.com/apps/${process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate"}/installations/new`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-2 bg-white/5 border border-white/10 text-white font-mono text-sm hover:bg-white/10 hover:border-git-green transition-colors whitespace-nowrap text-center sm:text-left cmd-selectable"
+                className="px-3 py-2 bg-white/5 border border-white/10 text-white font-mono text-sm hover:bg-white/10 hover:border-git-green transition-colors whitespace-nowrap text-center sm:text-left cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-white/10"
               >
                 Grant Access
               </a>
@@ -158,7 +158,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-git-green text-obsidian-night font-bold font-mono py-2 hover:bg-opacity-90 transition-opacity disabled:opacity-50 cmd-selectable"
+          className="w-full bg-git-green text-obsidian-night font-bold font-mono py-2 hover:bg-opacity-90 transition-opacity disabled:opacity-50 cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-white [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
         >
           {isSubmitting ? "Creating..." : "Create Board"}
         </button>
