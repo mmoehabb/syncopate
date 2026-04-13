@@ -11,8 +11,7 @@ export function MainBoard({ board }: { board?: any }) {
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
 
-  const { activePane, paneFocus, setSelectedTaskId } =
-    useCommand();
+  const { activePane, paneFocus, setSelectedTaskId } = useCommand();
 
   const tasks = useMemo(() => {
     if (!board?.tasks) return [];
