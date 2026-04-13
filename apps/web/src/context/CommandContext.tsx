@@ -76,9 +76,16 @@ export function CommandProvider({ children }: { children: ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       const isInput =
-        target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT";
 
       if (mode === "normal") {
+        if (isInput && e.key === "Escape") {
+          target.blur();
+          return;
+        }
+
         if (e.key === "/") {
           if (!isInput) {
             e.preventDefault();
@@ -125,6 +132,32 @@ export function CommandProvider({ children }: { children: ReactNode }) {
                 return;
               }
             }
+          }
+
+          // Container scrolling via Alt + j/k
+          if (
+            e.altKey &&
+            (e.key === "j" ||
+              e.key === "k" ||
+              e.code === "KeyJ" ||
+              e.code === "KeyK" ||
+              e.key === "∆" ||
+              e.key === "˚")
+          ) {
+            e.preventDefault();
+            const activeContainer = document.querySelector(
+              ".cmd-container.cmd-active-container",
+            );
+            if (activeContainer) {
+              const scrollAmount = 100;
+              const isDown =
+                e.key === "j" || e.code === "KeyJ" || e.key === "∆";
+              activeContainer.scrollBy({
+                top: isDown ? scrollAmount : -scrollAmount,
+                behavior: "smooth",
+              });
+            }
+            return;
           }
 
           // DOM based j / k navigation
@@ -184,10 +217,20 @@ export function CommandProvider({ children }: { children: ReactNode }) {
           }
 
           if (e.key === "Enter") {
-            const selectedElement = document.querySelector(".cmd-selected");
+            const selectedElement = document.querySelector(
+              ".cmd-selected",
+            ) as HTMLElement;
             if (selectedElement) {
               e.preventDefault();
-              (selectedElement as HTMLElement).click();
+              if (
+                selectedElement.tagName === "INPUT" ||
+                selectedElement.tagName === "TEXTAREA" ||
+                selectedElement.tagName === "SELECT"
+              ) {
+                selectedElement.focus();
+              } else {
+                selectedElement.click();
+              }
             }
             return;
           }
