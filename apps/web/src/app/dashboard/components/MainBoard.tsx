@@ -1,6 +1,5 @@
 "use client";
 
-import { useCommand } from "@/context/CommandContext";
 import { useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TaskDetailsPanel } from "./TaskDetailsPanel";
@@ -10,9 +9,6 @@ export function MainBoard({ board }: { board?: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
-
-  const { activePane, paneFocus, registerPaneItemsCount, setSelectedTaskId } =
-    useCommand();
 
   const tasks = useMemo(() => {
     if (!board?.tasks) return [];
@@ -43,22 +39,6 @@ export function MainBoard({ board }: { board?: any }) {
     return tasks.find((t: any) => t.id.toString() === taskIdParam) || null;
   }, [taskIdParam, tasks]);
 
-  useEffect(() => {
-    registerPaneItemsCount("main", tasks.length);
-  }, [registerPaneItemsCount, tasks.length]);
-
-  const isFocused = activePane === "main";
-  const focusIndex = paneFocus?.["main"] ?? 0;
-
-  useEffect(() => {
-    if (tasks.length > 0 && isFocused) {
-      const task = tasks[focusIndex];
-      if (task) {
-        setSelectedTaskId(task.id.toString());
-      }
-    }
-  }, [focusIndex, isFocused, tasks, setSelectedTaskId]);
-
   const statusGroups = [
     { title: "TODO", status: "TODO", color: "text-syntax-grey" },
     { title: "IN PROGRESS", status: "IN_PROGRESS", color: "text-neon-pulse" },
@@ -84,16 +64,12 @@ export function MainBoard({ board }: { board?: any }) {
 
   return (
     <div className="flex-1 flex overflow-hidden">
-      <div
-        className={`flex-1 flex flex-col bg-obsidian-night transition-all ${
-          isFocused ? "shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]" : ""
-        }`}
-      >
+      <div className="flex-1 flex flex-col bg-obsidian-night transition-all cmd-container">
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
           <h2 className="text-white font-mono font-bold"># {board.name}</h2>
-          {isFocused && (
-            <span className="text-git-green font-mono text-xs">focused</span>
-          )}
+          <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+            focused
+          </span>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
@@ -117,24 +93,13 @@ export function MainBoard({ board }: { board?: any }) {
                 <div className="flex flex-col gap-2">
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {groupTasks.map((task: any) => {
-                    const globalTaskIndex = tasks.findIndex(
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (t: any) => t.id === task.id,
-                    );
-                    const isTaskFocused =
-                      isFocused && focusIndex === globalTaskIndex;
-
                     return (
                       <div
                         key={task.id.toString()}
                         onClick={() =>
                           router.push(`?taskId=${task.id.toString()}`)
                         }
-                        className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex items-center justify-between ${
-                          isTaskFocused || selectedTask?.id === task.id
-                            ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]"
-                            : "border-white/10 bg-void-grey hover:border-white/20"
-                        }`}
+                        className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex items-center justify-between ${selectedTask?.id === task.id ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]" : "border-white/10 bg-void-grey hover:border-white/20"} cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5 [&.cmd-selected]:shadow-md [&.cmd-selected]:scale-[1.01]`}
                       >
                         <div className="flex flex-col">
                           <div className="text-syntax-grey font-mono text-xs mb-1">

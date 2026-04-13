@@ -1,6 +1,5 @@
 "use client";
 
-import { useCommand } from "@/context/CommandContext";
 import { useEffect, useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,6 @@ export function Sidebar({
   activeBoardId?: string;
 }) {
   const router = useRouter();
-  const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,28 +27,17 @@ export function Sidebar({
     }
   });
 
-  useEffect(() => {
-    registerPaneItemsCount("sidebar", flatItems.length);
-  }, [flatItems.length, registerPaneItemsCount]);
-
   const toggleWorkspace = (id: string) => {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const isFocused = activePane === "sidebar";
-  const focusIndex = paneFocus?.["sidebar"] ?? 0;
-
   return (
-    <div
-      className={`w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all ${
-        isFocused
-          ? "border-git-green shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]"
-          : ""
-      }`}
-    >
+    <div className="w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all cmd-container cmd-active-container">
       <div className="p-4 border-b border-white/10 text-syntax-grey flex items-center justify-between">
         <span className="font-bold">Explorer</span>
-        {isFocused && <span className="text-git-green text-xs">focused</span>}
+        <span className="text-git-green text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+          focused
+        </span>
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {flatItems.length === 0 && (
@@ -59,17 +46,12 @@ export function Sidebar({
           </div>
         )}
         {flatItems.map((item, index) => {
-          const isItemFocused = isFocused && focusIndex === index;
           if (item.type === "workspace") {
             return (
               <div key={`ws-${item.id}`} className="group relative">
                 <button
                   onClick={() => toggleWorkspace(item.id)}
-                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                    isItemFocused
-                      ? "bg-white/10 text-white"
-                      : "text-syntax-grey"
-                  }`}
+                  className="w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white cmd-selectable"
                 >
                   {collapsed[item.id] ? (
                     <ChevronRight size={14} />
@@ -92,11 +74,7 @@ export function Sidebar({
             <button
               key={`b-${item.id}`}
               onClick={() => router.push(`/dashboard/b/${item.id}`)}
-              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
-                isItemFocused || activeBoardId === item.id
-                  ? "bg-white/10 text-white border-l-2 border-git-green"
-                  : "text-syntax-grey border-l-2 border-transparent"
-              }`}
+              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${activeBoardId === item.id ? "bg-white/10 text-white border-l-2 border-git-green" : "text-syntax-grey border-l-2 border-transparent"} [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white [&.cmd-selected]:border-git-green cmd-selectable`}
             >
               # {item.label}
             </button>
