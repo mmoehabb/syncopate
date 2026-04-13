@@ -9,8 +9,7 @@ function verifySignature(req: NextRequest, bodyText: string) {
   const signature = req.headers.get("x-hub-signature-256");
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
 
-  if (!secret) return true; // Bypass if no secret configured
-  if (!signature) return false;
+  if (!secret || !signature) return false;
 
   const hmac = crypto.createHmac("sha256", secret);
   const digest = `sha256=${hmac.update(bodyText).digest("hex")}`;
