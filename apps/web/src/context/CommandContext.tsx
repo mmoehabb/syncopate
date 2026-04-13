@@ -32,6 +32,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -71,6 +72,32 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       ]);
     }
   };
+
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        setIsInputFocused(true);
+      }
+    };
+
+    const handleFocusOut = () => {
+      setIsInputFocused(false);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -281,6 +308,15 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      {isInputFocused && mode === "normal" && (
+        <div className="fixed bottom-4 left-4 z-50 bg-git-green text-obsidian-night font-mono text-xs px-3 py-2 rounded shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
+          Press{" "}
+          <kbd className="font-bold border border-obsidian-night/20 rounded px-1">
+            ESC
+          </kbd>{" "}
+          to resume navigation
+        </div>
+      )}
     </CommandContext.Provider>
   );
 }
