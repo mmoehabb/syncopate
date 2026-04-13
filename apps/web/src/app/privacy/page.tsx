@@ -43,12 +43,16 @@ export default function PrivacyPolicyPage() {
             </h2>
             <p>
               We collect information that you voluntarily provide to us when you
-              register on the application, express an interest in obtaining
-              information about us or our products and services, or otherwise
-              when you contact us. This includes information obtained through
-              third-party authentication providers such as GitHub (e.g., your
-              email address, profile picture, and username).
+              register on the application and link your third-party accounts
+              (such as GitHub or GitLab). This includes:
             </p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li>Your name, email address, and profile picture.</li>
+              <li>
+                Information related to your connected repositories, including
+                Pull Request names, descriptions, and statuses.
+              </li>
+            </ul>
           </section>
 
           <section className="space-y-4">
@@ -56,21 +60,16 @@ export default function PrivacyPolicyPage() {
               3. How We Use Your Information
             </h2>
             <p>
-              Having accurate information about you permits us to provide you
-              with a smooth, efficient, and customized experience. Specifically,
-              we may use information collected about you via the application to:
+              We use the information we collect strictly to provide and improve
+              the core functionality of the application. Specifically, we use
+              your information to:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Create and manage your account.</li>
-              <li>Authenticate your identity using third-party providers.</li>
+              <li>Create, identify, and manage your user account.</li>
               <li>
-                Deliver targeted advertising, coupons, newsletters, and other
-                information regarding our website.
-              </li>
-              <li>Email you regarding your account or order.</li>
-              <li>
-                Fulfill and manage purchases, orders, payments, and other
-                transactions related to the application.
+                Synchronize your connected repositories and update your Kanban
+                boards using the names, descriptions, and statuses of your Pull
+                Requests.
               </li>
             </ul>
           </section>
@@ -82,8 +81,8 @@ export default function PrivacyPolicyPage() {
             <p>
               We may share information we have collected about you in certain
               situations. Your information may be disclosed as follows: By Law
-              or to Protect Rights, Third-Party Service Providers, and Other
-              Third Parties.
+              or to Protect Rights, Third-Party Service Providers (such as our
+              cloud hosting provider), and Other Third Parties.
             </p>
           </section>
 
@@ -100,22 +99,6 @@ export default function PrivacyPolicyPage() {
               can be guaranteed against any interception or other type of
               misuse.
             </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-bold text-white">6. Contact Us</h2>
-            <p>
-              If you have questions or comments about this Privacy Policy,
-              please contact us at:
-            </p>
-            <div className="bg-void-grey p-4 rounded border border-white/10 text-white">
-              <a
-                href="mailto:mo.ehab.abdelsalam@gmail.com"
-                className="hover:text-neon-pulse transition-colors"
-              >
-                mo.ehab.abdelsalam@gmail.com
-              </a>
-            </div>
           </section>
         </main>
       </div>

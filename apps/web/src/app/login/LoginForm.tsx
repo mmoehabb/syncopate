@@ -52,6 +52,7 @@ export function LoginForm() {
         <ProviderButton
           provider="GitLab"
           disabled
+          comingSoon
           icon={
             <svg
               viewBox="0 0 24 24"
@@ -71,10 +72,12 @@ function ProviderButton({
   provider,
   icon,
   disabled,
+  comingSoon,
 }: {
   provider: string;
   icon: React.ReactNode;
   disabled?: boolean;
+  comingSoon?: boolean;
 }) {
   return (
     <button
@@ -90,7 +93,7 @@ function ProviderButton({
         {icon}
       </span>
       <span>
-        Continue with {provider} {disabled && "(Soon)"}
+        Continue with {provider} {comingSoon && "(Soon)"}
       </span>
     </button>
   );

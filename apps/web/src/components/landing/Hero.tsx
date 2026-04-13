@@ -22,7 +22,7 @@ export function Hero() {
 
   return (
     <section className="flex flex-col items-center text-center gap-6 py-20 z-10 relative">
-      <div className="h-24 sm:h-32 flex items-center justify-center overflow-hidden -mt-4">
+      <div className="h-24 sm:h-32 flex items-center justify-center overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.h2
             key={phraseIndex}
