@@ -16,10 +16,15 @@ export default async function SettingsPage() {
     <div className="flex-1 flex flex-col min-h-screen bg-obsidian-night text-white font-mono">
       <div className="flex flex-1 border-t border-white/10 overflow-hidden">
         {/* Left Nav */}
-        <div className="w-64 border-r border-white/10 bg-void-grey/50 p-6 flex flex-col gap-4 cmd-container">
-          <h3 className="text-syntax-grey font-bold uppercase tracking-wider text-xs">
-            Settings
-          </h3>
+        <div className="w-64 border-r border-white/10 bg-void-grey/50 p-6 flex flex-col gap-4 cmd-container relative">
+          <div className="flex items-center justify-between">
+            <h3 className="text-syntax-grey font-bold uppercase tracking-wider text-xs">
+              Settings
+            </h3>
+            <span className="text-git-green text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+              focused
+            </span>
+          </div>
           <div className="flex flex-col gap-2">
             <button className="text-left px-3 py-2 bg-white/10 border-l-2 border-git-green text-white text-sm hover:bg-white/5 transition-colors cmd-selectable">
               Add Board
@@ -29,7 +34,12 @@ export default async function SettingsPage() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8 overflow-y-auto cmd-container">
+        <div className="flex-1 p-8 overflow-y-auto cmd-container relative">
+          <div className="flex justify-end mb-4">
+            <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+              focused
+            </span>
+          </div>
           <AddBoard workspaces={workspaces} />
         </div>
       </div>
