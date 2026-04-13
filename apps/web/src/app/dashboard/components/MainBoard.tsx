@@ -54,10 +54,13 @@ export function MainBoard({ board }: { board?: any }) {
 
   if (!board) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-obsidian-night">
+      <div className="flex-1 flex items-center justify-center bg-obsidian-night transition-all cmd-container">
         <div className="text-syntax-grey font-mono text-sm">
           Select a board to view tasks
         </div>
+        <span className="absolute top-4 right-4 text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+          focused
+        </span>
       </div>
     );
   }

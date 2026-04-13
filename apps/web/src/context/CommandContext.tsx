@@ -73,6 +73,19 @@ export function CommandProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Ensure at least one container is active
+  useEffect(() => {
+    const containers = document.querySelectorAll(".cmd-container");
+    if (containers.length > 0) {
+      const hasActive = Array.from(containers).some((c) =>
+        c.classList.contains("cmd-active-container"),
+      );
+      if (!hasActive) {
+        containers[0].classList.add("cmd-active-container");
+      }
+    }
+  }); // This runs intentionally on every render to ensure the DOM is correct when navigating.
+
   useEffect(() => {
     const handleFocusIn = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
@@ -179,7 +192,19 @@ export function CommandProvider({ children }: { children: ReactNode }) {
               const scrollAmount = 100;
               const isDown =
                 e.key === "j" || e.code === "KeyJ" || e.key === "∆";
-              activeContainer.scrollBy({
+
+              // Find the scrollable element (could be the container itself, or an inner element)
+              let scrollTarget = activeContainer;
+              if (scrollTarget.scrollHeight <= scrollTarget.clientHeight) {
+                const scrollableChild = activeContainer.querySelector(
+                  ".overflow-y-auto, .overflow-auto",
+                ) as HTMLElement;
+                if (scrollableChild) {
+                  scrollTarget = scrollableChild;
+                }
+              }
+
+              scrollTarget.scrollBy({
                 top: isDown ? scrollAmount : -scrollAmount,
                 behavior: "smooth",
               });
