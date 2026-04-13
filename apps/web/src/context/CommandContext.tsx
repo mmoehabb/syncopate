@@ -7,7 +7,6 @@ import React, {
   useState,
   useRef,
   ReactNode,
-  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import { AppMode } from "../types/commands";
@@ -110,7 +109,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       currentItem.classList.add("cmd-focused");
       currentItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
-  }, [activePane, paneFocus, paneItemsCount]);
+  }, [activePane, paneFocus]);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -118,38 +117,41 @@ export function CommandProvider({ children }: { children: ReactNode }) {
 
   const clearHistory = () => setOutputHistory([]);
 
-  const printOutput = (output: string[]) => {
+  const printOutput = useCallback((output: string[]) => {
     if (output.length === 0) {
-      clearHistory();
+      setOutputHistory([]);
     } else {
       setOutputHistory((prev) => [...prev, ...output]);
     }
-  };
+  }, []);
 
-  const executeCommand = (commandStr: string) => {
-    const parts = commandStr.trim().split(" ");
-    const cmdName = parts[0].toLowerCase();
-    const args = parts.slice(1);
+  const executeCommand = useCallback(
+    (commandStr: string) => {
+      const parts = commandStr.trim().split(" ");
+      const cmdName = parts[0].toLowerCase();
+      const args = parts.slice(1);
 
-    printOutput([`$ /${commandStr.trim()}`]);
+      printOutput([`$ /${commandStr.trim()}`]);
 
-    if (COMMAND_REGISTRY[cmdName]) {
-      COMMAND_REGISTRY[cmdName].action({
-        navigate: (path) => router.push(path),
-        printOutput,
-        setMode,
-        args,
-        selectedTaskId,
-        activeBoardId: window.location.pathname.startsWith("/dashboard/b/")
-          ? window.location.pathname.split("/dashboard/b/")[1]
-          : undefined,
-      });
-    } else {
-      printOutput([
-        `Command not found: ${cmdName}. Type /help for available commands.`,
-      ]);
-    }
-  };
+      if (COMMAND_REGISTRY[cmdName]) {
+        COMMAND_REGISTRY[cmdName].action({
+          navigate: (path) => router.push(path),
+          printOutput,
+          setMode,
+          args,
+          selectedTaskId,
+          activeBoardId: window.location.pathname.startsWith("/dashboard/b/")
+            ? window.location.pathname.split("/dashboard/b/")[1]
+            : undefined,
+        });
+      } else {
+        printOutput([
+          `Command not found: ${cmdName}. Type /help for available commands.`,
+        ]);
+      }
+    },
+    [router, selectedTaskId, printOutput],
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -224,7 +226,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
                 const select = currentItem as HTMLSelectElement;
                 if ("showPicker" in select) {
                   try {
-                    select.showPicker();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (select as any).showPicker();
                   } catch (err) {
                     console.error("Failed to show picker:", err);
                     select.focus();
@@ -271,7 +274,14 @@ export function CommandProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", handleKeyDown);
       if (keyTimeout.current) clearTimeout(keyTimeout.current);
     };
-  }, [mode, activePane, paneItemsCount]);
+  }, [
+    mode,
+    activePane,
+    paneItemsCount,
+    paneFocus,
+    executeCommand,
+    selectedTaskId,
+  ]);
 
   return (
     <CommandContext.Provider

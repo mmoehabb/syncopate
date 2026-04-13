@@ -1,7 +1,7 @@
 "use client";
 
 import { useCommand } from "@/context/CommandContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
