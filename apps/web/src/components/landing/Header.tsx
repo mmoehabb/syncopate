@@ -1,15 +1,19 @@
 import React from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { AlphaBadge } from "@/components/AlphaBadge";
 
 export function Header() {
   return (
     <header className="flex justify-between items-center w-full pb-6 border-b border-white/5 pt-8 z-20 relative">
       <div className="flex items-center gap-3">
         <Logo className="w-8 h-8" />
-        <h1 className="text-xl font-bold text-white tracking-tight">
-          Syncopate
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-white tracking-tight">
+            Syncopate
+          </h1>
+          <AlphaBadge />
+        </div>
       </div>
       <nav className="flex gap-4 font-mono text-sm">
         <Link
