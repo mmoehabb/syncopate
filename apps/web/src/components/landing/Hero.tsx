@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { AlphaBadge } from "@/components/AlphaBadge";
 
 export function Hero() {
   const phrases = [
@@ -22,7 +23,10 @@ export function Hero() {
 
   return (
     <section className="flex flex-col items-center text-center gap-6 py-20 z-10 relative">
-      <div className="h-24 sm:h-32 flex items-center justify-center overflow-hidden">
+      <div className="mb-2">
+        <AlphaBadge className="px-3 py-1 text-xs" />
+      </div>
+      <div className="h-24 sm:h-32 flex items-center justify-center overflow-hidden -mt-4">
         <AnimatePresence mode="wait">
           <motion.h2
             key={phraseIndex}
