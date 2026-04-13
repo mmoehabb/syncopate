@@ -16,7 +16,10 @@ export default async function SettingsPage() {
     <div className="flex-1 flex flex-col min-h-screen bg-obsidian-night text-white font-mono">
       <div className="flex flex-1 border-t border-white/10 overflow-hidden">
         {/* Left Nav */}
-        <div className="w-64 border-r border-white/10 bg-void-grey/50 p-6 flex flex-col gap-4 cmd-container">
+        <div
+          className="w-64 border-r border-white/10 bg-void-grey/50 p-6 flex flex-col gap-4"
+          data-pane="sidebar"
+        >
           <h3 className="text-syntax-grey font-bold uppercase tracking-wider text-xs">
             Settings
           </h3>
@@ -29,7 +32,7 @@ export default async function SettingsPage() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8 overflow-y-auto cmd-container">
+        <div className="flex-1 p-8 overflow-y-auto" data-pane="main">
           <AddBoard workspaces={workspaces} />
         </div>
       </div>

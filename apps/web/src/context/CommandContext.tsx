@@ -25,7 +25,6 @@ interface CommandContextType {
 
   activePane: Pane;
   paneFocus: Record<Pane, number>;
-  registerPaneItemsCount: (pane: Pane, count: number) => void;
 
   selectedTaskId: string | null;
   setSelectedTaskId: (id: string | null) => void;
@@ -51,12 +50,67 @@ export function CommandProvider({ children }: { children: ReactNode }) {
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  const registerPaneItemsCount = useCallback((pane: Pane, count: number) => {
-    setPaneItemsCount((prev) => {
-      if (prev[pane] === count) return prev;
-      return { ...prev, [pane]: count };
+  // Automatic element discovery
+  useEffect(() => {
+    const updateCounts = () => {
+      const sidebarItems = document.querySelectorAll(
+        '[data-pane="sidebar"] .cmd-selectable',
+      ).length;
+      const mainItems = document.querySelectorAll(
+        '[data-pane="main"] .cmd-selectable',
+      ).length;
+
+      setPaneItemsCount((prev) => {
+        if (prev.sidebar === sidebarItems && prev.main === mainItems) {
+          return prev;
+        }
+        return {
+          sidebar: sidebarItems,
+          main: mainItems,
+        };
+      });
+    };
+
+    updateCounts();
+
+    const observer = new MutationObserver((mutations) => {
+      // Only update if child list changed or cmd-selectable class was toggled
+      const shouldUpdate = mutations.some(
+        (m) =>
+          m.type === "childList" ||
+          (m.type === "attributes" && m.attributeName === "class"),
+      );
+      if (shouldUpdate) {
+        updateCounts();
+      }
     });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
+
+  // Visual focus management
+  useEffect(() => {
+    // Remove all existing focus classes
+    document.querySelectorAll(".cmd-focused").forEach((el) => {
+      el.classList.remove("cmd-focused");
+    });
+
+    // Add focus class to current item
+    const selector = `[data-pane="${activePane}"] .cmd-selectable`;
+    const items = document.querySelectorAll(selector);
+    const currentItem = items[paneFocus[activePane]] as HTMLElement;
+
+    if (currentItem) {
+      currentItem.classList.add("cmd-focused");
+      currentItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [activePane, paneFocus, paneItemsCount]);
 
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
@@ -150,6 +204,42 @@ export function CommandProvider({ children }: { children: ReactNode }) {
             return;
           }
 
+          if (e.key === "Enter") {
+            const selector = `[data-pane="${activePane}"] .cmd-selectable`;
+            const items = document.querySelectorAll(selector);
+            const currentItem = items[paneFocus[activePane]] as HTMLElement;
+
+            if (currentItem) {
+              if (
+                currentItem.tagName === "INPUT" ||
+                currentItem.tagName === "TEXTAREA"
+              ) {
+                // If already focused, let Enter behave normally
+                if (document.activeElement === currentItem) {
+                  return;
+                }
+                e.preventDefault();
+                currentItem.focus();
+              } else if (currentItem.tagName === "SELECT") {
+                const select = currentItem as HTMLSelectElement;
+                if ("showPicker" in select) {
+                  try {
+                    select.showPicker();
+                  } catch (err) {
+                    console.error("Failed to show picker:", err);
+                    select.focus();
+                  }
+                } else {
+                  select.focus();
+                }
+              } else {
+                e.preventDefault();
+                currentItem.click();
+              }
+              return;
+            }
+          }
+
           keyBuffer.current += e.key;
 
           if (keyTimeout.current) {
@@ -193,7 +283,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         clearHistory,
         activePane,
         paneFocus,
-        registerPaneItemsCount,
         selectedTaskId,
         setSelectedTaskId,
       }}

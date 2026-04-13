@@ -11,7 +11,7 @@ export function MainBoard({ board }: { board?: any }) {
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
 
-  const { activePane, paneFocus, registerPaneItemsCount, setSelectedTaskId } =
+  const { activePane, paneFocus, setSelectedTaskId } =
     useCommand();
 
   const tasks = useMemo(() => {
@@ -42,10 +42,6 @@ export function MainBoard({ board }: { board?: any }) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return tasks.find((t: any) => t.id.toString() === taskIdParam) || null;
   }, [taskIdParam, tasks]);
-
-  useEffect(() => {
-    registerPaneItemsCount("main", tasks.length);
-  }, [registerPaneItemsCount, tasks.length]);
 
   const isFocused = activePane === "main";
   const focusIndex = paneFocus?.["main"] ?? 0;
@@ -83,7 +79,7 @@ export function MainBoard({ board }: { board?: any }) {
   }
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div className="flex-1 flex overflow-hidden" data-pane="main">
       <div
         className={`flex-1 flex flex-col bg-obsidian-night transition-all ${
           isFocused ? "shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]" : ""
@@ -130,7 +126,7 @@ export function MainBoard({ board }: { board?: any }) {
                         onClick={() =>
                           router.push(`?taskId=${task.id.toString()}`)
                         }
-                        className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex items-center justify-between ${
+                        className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex items-center justify-between cmd-selectable ${
                           isTaskFocused || selectedTask?.id === task.id
                             ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]"
                             : "border-white/10 bg-void-grey hover:border-white/20"

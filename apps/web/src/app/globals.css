@@ -37,6 +37,10 @@
   .surface-panel {
     @apply bg-void-grey border border-gray-800 rounded-md shadow-lg;
   }
+
+  .cmd-focused {
+    @apply border-git-green! ring-1 ring-git-green! bg-white/10! text-white! outline-none;
+  }
 }
 
 @keyframes fall {

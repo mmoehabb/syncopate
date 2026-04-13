@@ -14,7 +14,7 @@ export function Sidebar({
   activeBoardId?: string;
 }) {
   const router = useRouter();
-  const { activePane, paneFocus, registerPaneItemsCount } = useCommand();
+  const { activePane, paneFocus } = useCommand();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,10 +29,6 @@ export function Sidebar({
     }
   });
 
-  useEffect(() => {
-    registerPaneItemsCount("sidebar", flatItems.length);
-  }, [flatItems.length, registerPaneItemsCount]);
-
   const toggleWorkspace = (id: string) => {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -42,6 +38,7 @@ export function Sidebar({
 
   return (
     <div
+      data-pane="sidebar"
       className={`w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all ${
         isFocused
           ? "border-git-green shadow-[inset_0_0_10px_rgba(46,160,67,0.1)]"
@@ -65,7 +62,7 @@ export function Sidebar({
               <div key={`ws-${item.id}`} className="group relative">
                 <button
                   onClick={() => toggleWorkspace(item.id)}
-                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
+                  className={`w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 cmd-selectable ${
                     isItemFocused
                       ? "bg-white/10 text-white"
                       : "text-syntax-grey"
@@ -80,7 +77,7 @@ export function Sidebar({
                 </button>
                 <button
                   onClick={() => router.push("/settings")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded text-syntax-grey hover:text-white transition-all"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded text-syntax-grey hover:text-white transition-all cmd-selectable"
                   title="Add Board"
                 >
                   <Plus size={14} />
@@ -92,7 +89,7 @@ export function Sidebar({
             <button
               key={`b-${item.id}`}
               onClick={() => router.push(`/dashboard/b/${item.id}`)}
-              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${
+              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 cmd-selectable ${
                 isItemFocused || activeBoardId === item.id
                   ? "bg-white/10 text-white border-l-2 border-git-green"
                   : "text-syntax-grey border-l-2 border-transparent"
