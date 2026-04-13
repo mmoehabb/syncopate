@@ -5,7 +5,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { LogOut, Settings, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { AlphaBadge } from "@/components/AlphaBadge";
 import Link from "next/link";
 
 export function Header() {
@@ -16,10 +15,7 @@ export function Header() {
     <header className="h-14 border-b border-white/10 bg-obsidian-night flex items-center justify-between px-6 z-20 relative">
       <div className="flex items-center gap-2 font-mono font-bold text-white tracking-tight">
         <Logo className="w-8 h-8" />
-        <div className="flex items-center gap-2">
-          <span>SYNCOPATE</span>
-          <AlphaBadge />
-        </div>
+        <span>SYNCOPATE</span>
       </div>
 
       {session?.user && (
