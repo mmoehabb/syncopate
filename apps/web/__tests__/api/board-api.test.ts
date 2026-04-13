@@ -1,13 +1,14 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
-import { BoardApi } from "@/lib/api/BoardApi";
 
 describe("BoardApi", () => {
-  let boardApi: BoardApi;
+  let boardApi: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mockAxiosInstance.post.mockClear();
     mockAxiosInstance.delete.mockClear();
+    // Dynamically import to ensure mock is registered first
+    const { BoardApi } = await import("@/lib/api/BoardApi");
     boardApi = new BoardApi();
   });
 

@@ -7,15 +7,16 @@ export const mockAxiosInstance = {
   delete: mock(),
   interceptors: {
     response: {
-      use: mock(),
+      use: mock(() => {}),
     },
   },
 };
 
-mock.module("axios", () => {
-  return {
-    default: {
-      create: () => mockAxiosInstance,
-    },
-  };
-});
+const mockAxios = {
+  create: mock(() => mockAxiosInstance),
+};
+
+mock.module("axios", () => ({
+  ...mockAxios,
+  default: mockAxios,
+}));
