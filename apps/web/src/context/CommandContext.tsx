@@ -7,6 +7,7 @@ import React, {
   useState,
   useRef,
   ReactNode,
+  useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
 import { AppMode } from "../types/commands";
