@@ -232,9 +232,14 @@ export async function DELETE(req: Request) {
     });
 
     return NextResponse.json({ message: "Member removed successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If the record didn't exist in the first place, Prisma throws P2025
-    if (error.code === "P2025") {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
       return NextResponse.json(
         { error: "User is not a member of this board" },
         { status: 404 },
