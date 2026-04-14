@@ -319,7 +319,8 @@ export function MainBoard({ board }: { board?: any }) {
                               >
                                 {formatRelativeOrAbsoluteDate(task.createdAt)}
                               </div>
-                              {new Date(task.updatedAt).getTime() !== new Date(task.createdAt).getTime() && (
+                              {new Date(task.updatedAt).getTime() !==
+                                new Date(task.createdAt).getTime() && (
                                 <div
                                   title={`Updated: ${new Date(task.updatedAt).toLocaleString()}`}
                                   className="text-white/40"
