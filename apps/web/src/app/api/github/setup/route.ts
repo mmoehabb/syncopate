@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
+import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -13,9 +14,8 @@ export async function GET(request: Request) {
   const installationId = searchParams.get("installation_id");
 
   if (!installationId) {
-    return NextResponse.json(
-      { error: "Missing installation_id parameter" },
-      { status: 400 },
+    return apiError(
+      API_ERRORS.customBadRequest("Missing installation_id parameter"),
     );
   }
 
@@ -29,10 +29,7 @@ export async function GET(request: Request) {
     });
 
     if (!account?.access_token) {
-      return NextResponse.json(
-        { error: "No GitHub account linked" },
-        { status: 404 },
-      );
+      return apiError(API_ERRORS.custom404("No GitHub account linked"));
     }
 
     const validationResponse = await fetch(
@@ -56,9 +53,8 @@ export async function GET(request: Request) {
     );
 
     if (!hasAccess) {
-      return NextResponse.json(
-        { error: "Unauthorized access to this installation" },
-        { status: 403 },
+      return apiError(
+        API_ERRORS.customForbidden("Unauthorized access to this installation"),
       );
     }
 
@@ -98,9 +94,8 @@ export async function GET(request: Request) {
       "Error updating workspace with GitHub App installation:",
       error,
     );
-    return NextResponse.json(
-      { error: "Failed to save installation ID" },
-      { status: 500 },
+    return apiError(
+      API_ERRORS.customInternal("Failed to save installation ID"),
     );
   }
 }

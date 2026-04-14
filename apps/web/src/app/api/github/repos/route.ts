@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { App } from "@octokit/app";
+import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function GET(request: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
   const { searchParams } = new URL(request.url);
@@ -23,9 +24,8 @@ export async function GET(request: Request) {
       });
 
       if (!workspace || workspace.members.length === 0) {
-        return NextResponse.json(
-          { error: "Workspace not found or unauthorized" },
-          { status: 404 },
+        return apiError(
+          API_ERRORS.custom404("Workspace not found or unauthorized"),
         );
       }
     } else {
@@ -45,9 +45,10 @@ export async function GET(request: Request) {
     }
 
     if (!workspace?.githubInstallationId) {
-      return NextResponse.json(
-        { error: "No GitHub App installation linked to this workspace" },
-        { status: 404 },
+      return apiError(
+        API_ERRORS.custom404(
+          "No GitHub App installation linked to this workspace",
+        ),
       );
     }
 
@@ -56,10 +57,7 @@ export async function GET(request: Request) {
 
     if (!appId || !privateKey) {
       console.error("Missing GitHub App credentials in environment variables.");
-      return NextResponse.json(
-        { error: "Server misconfiguration" },
-        { status: 500 },
-      );
+      return apiError(API_ERRORS.customInternal("Server misconfiguration"));
     }
 
     const app = new App({
@@ -97,9 +95,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ repos: formattedRepos });
   } catch (error) {
     console.error("Error fetching GitHub repos:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch repositories" },
-      { status: 500 },
-    );
+    return apiError(API_ERRORS.customInternal("Failed to fetch repositories"));
   }
 }
