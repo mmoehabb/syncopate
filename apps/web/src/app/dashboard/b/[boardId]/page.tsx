@@ -29,6 +29,7 @@ export default async function BoardPage({
     include: {
       tasks: {
         orderBy: { updatedAt: "desc" },
+        include: { assignees: true, reviewers: true },
       },
     },
   });
