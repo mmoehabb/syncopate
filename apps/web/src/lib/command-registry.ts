@@ -374,6 +374,21 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       navigate(url.pathname + url.search);
       printOutput([`Searching tasks for: '${searchText}'`]);
       setMode("normal");
+    }
+  },
+  "join-voice-call": {
+    name: "join-voice-call",
+    description: "Join or start the board's voice call session",
+    action: ({ printOutput, activeBoardId, setMode, setIsVoiceCallActive }) => {
+      if (!activeBoardId) {
+        printOutput(["Error: You must be on a board to join a voice call."]);
+        return;
+      }
+      if (setIsVoiceCallActive) {
+        setIsVoiceCallActive(true);
+        printOutput(["Joining voice call session..."]);
+        setMode("normal");
+      }
     },
   },
 };

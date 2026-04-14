@@ -6,12 +6,16 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TaskDetailsPanel } from "./TaskDetailsPanel";
 import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
 import { Search } from "lucide-react";
+import { VoiceCallPanel } from "./VoiceCallPanel";
+import { useCommand } from "@/context/CommandContext";
 
 export function MainBoard({ board }: { board?: any }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
+  const { isVoiceCallActive } = useCommand();
+
   const searchQueryParam = searchParams.get("search") || "";
 
   const [searchValue, setSearchValue] = useState(searchQueryParam);
@@ -138,7 +142,7 @@ export function MainBoard({ board }: { board?: any }) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  {}
+                  { }
                   {groupTasks.map(
                     (task: {
                       id: { toString: () => string };
@@ -208,83 +212,9 @@ export function MainBoard({ board }: { board?: any }) {
                                   {/* Assignees */}
                                   {(assignees.length > 0 ||
                                     unregisteredAssignees.length > 0) && (
-                                    <div className="flex -space-x-2">
-                                      {}
-                                      {assignees.map(
-                                        (user: {
-                                          id: string;
-                                          name: string | null;
-                                          email: string | null;
-                                          image: string | null;
-                                        }) => (
-                                          <div
-                                            key={user.id}
-                                            className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                            title={`Assignee: ${user.name || user.email || "Unknown"}`}
-                                          >
-                                            {user.image ? (
-                                              // eslint-disable-next-line @next/next/no-img-element
-                                              <img
-                                                src={user.image}
-                                                alt="Avatar"
-                                                className="w-full h-full object-cover"
-                                              />
-                                            ) : (
-                                              <div className="w-full h-full bg-neon-pulse/20 text-neon-pulse flex items-center justify-center text-[10px] font-bold">
-                                                {(
-                                                  user.name ||
-                                                  user.email ||
-                                                  "?"
-                                                )
-                                                  .charAt(0)
-                                                  .toUpperCase()}
-                                              </div>
-                                            )}
-                                          </div>
-                                        ),
-                                      )}
-                                      {}
-                                      {unregisteredAssignees.map(
-                                        (
-                                          u: {
-                                            login: string;
-                                            avatar_url: string;
-                                          },
-                                          idx: number,
-                                        ) => (
-                                          <div
-                                            key={`u-a-${idx}`}
-                                            className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                            title={`Assignee: Anonymous (${u.login}) - Not registered on Syncopate`}
-                                          >
-                                            {u.avatar_url ? (
-                                              // eslint-disable-next-line @next/next/no-img-element
-                                              <img
-                                                src={u.avatar_url}
-                                                alt="Avatar"
-                                                className="w-full h-full object-cover grayscale opacity-80"
-                                              />
-                                            ) : (
-                                              <div className="w-full h-full bg-syntax-grey/20 text-syntax-grey flex items-center justify-center text-[10px] font-bold">
-                                                ?
-                                              </div>
-                                            )}
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Reviewers */}
-                                  {(reviewers.length > 0 ||
-                                    unregisteredReviewers.length > 0) && (
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-[10px] text-syntax-grey font-mono tracking-tighter">
-                                        REV:
-                                      </span>
                                       <div className="flex -space-x-2">
-                                        {}
-                                        {reviewers.map(
+                                        { }
+                                        {assignees.map(
                                           (user: {
                                             id: string;
                                             name: string | null;
@@ -294,7 +224,7 @@ export function MainBoard({ board }: { board?: any }) {
                                             <div
                                               key={user.id}
                                               className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                              title={`Reviewer: ${user.name || user.email || "Unknown"}`}
+                                              title={`Assignee: ${user.name || user.email || "Unknown"}`}
                                             >
                                               {user.image ? (
                                                 // eslint-disable-next-line @next/next/no-img-element
@@ -304,7 +234,7 @@ export function MainBoard({ board }: { board?: any }) {
                                                   className="w-full h-full object-cover"
                                                 />
                                               ) : (
-                                                <div className="w-full h-full bg-git-green/20 text-git-green flex items-center justify-center text-[10px] font-bold">
+                                                <div className="w-full h-full bg-neon-pulse/20 text-neon-pulse flex items-center justify-center text-[10px] font-bold">
                                                   {(
                                                     user.name ||
                                                     user.email ||
@@ -317,8 +247,8 @@ export function MainBoard({ board }: { board?: any }) {
                                             </div>
                                           ),
                                         )}
-                                        {}
-                                        {unregisteredReviewers.map(
+                                        { }
+                                        {unregisteredAssignees.map(
                                           (
                                             u: {
                                               login: string;
@@ -327,9 +257,9 @@ export function MainBoard({ board }: { board?: any }) {
                                             idx: number,
                                           ) => (
                                             <div
-                                              key={`u-r-${idx}`}
+                                              key={`u-a-${idx}`}
                                               className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                              title={`Reviewer: Anonymous (${u.login}) - Not registered on Syncopate`}
+                                              title={`Assignee: Anonymous (${u.login}) - Not registered on Syncopate`}
                                             >
                                               {u.avatar_url ? (
                                                 // eslint-disable-next-line @next/next/no-img-element
@@ -347,8 +277,82 @@ export function MainBoard({ board }: { board?: any }) {
                                           ),
                                         )}
                                       </div>
-                                    </div>
-                                  )}
+                                    )}
+
+                                  {/* Reviewers */}
+                                  {(reviewers.length > 0 ||
+                                    unregisteredReviewers.length > 0) && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] text-syntax-grey font-mono tracking-tighter">
+                                          REV:
+                                        </span>
+                                        <div className="flex -space-x-2">
+                                          { }
+                                          {reviewers.map(
+                                            (user: {
+                                              id: string;
+                                              name: string | null;
+                                              email: string | null;
+                                              image: string | null;
+                                            }) => (
+                                              <div
+                                                key={user.id}
+                                                className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
+                                                title={`Reviewer: ${user.name || user.email || "Unknown"}`}
+                                              >
+                                                {user.image ? (
+                                                  // eslint-disable-next-line @next/next/no-img-element
+                                                  <img
+                                                    src={user.image}
+                                                    alt="Avatar"
+                                                    className="w-full h-full object-cover"
+                                                  />
+                                                ) : (
+                                                  <div className="w-full h-full bg-git-green/20 text-git-green flex items-center justify-center text-[10px] font-bold">
+                                                    {(
+                                                      user.name ||
+                                                      user.email ||
+                                                      "?"
+                                                    )
+                                                      .charAt(0)
+                                                      .toUpperCase()}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            ),
+                                          )}
+                                          { }
+                                          {unregisteredReviewers.map(
+                                            (
+                                              u: {
+                                                login: string;
+                                                avatar_url: string;
+                                              },
+                                              idx: number,
+                                            ) => (
+                                              <div
+                                                key={`u-r-${idx}`}
+                                                className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
+                                                title={`Reviewer: Anonymous (${u.login}) - Not registered on Syncopate`}
+                                              >
+                                                {u.avatar_url ? (
+                                                  // eslint-disable-next-line @next/next/no-img-element
+                                                  <img
+                                                    src={u.avatar_url}
+                                                    alt="Avatar"
+                                                    className="w-full h-full object-cover grayscale opacity-80"
+                                                  />
+                                                ) : (
+                                                  <div className="w-full h-full bg-syntax-grey/20 text-syntax-grey flex items-center justify-center text-[10px] font-bold">
+                                                    ?
+                                                  </div>
+                                                )}
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
                                 </div>
                               )}
                             </div>
@@ -361,14 +365,14 @@ export function MainBoard({ board }: { board?: any }) {
                               </div>
                               {new Date(task.updatedAt).getTime() !==
                                 new Date(task.createdAt).getTime() && (
-                                <div
-                                  title={`Updated: ${new Date(task.updatedAt).toLocaleString()}`}
-                                  className="text-white/40"
-                                >
-                                  ✎{" "}
-                                  {formatRelativeOrAbsoluteDate(task.updatedAt)}
-                                </div>
-                              )}
+                                  <div
+                                    title={`Updated: ${new Date(task.updatedAt).toLocaleString()}`}
+                                    className="text-white/40"
+                                  >
+                                    ✎{" "}
+                                    {formatRelativeOrAbsoluteDate(task.updatedAt)}
+                                  </div>
+                                )}
                             </div>
                           </div>
                         </div>
@@ -393,6 +397,8 @@ export function MainBoard({ board }: { board?: any }) {
           onClose={() => router.push(`/dashboard/b/${board.id}`)}
         />
       )}
+
+      {isVoiceCallActive && board && <VoiceCallPanel boardId={board.id} />}
     </div>
   );
 }

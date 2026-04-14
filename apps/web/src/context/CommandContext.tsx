@@ -22,6 +22,8 @@ interface CommandContextType {
 
   selectedTaskId: string | null;
   setSelectedTaskId: (id: string | null) => void;
+  isVoiceCallActive: boolean;
+  setIsVoiceCallActive: (active: boolean) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -37,6 +39,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
   const keyTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isVoiceCallActive, setIsVoiceCallActive] = useState(false);
 
   const clearHistory = () => setOutputHistory([]);
 
@@ -65,6 +68,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         activeBoardId: window.location.pathname.startsWith("/dashboard/b/")
           ? window.location.pathname.split("/dashboard/b/")[1]
           : undefined,
+        isVoiceCallActive,
+        setIsVoiceCallActive,
       });
     } else {
       printOutput([
@@ -330,6 +335,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         clearHistory,
         selectedTaskId,
         setSelectedTaskId,
+        isVoiceCallActive,
+        setIsVoiceCallActive,
       }}
     >
       {children}
