@@ -37,7 +37,7 @@ export function MainBoard({ board }: { board?: any }) {
     if (!taskIdParam) return null;
     return (
       tasks.find(
-        (t: { status: string; [key: string]: unknown }) =>
+        (t: { id: { toString: () => string }; status: string; [key: string]: unknown }) =>
           t.id.toString() === taskIdParam,
       ) || null
     );
@@ -82,7 +82,7 @@ export function MainBoard({ board }: { board?: any }) {
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
           {statusGroups.map((group) => {
             const groupTasks = tasks.filter(
-              (t: { status: string; [key: string]: unknown }) =>
+              (t: { id: { toString: () => string }; status: string; [key: string]: unknown }) =>
                 t.status === group.status,
             );
             if (groupTasks.length === 0) return null;

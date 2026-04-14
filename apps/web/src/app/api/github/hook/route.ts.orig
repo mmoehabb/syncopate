@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     // The PR object has requested_reviewers (we can assume these are users, not teams, for our purposes right now, or filter if needed)
     // Actually, requested_reviewers can be User | Team. We'll only map those that have an 'id'.
     for (const reviewer of requestedReviewers) {
-      if (!("id" in reviewer) || !("login" in reviewer) || !("avatar_url" in reviewer)) continue; // skip teams
+      if (!("id" in reviewer)) continue; // skip teams
 
       const account = await prisma.account.findFirst({
         where: {
