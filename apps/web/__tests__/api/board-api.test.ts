@@ -70,6 +70,90 @@ describe("BoardApi", () => {
     });
   });
 
+  describe("addMember", () => {
+    it("should call POST /api/boards/members with correct payload", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const identifier = "user_123";
+      const mockMember = {
+        boardId: "board_123",
+        userId: "user_123",
+        role: "MEMBER",
+      };
+      mockAxiosInstance.post.mockResolvedValue({
+        data: { member: mockMember },
+      });
+
+      const result = await boardApi.addMember(
+        workspaceName,
+        boardName,
+        identifier,
+      );
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith(
+        "/members",
+        {
+          workspaceName,
+          boardName,
+          identifier,
+        },
+        undefined,
+      );
+      expect(result).toEqual(mockMember);
+    });
+
+    it("should propagate errors", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const identifier = "user_123";
+      const error = new Error("Network Error");
+      mockAxiosInstance.post.mockRejectedValue(error);
+
+      await expect(
+        boardApi.addMember(workspaceName, boardName, identifier),
+      ).rejects.toThrow("Network Error");
+    });
+  });
+
+  describe("removeMember", () => {
+    it("should call DELETE /api/boards/members with correct query parameters", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const identifier = "user_123";
+      const mockResponse = { message: "Member removed successfully" };
+      mockAxiosInstance.delete.mockResolvedValue({
+        data: mockResponse,
+      });
+
+      const result = await boardApi.removeMember(
+        workspaceName,
+        boardName,
+        identifier,
+      );
+
+      expect(mockAxiosInstance.delete).toHaveBeenCalledWith("/members", {
+        params: {
+          workspace: workspaceName,
+          board: boardName,
+          identifier,
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("should propagate errors", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const identifier = "user_123";
+      const error = new Error("Delete failed");
+      mockAxiosInstance.delete.mockRejectedValue(error);
+
+      await expect(
+        boardApi.removeMember(workspaceName, boardName, identifier),
+      ).rejects.toThrow("Delete failed");
+    });
+  });
+
   describe("deleteBoard", () => {
     it("should call DELETE /api/boards with correct query parameters", async () => {
       const workspaceName = "my-workspace";

@@ -20,7 +20,9 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         ].includes(c.name),
       );
       const boardCommands = commands.filter((c) =>
-        ["add-board", "delete-board"].includes(c.name),
+        ["add-board", "delete-board", "add-member", "rmv-member"].includes(
+          c.name,
+        ),
       );
       const taskCommands = commands.filter((c) =>
         ["add-task", "update-task", "delete-task"].includes(c.name),
@@ -154,6 +156,98 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
                 ?.data?.error ||
               (err as Error).message ||
               "Failed to delete board.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "add-member": {
+    name: "add-member",
+    description:
+      "Add a member to a board (usage: /add-member <workspace_name>/<board_name> <user_id_or_email>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length < 2) {
+        printOutput([
+          "Error: Missing arguments. Usage: /add-member <workspace_name>/<board_name> <user_id_or_email>",
+        ]);
+        return;
+      }
+
+      const fullPath = args[0];
+      const identifier = args[1];
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /add-member <workspace_name>/<board_name> <user_id_or_email>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import("./api/BoardApi").then(({ boardApi }) => {
+        boardApi
+          .addMember(workspaceName.trim(), boardName.trim(), identifier.trim())
+          .then(() => {
+            printOutput([
+              `Successfully added member '${identifier}' to board '${boardName}'.`,
+            ]);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to add member.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "rmv-member": {
+    name: "rmv-member",
+    description:
+      "Remove a member from a board (usage: /rmv-member <workspace_name>/<board_name> <user_id_or_email>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length < 2) {
+        printOutput([
+          "Error: Missing arguments. Usage: /rmv-member <workspace_name>/<board_name> <user_id_or_email>",
+        ]);
+        return;
+      }
+
+      const fullPath = args[0];
+      const identifier = args[1];
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /rmv-member <workspace_name>/<board_name> <user_id_or_email>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import("./api/BoardApi").then(({ boardApi }) => {
+        boardApi
+          .removeMember(
+            workspaceName.trim(),
+            boardName.trim(),
+            identifier.trim(),
+          )
+          .then(() => {
+            printOutput([
+              `Successfully removed member '${identifier}' from board '${boardName}'.`,
+            ]);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to remove member.";
             printOutput([`Error: ${errorMessage}`]);
           });
       });
