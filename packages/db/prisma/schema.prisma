@@ -54,6 +54,7 @@ model User {
   workspaceMembers WorkspaceMember[]
   boardMembers     BoardMember[]
   assignedTasks    Task[]            @relation("TaskAssignees")
+  reviewingTasks   Task[]            @relation("TaskReviewers")
   subscriptions    Subscription[]
 }
 
@@ -216,9 +217,12 @@ model Task {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  assignees User[]  @relation("TaskAssignees")
-  labels    Label[]
+  board                 Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  assignees             User[]  @relation("TaskAssignees")
+  reviewers             User[]  @relation("TaskReviewers")
+  unregisteredAssignees Json    @default("[]")
+  unregisteredReviewers Json    @default("[]")
+  labels                Label[]
 }
 
 model Label {

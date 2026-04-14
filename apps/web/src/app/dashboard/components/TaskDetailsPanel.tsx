@@ -1,16 +1,54 @@
 "use client";
 
 import { X } from "lucide-react";
+import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
 
 export function TaskDetailsPanel({
   task,
   onClose,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  task: any;
+  task: {
+    id: { toString: () => string };
+    status: string;
+    title: string;
+    prNumber?: number;
+    branchName?: string;
+    description?: string;
+    assignees?: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    }[];
+    reviewers?: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    }[];
+    unregisteredAssignees?: string | { login: string; avatar_url: string }[];
+    unregisteredReviewers?: string | { login: string; avatar_url: string }[];
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    [key: string]: unknown;
+  };
   onClose: () => void;
 }) {
   if (!task) return null;
+
+  const assignees = task.assignees || [];
+  const reviewers = task.reviewers || [];
+  const unregisteredAssignees =
+    typeof task.unregisteredAssignees === "string"
+      ? JSON.parse(task.unregisteredAssignees)
+      : task.unregisteredAssignees || [];
+  const unregisteredReviewers =
+    typeof task.unregisteredReviewers === "string"
+      ? JSON.parse(task.unregisteredReviewers)
+      : task.unregisteredReviewers || [];
+
+  const hasAssignees = assignees.length > 0 || unregisteredAssignees.length > 0;
+  const hasReviewers = reviewers.length > 0 || unregisteredReviewers.length > 0;
 
   return (
     <div className="w-80 border-l border-white/10 bg-void-grey/80 flex flex-col font-mono text-sm overflow-hidden">
@@ -43,6 +81,153 @@ export function TaskDetailsPanel({
           </div>
         </div>
 
+        {/* People Section */}
+        {(hasAssignees || hasReviewers) && (
+          <div className="flex flex-col gap-4 py-4 border-t border-b border-white/10">
+            {hasAssignees && (
+              <div className="flex flex-col gap-2">
+                <h4 className="text-xs font-bold text-syntax-grey uppercase tracking-wider">
+                  Assignees
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {assignees.map(
+                    (user: {
+                      id: string;
+                      name: string | null;
+                      email: string | null;
+                      image: string | null;
+                    }) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
+                      >
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
+                          {user.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={user.image}
+                              alt="Avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-neon-pulse/20 text-neon-pulse flex items-center justify-center text-[10px] font-bold">
+                              {(user.name || user.email || "?")
+                                .charAt(0)
+                                .toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-white/80">
+                          {user.name || user.email || "Unknown"}
+                        </span>
+                      </div>
+                    ),
+                  )}
+
+                  {unregisteredAssignees.map(
+                    (u: { login: string; avatar_url: string }, idx: number) => (
+                      <div
+                        key={`u-a-${idx}`}
+                        className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
+                        title={`Not registered on Syncopate (${u.login})`}
+                      >
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
+                          {u.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={u.avatar_url}
+                              alt="Avatar"
+                              className="w-full h-full object-cover grayscale opacity-80"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-syntax-grey/20 text-syntax-grey flex items-center justify-center text-[10px] font-bold">
+                              ?
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-syntax-grey italic">
+                          Anonymous
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+
+            {hasReviewers && (
+              <div className="flex flex-col gap-2">
+                <h4 className="text-xs font-bold text-syntax-grey uppercase tracking-wider">
+                  Reviewers
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {reviewers.map(
+                    (user: {
+                      id: string;
+                      name: string | null;
+                      email: string | null;
+                      image: string | null;
+                    }) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
+                      >
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
+                          {user.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={user.image}
+                              alt="Avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-git-green/20 text-git-green flex items-center justify-center text-[10px] font-bold">
+                              {(user.name || user.email || "?")
+                                .charAt(0)
+                                .toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-white/80">
+                          {user.name || user.email || "Unknown"}
+                        </span>
+                      </div>
+                    ),
+                  )}
+
+                  {unregisteredReviewers.map(
+                    (u: { login: string; avatar_url: string }, idx: number) => (
+                      <div
+                        key={`u-r-${idx}`}
+                        className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
+                        title={`Not registered on Syncopate (${u.login})`}
+                      >
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
+                          {u.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={u.avatar_url}
+                              alt="Avatar"
+                              className="w-full h-full object-cover grayscale opacity-80"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-syntax-grey/20 text-syntax-grey flex items-center justify-center text-[10px] font-bold">
+                              ?
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-syntax-grey italic">
+                          Anonymous
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <h4 className="text-xs font-bold text-syntax-grey uppercase tracking-wider">
             Description
@@ -59,11 +244,15 @@ export function TaskDetailsPanel({
         <div className="flex flex-col gap-2 mt-auto pt-6 border-t border-white/10">
           <div className="text-xs text-syntax-grey flex justify-between">
             <span>Created:</span>
-            <span>{new Date(task.createdAt).toLocaleDateString()}</span>
+            <span title={new Date(task.createdAt).toLocaleString()}>
+              {formatRelativeOrAbsoluteDate(task.createdAt)}
+            </span>
           </div>
           <div className="text-xs text-syntax-grey flex justify-between">
             <span>Updated:</span>
-            <span>{new Date(task.updatedAt).toLocaleDateString()}</span>
+            <span title={new Date(task.updatedAt).toLocaleString()}>
+              {formatRelativeOrAbsoluteDate(task.updatedAt)}
+            </span>
           </div>
         </div>
       </div>

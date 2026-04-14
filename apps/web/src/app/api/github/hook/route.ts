@@ -81,6 +81,56 @@ export async function POST(req: NextRequest) {
       status = "IN_PROGRESS";
     }
 
+    // Process assignees and reviewers
+    const assignees = pr.assignees || [];
+    const requestedReviewers = pr.requested_reviewers || [];
+
+    const registeredAssignees: string[] = [];
+    const unregisteredAssignees: { login: string; avatar_url: string }[] = [];
+
+    for (const assignee of assignees) {
+      const account = await prisma.account.findFirst({
+        where: {
+          provider: "github",
+          providerAccountId: String(assignee.id),
+        },
+      });
+
+      if (account) {
+        registeredAssignees.push(account.userId);
+      } else {
+        unregisteredAssignees.push({
+          login: assignee.login,
+          avatar_url: assignee.avatar_url,
+        });
+      }
+    }
+
+    const registeredReviewers: string[] = [];
+    const unregisteredReviewers: { login: string; avatar_url: string }[] = [];
+
+    // The PR object has requested_reviewers (we can assume these are users, not teams, for our purposes right now, or filter if needed)
+    // Actually, requested_reviewers can be User | Team. We'll only map those that have an 'id'.
+    for (const reviewer of requestedReviewers) {
+      if (!("id" in reviewer)) continue; // skip teams
+
+      const account = await prisma.account.findFirst({
+        where: {
+          provider: "github",
+          providerAccountId: String(reviewer.id),
+        },
+      });
+
+      if (account) {
+        registeredReviewers.push(account.userId);
+      } else {
+        unregisteredReviewers.push({
+          login: reviewer.login,
+          avatar_url: reviewer.avatar_url,
+        });
+      }
+    }
+
     // See if task with this PR already exists
     const existingTask = await prisma.task.findFirst({
       where: {
@@ -97,6 +147,14 @@ export async function POST(req: NextRequest) {
           description: pr.body || "",
           status: status,
           branchName: pr.head.ref,
+          assignees: {
+            set: registeredAssignees.map((id) => ({ id })),
+          },
+          reviewers: {
+            set: registeredReviewers.map((id) => ({ id })),
+          },
+          unregisteredAssignees: JSON.stringify(unregisteredAssignees),
+          unregisteredReviewers: JSON.stringify(unregisteredReviewers),
         },
       });
       return NextResponse.json({ message: "Task updated" });
@@ -124,6 +182,14 @@ export async function POST(req: NextRequest) {
               branchName: pr.head.ref,
               description: matchedTask.description || pr.body || "",
               status: status,
+              assignees: {
+                set: registeredAssignees.map((id) => ({ id })),
+              },
+              reviewers: {
+                set: registeredReviewers.map((id) => ({ id })),
+              },
+              unregisteredAssignees: JSON.stringify(unregisteredAssignees),
+              unregisteredReviewers: JSON.stringify(unregisteredReviewers),
             },
           });
           return NextResponse.json({ message: "Task linked and updated" });
@@ -140,6 +206,14 @@ export async function POST(req: NextRequest) {
         status: status,
         prNumber: pr.number,
         branchName: pr.head.ref,
+        assignees: {
+          connect: registeredAssignees.map((id) => ({ id })),
+        },
+        reviewers: {
+          connect: registeredReviewers.map((id) => ({ id })),
+        },
+        unregisteredAssignees: JSON.stringify(unregisteredAssignees),
+        unregisteredReviewers: JSON.stringify(unregisteredReviewers),
       },
     });
 
