@@ -21,7 +21,7 @@ export function DashboardClient({
 }) {
   return (
     <CommandProvider>
-      <div className="h-screen w-full flex flex-col bg-obsidian-night overflow-hidden">
+      <div className="flex-1 w-full flex flex-col bg-obsidian-night overflow-hidden">
         <Header />
 
         <div className="flex-1 flex overflow-hidden relative">

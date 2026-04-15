@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetBrainsMono.variable} dark`}
     >
-      <body className="antialiased min-h-screen flex flex-col relative pb-16">
+      <body className="antialiased min-h-screen flex flex-col relative">
         <Cursor />
         <CommandProvider>
           {children}
