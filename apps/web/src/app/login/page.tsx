@@ -4,7 +4,9 @@ import { LoginForm } from "./LoginForm";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+export default async function LoginPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await auth();
   const searchParams = await props.searchParams;
 

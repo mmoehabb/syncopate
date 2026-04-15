@@ -7,7 +7,9 @@ import { Footer } from "@/components/landing/Footer";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function Home(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+export default async function Home(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await auth();
   const searchParams = await props.searchParams;
 
