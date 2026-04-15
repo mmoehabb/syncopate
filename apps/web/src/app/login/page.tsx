@@ -1,8 +1,17 @@
 import { ParticleNetwork } from "./ParticleNetwork";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "./LoginForm";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export default async function LoginPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const session = await auth();
+  const searchParams = await props.searchParams;
+
+  if (session?.user && searchParams.redirect !== "false") {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center h-screen w-full p-8 bg-obsidian-night relative overflow-hidden">
       {/* Dynamic Background */}
