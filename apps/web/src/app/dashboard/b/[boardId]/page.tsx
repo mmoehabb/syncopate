@@ -7,11 +7,17 @@ import { SessionProvider } from "next-auth/react";
 
 export default async function BoardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ boardId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const boardId = resolvedParams.boardId;
+  const searchQuery = resolvedSearchParams?.search
+    ? String(resolvedSearchParams.search)
+    : undefined;
 
   const session = await auth();
 
@@ -28,6 +34,14 @@ export default async function BoardPage({
     where: { id: boardId },
     include: {
       tasks: {
+        where: searchQuery
+          ? {
+              title: {
+                contains: searchQuery,
+                mode: "insensitive",
+              },
+            }
+          : undefined,
         orderBy: { updatedAt: "desc" },
         include: { assignees: true, reviewers: true },
       },
