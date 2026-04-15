@@ -20,7 +20,13 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         ].includes(c.name),
       );
       const boardCommands = commands.filter((c) =>
-        ["add-board", "delete-board", "add-member", "rmv-member", "join-voice-call"].includes(c.name)
+        [
+          "add-board",
+          "delete-board",
+          "add-member",
+          "rmv-member",
+          "join-voice-call",
+        ].includes(c.name),
       );
       const taskCommands = commands.filter((c) =>
         ["add-task", "update-task", "delete-task", "search-task"].includes(
@@ -372,7 +378,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       navigate(url.pathname + url.search);
       printOutput([`Searching tasks for: '${searchText}'`]);
       setMode("normal");
-    }
+    },
   },
   "join-voice-call": {
     name: "join-voice-call",
