@@ -5,6 +5,7 @@ import stringSimilarity from "string-similarity";
 import { TaskStatus } from "@prisma/client";
 import { SIMILARITY_THRESHOLD } from "@/lib/constants";
 import { PullRequestEvent } from "@octokit/webhooks-types";
+import { API_ERRORS, apiError } from "@/lib/api/error";
 
 function verifySignature(req: NextRequest, bodyText: string) {
   const signature = req.headers.get("x-hub-signature-256");
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     const bodyText = await req.text();
 
     if (!verifySignature(req, bodyText)) {
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      return apiError(API_ERRORS.customUnauthorized("Invalid signature"));
     }
 
     const payload = JSON.parse(bodyText);
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
     const repo = prEvent.repository;
 
     if (!pr || !repo) {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+      return apiError(API_ERRORS.customBadRequest("Invalid payload"));
     }
 
     const repoIdStr = String(repo.id);
@@ -225,6 +226,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Task created" });
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return apiError(API_ERRORS.customInternal(errorMessage));
   }
 }

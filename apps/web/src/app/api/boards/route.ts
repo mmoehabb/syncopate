@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
+import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function POST(req: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -14,9 +15,8 @@ export async function POST(req: Request) {
     const { workspaceId, name, repositoryName, githubRepoId } = body;
 
     if (!workspaceId || !name) {
-      return NextResponse.json(
-        { error: "Workspace ID and Board name are required" },
-        { status: 400 },
+      return apiError(
+        API_ERRORS.customBadRequest("Workspace ID and Board name are required"),
       );
     }
 
@@ -31,9 +31,8 @@ export async function POST(req: Request) {
     });
 
     if (!workspaceMember) {
-      return NextResponse.json(
-        { error: "Workspace not found or unauthorized" },
-        { status: 404 },
+      return apiError(
+        API_ERRORS.custom404("Workspace not found or unauthorized"),
       );
     }
 
@@ -58,10 +57,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ board }, { status: 201 });
   } catch (error) {
     console.error("Error creating board:", error);
-    return NextResponse.json(
-      { error: "Failed to create board" },
-      { status: 500 },
-    );
+    return apiError(API_ERRORS.customInternal("Failed to create board"));
   }
 }
 
@@ -69,7 +65,7 @@ export async function DELETE(req: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -78,9 +74,10 @@ export async function DELETE(req: Request) {
     const boardName = url.searchParams.get("board");
 
     if (!workspaceName || !boardName) {
-      return NextResponse.json(
-        { error: "Workspace name and Board name are required" },
-        { status: 400 },
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "Workspace name and Board name are required",
+        ),
       );
     }
 
@@ -97,10 +94,7 @@ export async function DELETE(req: Request) {
     });
 
     if (!workspace) {
-      return NextResponse.json(
-        { error: "Workspace not found" },
-        { status: 404 },
-      );
+      return apiError(API_ERRORS.customNotFound("Workspace"));
     }
 
     // Find the board in this workspace
@@ -112,7 +106,7 @@ export async function DELETE(req: Request) {
     });
 
     if (!board) {
-      return NextResponse.json({ error: "Board not found" }, { status: 404 });
+      return apiError(API_ERRORS.customNotFound("Board"));
     }
 
     // Check if user is an ADMIN of the board or workspace
@@ -135,9 +129,8 @@ export async function DELETE(req: Request) {
     });
 
     if (boardMember?.role !== "ADMIN" && workspaceMember?.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized to delete this board" },
-        { status: 403 },
+      return apiError(
+        API_ERRORS.customForbidden("Unauthorized to delete this board"),
       );
     }
 
@@ -148,9 +141,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ message: "Board deleted successfully" });
   } catch (error) {
     console.error("Error deleting board:", error);
-    return NextResponse.json(
-      { error: "Failed to delete board" },
-      { status: 500 },
-    );
+    return apiError(API_ERRORS.customInternal("Failed to delete board"));
   }
 }
