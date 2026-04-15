@@ -18,6 +18,7 @@ export function VoiceCallPanel({ boardId }: { boardId: string }) {
   const [isMuted, setIsMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activePeersCount, setActivePeersCount] = useState(1);
+  const [isConnecting, setIsConnecting] = useState(true);
 
   const peerRef = useRef<Peer | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -122,9 +123,11 @@ export function VoiceCallPanel({ boardId }: { boardId: string }) {
                 handleCall(call);
               }
             });
+            setIsConnecting(false);
           } catch (err) {
             console.error("Failed to register peer", err);
             setError("Failed to register peer with server.");
+            setIsConnecting(false);
           }
         });
 
@@ -136,10 +139,12 @@ export function VoiceCallPanel({ boardId }: { boardId: string }) {
         peer.on("error", (err) => {
           console.error("PeerJS error:", err);
           setError(`Connection error: ${err.type}`);
+          setIsConnecting(false);
         });
       } catch (err) {
         console.error("Microphone access denied or error:", err);
         setError("Microphone access is required for voice calls.");
+        setIsConnecting(false);
       }
     };
 
@@ -211,9 +216,12 @@ export function VoiceCallPanel({ boardId }: { boardId: string }) {
         </p>
       </div>
 
-      {error ? (
-        <div className="text-red-400 font-mono text-sm mb-6 p-4 border border-red-400/20 bg-red-400/5 rounded-md">
-          {error}
+      {isConnecting ? (
+        <div className="flex flex-col items-center justify-center h-40 gap-4 mb-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-pulse"></div>
+          <span className="text-syntax-grey font-mono text-sm animate-pulse">
+            Connecting...
+          </span>
         </div>
       ) : (
         <div className="flex flex-col gap-4 mb-8">
@@ -231,38 +239,60 @@ export function VoiceCallPanel({ boardId }: { boardId: string }) {
             <span className="text-syntax-grey">Participants</span>
             <span className="text-white">{activePeersCount}</span>
           </div>
-          {!peerId && (
-            <div className="text-syntax-grey font-mono text-xs animate-pulse">
-              Connecting to signaling server...
-            </div>
-          )}
         </div>
       )}
 
       <div className="mt-auto flex flex-col gap-3">
-        <button
-          onClick={toggleMute}
-          className={`flex items-center justify-center gap-2 p-3 rounded-md font-mono text-sm transition-colors ${
-            isMuted
-              ? "bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
-              : "bg-void-grey text-white border border-white/10 hover:border-white/30"
-          }`}
-        >
-          {isMuted ? (
-            <MicOff className="w-4 h-4" />
-          ) : (
-            <Mic className="w-4 h-4" />
-          )}
-          {isMuted ? "Unmute" : "Mute"}
-        </button>
+        {!isConnecting && (
+          <button
+            onClick={toggleMute}
+            className={`flex items-center justify-center gap-2 p-3 rounded-md font-mono text-sm transition-colors ${
+              isMuted
+                ? "bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
+                : "bg-void-grey text-white border border-white/10 hover:border-white/30"
+            }`}
+          >
+            {isMuted ? (
+              <MicOff className="w-4 h-4" />
+            ) : (
+              <Mic className="w-4 h-4" />
+            )}
+            {isMuted ? "Unmute" : "Mute"}
+          </button>
+        )}
         <button
           onClick={endCall}
-          className="flex items-center justify-center gap-2 p-3 rounded-md font-mono text-sm bg-red-400 text-obsidian-night font-bold hover:bg-red-500 transition-colors"
+          className={`flex items-center justify-center gap-2 p-3 rounded-md font-mono text-sm transition-colors ${
+            isConnecting
+              ? "bg-void-grey text-white border border-white/10 hover:border-white/30"
+              : "bg-red-400 text-obsidian-night font-bold hover:bg-red-500"
+          }`}
         >
-          <PhoneOff className="w-4 h-4" />
-          End Call
+          {isConnecting ? (
+            "Cancel"
+          ) : (
+            <>
+              <PhoneOff className="w-4 h-4" />
+              End Call
+            </>
+          )}
         </button>
       </div>
+
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-obsidian-night border border-red-400/50 p-4 rounded-md shadow-lg z-50 animate-in fade-in slide-in-from-bottom-4 flex flex-col gap-2 max-w-sm">
+          <span className="text-red-400 font-mono font-bold text-sm">
+            Connection Error
+          </span>
+          <span className="text-syntax-grey font-mono text-xs">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="text-white/50 hover:text-white text-xs font-mono self-end mt-1"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }
