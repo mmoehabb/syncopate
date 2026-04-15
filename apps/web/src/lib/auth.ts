@@ -25,9 +25,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   events: {
     createUser: async ({ user }) => {
       // Create a default workspace for the new user
-      const workspaceName = user.name
-        ? `${user.name}'s Workspace`
-        : "My Workspace";
+      const workspaceName = "MyWorkspace";
 
       const newWorkspace = await prisma.workspace.create({
         data: {
