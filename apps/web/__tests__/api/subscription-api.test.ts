@@ -7,9 +7,8 @@ describe("SubscriptionApi", () => {
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();
 
-    const { SubscriptionApi: SubscriptionApiClass } = await import(
-      "@/lib/api/SubscriptionApi"
-    );
+    const { SubscriptionApi: SubscriptionApiClass } =
+      await import("@/lib/api/SubscriptionApi");
     subscriptionApi = new SubscriptionApiClass();
   });
 

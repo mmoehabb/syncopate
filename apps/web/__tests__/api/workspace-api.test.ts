@@ -7,9 +7,8 @@ describe("WorkspaceApi", () => {
   beforeEach(async () => {
     mockAxiosInstance.get.mockReset();
 
-    const { WorkspaceApi: WorkspaceApiClass } = await import(
-      "@/lib/api/WorkspaceApi"
-    );
+    const { WorkspaceApi: WorkspaceApiClass } =
+      await import("@/lib/api/WorkspaceApi");
     workspaceApi = new WorkspaceApiClass();
   });
 
