@@ -3,25 +3,29 @@
 import { useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { DashboardWorkspace } from "./types";
+
+type FlatItem = {
+  type: "workspace" | "board";
+  id: string;
+  label: string;
+};
 
 export function Sidebar({
   workspaces,
   activeBoardId,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  workspaces: any[];
+  workspaces: DashboardWorkspace[];
   activeBoardId?: string;
 }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const flatItems: any[] = [];
+  const flatItems: FlatItem[] = [];
   workspaces.forEach((ws) => {
     flatItems.push({ type: "workspace", id: ws.id, label: ws.name });
     if (!collapsed[ws.id]) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ws.boards?.forEach((board: any) => {
+      ws.boards?.forEach((board) => {
         flatItems.push({ type: "board", id: board.id, label: board.name });
       });
     }

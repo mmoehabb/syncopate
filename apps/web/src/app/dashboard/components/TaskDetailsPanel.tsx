@@ -3,35 +3,13 @@
 import { X } from "lucide-react";
 import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
 
+import type { MainBoardTask } from "./types";
+
 export function TaskDetailsPanel({
   task,
   onClose,
 }: {
-  task: {
-    id: { toString: () => string };
-    status: string;
-    title: string;
-    prNumber?: number;
-    branchName?: string;
-    description?: string;
-    assignees?: {
-      id: string;
-      name: string | null;
-      email: string | null;
-      image: string | null;
-    }[];
-    reviewers?: {
-      id: string;
-      name: string | null;
-      email: string | null;
-      image: string | null;
-    }[];
-    unregisteredAssignees?: string | { login: string; avatar_url: string }[];
-    unregisteredReviewers?: string | { login: string; avatar_url: string }[];
-    createdAt: string | Date;
-    updatedAt: string | Date;
-    [key: string]: unknown;
-  };
+  task: MainBoardTask;
   onClose: () => void;
 }) {
   if (!task) return null;
