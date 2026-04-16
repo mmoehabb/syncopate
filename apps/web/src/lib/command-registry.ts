@@ -25,7 +25,9 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         ),
       );
       const taskCommands = commands.filter((c) =>
-        ["add-task", "update-task", "delete-task"].includes(c.name),
+        ["add-task", "update-task", "delete-task", "search-task"].includes(
+          c.name,
+        ),
       );
 
       const formatCmd = (cmd: Command) =>
@@ -342,6 +344,36 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
             printOutput([`Error: ${errorMessage}`]);
           });
       });
+    },
+  },
+  "search-task": {
+    name: "search-task",
+    description:
+      "Search tasks in the current board (usage: /search-task <search_text>)",
+    action: ({ args, printOutput, activeBoardId, navigate, setMode }) => {
+      if (!activeBoardId) {
+        printOutput(["Error: You must be on a board to search tasks."]);
+        return;
+      }
+
+      if (!args || args.length === 0) {
+        // If no args, clear the search
+        const url = new URL(window.location.href);
+        url.searchParams.delete("search");
+        navigate(url.pathname + url.search);
+        printOutput(["Cleared search filter."]);
+        setMode("normal");
+        return;
+      }
+
+      const searchText = args.join(" ");
+      const url = new URL(window.location.href);
+      url.searchParams.set("search", searchText);
+
+      // Navigate to the same path with the new search parameter
+      navigate(url.pathname + url.search);
+      printOutput([`Searching tasks for: '${searchText}'`]);
+      setMode("normal");
     },
   },
 };

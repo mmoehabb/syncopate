@@ -1,15 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TaskDetailsPanel } from "./TaskDetailsPanel";
 import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
+import { Search } from "lucide-react";
 
 export function MainBoard({ board }: { board?: any }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
+  const searchQueryParam = searchParams.get("search") || "";
+
+  const [searchValue, setSearchValue] = useState(searchQueryParam);
+
+  useEffect(() => {
+    setSearchValue(searchQueryParam);
+  }, [searchQueryParam]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchValue(val);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (val.trim()) {
+      params.set("search", val);
+    } else {
+      params.delete("search");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   const tasks = useMemo(() => {
     if (!board?.tasks) return [];
@@ -83,6 +106,17 @@ export function MainBoard({ board }: { board?: any }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+          <div className="flex items-center gap-2 px-3 py-2 bg-void-grey border border-white/10 rounded-md focus-within:border-git-green transition-colors">
+            <Search size={16} className="text-syntax-grey" />
+            <input
+              type="text"
+              placeholder="Search tasks... (or type /search-task)"
+              value={searchValue}
+              onChange={handleSearchChange}
+              className="flex-1 bg-transparent border-none outline-none text-sm font-mono text-white placeholder:text-syntax-grey/50"
+            />
+          </div>
+
           {statusGroups.map((group) => {
             const groupTasks = tasks.filter(
               (t: {
