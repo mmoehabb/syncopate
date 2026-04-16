@@ -1,0 +1,46 @@
+import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
+import { mockAxiosInstance } from "../mocks/axios";
+
+describe("SubscriptionApi", () => {
+  let subscriptionApi: import("@/lib/api/SubscriptionApi").SubscriptionApi;
+
+  beforeEach(async () => {
+    mockAxiosInstance.post.mockReset();
+
+    const { SubscriptionApi: SubscriptionApiClass } = await import(
+      "@/lib/api/SubscriptionApi"
+    );
+    subscriptionApi = new SubscriptionApiClass();
+  });
+
+  afterEach(() => {
+    mock.restore();
+  });
+
+  describe("subscribeToFreePlan", () => {
+    it("should subscribe to free plan successfully", async () => {
+      const mockSubscription = {
+        id: "1",
+        status: "ACTIVE",
+      };
+
+      mockAxiosInstance.post.mockResolvedValueOnce({
+        data: { subscription: mockSubscription },
+      });
+
+      const result = await subscriptionApi.subscribeToFreePlan();
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith("", {}, undefined);
+      expect(result).toEqual(mockSubscription);
+    });
+
+    it("should handle error when subscription fails", async () => {
+      const mockError = new Error("Already subscribed");
+      mockAxiosInstance.post.mockRejectedValueOnce(mockError);
+
+      await expect(subscriptionApi.subscribeToFreePlan()).rejects.toThrow(
+        "Already subscribed",
+      );
+    });
+  });
+});
