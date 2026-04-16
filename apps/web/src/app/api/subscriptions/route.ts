@@ -1,0 +1,53 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@syncopate/db";
+import { API_ERRORS, apiError } from "@/lib/api/error";
+
+export async function POST() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  try {
+    const existingSubscription = await prisma.user.findFirst({
+      where: { id: session.user.id },
+      include: { subscriptions: { where: { status: "ACTIVE" } } },
+    });
+
+    if (existingSubscription?.subscriptions?.length) {
+      return apiError(
+        API_ERRORS.customBadRequest("User already has an active subscription"),
+      );
+    }
+
+    const freePlan = await prisma.plan.findFirst({
+      where: { name: "Free" },
+      include: { prices: true },
+    });
+
+    if (!freePlan) {
+      return apiError(API_ERRORS.customInternal("Free plan not found"));
+    }
+
+    const subscription = await prisma.subscription.create({
+      data: {
+        userId: session.user.id,
+        priceId: freePlan.prices[0]?.id || "",
+        status: "ACTIVE",
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(
+          new Date().setFullYear(new Date().getFullYear() + 100),
+        ),
+        cancelAtPeriodEnd: false,
+      },
+    });
+
+    return NextResponse.json({ subscription }, { status: 201 });
+  } catch (error) {
+    console.error("Error subscribing to free plan:", error);
+    return apiError(
+      API_ERRORS.customInternal("Failed to subscribe to free plan"),
+    );
+  }
+}
