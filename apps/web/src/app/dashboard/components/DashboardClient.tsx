@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { MainBoard } from "./MainBoard";
+import type { DashboardWorkspace, MainBoardData } from "./types";
 
 export function DashboardClient({
   workspaces,
@@ -11,12 +12,10 @@ export function DashboardClient({
   modalComponent,
   board,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  workspaces: any[];
+  workspaces: DashboardWorkspace[];
   hasActiveSubscription: boolean;
   modalComponent: ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  board?: any;
+  board?: MainBoardData | null;
 }) {
   return (
     <div className="flex-1 w-full flex flex-col bg-obsidian-night overflow-hidden">

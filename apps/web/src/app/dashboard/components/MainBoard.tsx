@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
@@ -8,8 +7,9 @@ import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
 import { Search } from "lucide-react";
 import { VoiceCallPanel } from "./VoiceCallPanel";
 import { useCommand } from "@/context/CommandContext";
+import type { MainBoardData, MainBoardTask, UnregisteredUser } from "./types";
 
-export function MainBoard({ board }: { board?: any }) {
+export function MainBoard({ board }: { board?: MainBoardData | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,7 +51,7 @@ export function MainBoard({ board }: { board?: any }) {
       CLOSED: 5,
     };
 
-    return [...board.tasks].sort((a: any, b: any) => {
+    return [...board.tasks].sort((a: MainBoardTask, b: MainBoardTask) => {
       const orderA = statusOrder[a.status] ?? 99;
       const orderB = statusOrder[b.status] ?? 99;
       if (orderA !== orderB) return orderA - orderB;
@@ -63,13 +63,7 @@ export function MainBoard({ board }: { board?: any }) {
   const selectedTask = useMemo(() => {
     if (!taskIdParam) return null;
     return (
-      tasks.find(
-        (t: {
-          id: { toString: () => string };
-          status: string;
-          [key: string]: unknown;
-        }) => t.id.toString() === taskIdParam,
-      ) || null
+      tasks.find((t: MainBoardTask) => t.id.toString() === taskIdParam) || null
     );
   }, [taskIdParam, tasks]);
 
@@ -123,11 +117,7 @@ export function MainBoard({ board }: { board?: any }) {
 
           {statusGroups.map((group) => {
             const groupTasks = tasks.filter(
-              (t: {
-                id: { toString: () => string };
-                status: string;
-                [key: string]: unknown;
-              }) => t.status === group.status,
+              (t: MainBoardTask) => t.status === group.status,
             );
             if (groupTasks.length === 0) return null;
 
@@ -142,32 +132,31 @@ export function MainBoard({ board }: { board?: any }) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  {}
-                  {groupTasks.map(
-                    (task: {
-                      id: { toString: () => string };
-                      status: string;
-                      title: string;
-                      prNumber?: number;
-                      branchName?: string;
-                      assignees?: any[];
-                      reviewers?: any[];
-                      unregisteredAssignees?: string | any[];
-                      unregisteredReviewers?: string | any[];
-                      createdAt: string | Date;
-                      updatedAt: string | Date;
-                      [key: string]: unknown;
-                    }) => {
-                      const assignees = task.assignees || [];
-                      const reviewers = task.reviewers || [];
-                      const unregisteredAssignees =
-                        typeof task.unregisteredAssignees === "string"
-                          ? JSON.parse(task.unregisteredAssignees)
-                          : task.unregisteredAssignees || [];
-                      const unregisteredReviewers =
-                        typeof task.unregisteredReviewers === "string"
-                          ? JSON.parse(task.unregisteredReviewers)
-                          : task.unregisteredReviewers || [];
+                  {groupTasks.map((task: MainBoardTask) => {
+                    const assignees = task.assignees || [];
+                    const reviewers = task.reviewers || [];
+
+                    let unregisteredAssignees: UnregisteredUser[] = [];
+                    if (typeof task.unregisteredAssignees === "string") {
+                      try {
+                        unregisteredAssignees = JSON.parse(task.unregisteredAssignees) as UnregisteredUser[];
+                      } catch {
+                        unregisteredAssignees = [];
+                      }
+                    } else if (Array.isArray(task.unregisteredAssignees)) {
+                      unregisteredAssignees = task.unregisteredAssignees as UnregisteredUser[];
+                    }
+
+                    let unregisteredReviewers: UnregisteredUser[] = [];
+                    if (typeof task.unregisteredReviewers === "string") {
+                      try {
+                        unregisteredReviewers = JSON.parse(task.unregisteredReviewers) as UnregisteredUser[];
+                      } catch {
+                        unregisteredReviewers = [];
+                      }
+                    } else if (Array.isArray(task.unregisteredReviewers)) {
+                      unregisteredReviewers = task.unregisteredReviewers as UnregisteredUser[];
+                    }
 
                       const hasPeople =
                         assignees.length > 0 ||
@@ -213,14 +202,7 @@ export function MainBoard({ board }: { board?: any }) {
                                   {(assignees.length > 0 ||
                                     unregisteredAssignees.length > 0) && (
                                     <div className="flex -space-x-2">
-                                      {}
-                                      {assignees.map(
-                                        (user: {
-                                          id: string;
-                                          name: string | null;
-                                          email: string | null;
-                                          image: string | null;
-                                        }) => (
+                                      {assignees.map((user) => (
                                           <div
                                             key={user.id}
                                             className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
@@ -247,15 +229,8 @@ export function MainBoard({ board }: { board?: any }) {
                                           </div>
                                         ),
                                       )}
-                                      {}
                                       {unregisteredAssignees.map(
-                                        (
-                                          u: {
-                                            login: string;
-                                            avatar_url: string;
-                                          },
-                                          idx: number,
-                                        ) => (
+                                        (u, idx: number) => (
                                           <div
                                             key={`u-a-${idx}`}
                                             className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
@@ -287,14 +262,7 @@ export function MainBoard({ board }: { board?: any }) {
                                         REV:
                                       </span>
                                       <div className="flex -space-x-2">
-                                        {}
-                                        {reviewers.map(
-                                          (user: {
-                                            id: string;
-                                            name: string | null;
-                                            email: string | null;
-                                            image: string | null;
-                                          }) => (
+                                        {reviewers.map((user) => (
                                             <div
                                               key={user.id}
                                               className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
@@ -321,15 +289,8 @@ export function MainBoard({ board }: { board?: any }) {
                                             </div>
                                           ),
                                         )}
-                                        {}
                                         {unregisteredReviewers.map(
-                                          (
-                                            u: {
-                                              login: string;
-                                              avatar_url: string;
-                                            },
-                                            idx: number,
-                                          ) => (
+                                          (u, idx: number) => (
                                             <div
                                               key={`u-r-${idx}`}
                                               className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
