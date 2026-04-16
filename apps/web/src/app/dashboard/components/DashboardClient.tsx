@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { MainBoard } from "./MainBoard";
-import { CommandProvider } from "@/context/CommandContext";
 
 export function DashboardClient({
   workspaces,
@@ -20,16 +19,14 @@ export function DashboardClient({
   board?: any;
 }) {
   return (
-    <CommandProvider>
-      <div className="flex-1 w-full flex flex-col bg-obsidian-night overflow-hidden">
-        <Header />
+    <div className="flex-1 w-full flex flex-col bg-obsidian-night overflow-hidden">
+      <Header />
 
-        <div className="flex-1 flex overflow-hidden relative">
-          <Sidebar workspaces={workspaces} activeBoardId={board?.id} />
-          <MainBoard board={board} />
-          {!hasActiveSubscription && modalComponent}
-        </div>
+      <div className="flex-1 flex overflow-hidden relative">
+        <Sidebar workspaces={workspaces} activeBoardId={board?.id} />
+        <MainBoard board={board} />
+        {!hasActiveSubscription && modalComponent}
       </div>
-    </CommandProvider>
+    </div>
   );
 }

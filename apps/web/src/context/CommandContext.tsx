@@ -8,7 +8,7 @@ import React, {
   useRef,
   ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { AppMode } from "../types/commands";
 import { COMMAND_REGISTRY } from "../lib/command-registry";
 import { NORMAL_ACTIONS_REGISTRY } from "../lib/normal-actions-registry";
@@ -22,6 +22,8 @@ interface CommandContextType {
 
   selectedTaskId: string | null;
   setSelectedTaskId: (id: string | null) => void;
+  isVoiceCallActive: boolean;
+  setIsVoiceCallActive: (active: boolean) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -30,6 +32,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AppMode>("normal");
   const [outputHistory, setOutputHistory] = useState<string[]>([]);
   const router = useRouter();
+  const params = useParams();
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -37,6 +40,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   // Used for tracking sequential key presses like 'g' followed by 'g'
   const keyBuffer = useRef<string>("");
   const keyTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isVoiceCallActive, setIsVoiceCallActive] = useState(false);
 
   const clearHistory = () => setOutputHistory([]);
 
@@ -62,9 +66,9 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setMode,
         args,
         selectedTaskId,
-        activeBoardId: window.location.pathname.startsWith("/dashboard/b/")
-          ? window.location.pathname.split("/dashboard/b/")[1]
-          : undefined,
+        activeBoardId: params?.boardId as string | undefined,
+        isVoiceCallActive,
+        setIsVoiceCallActive,
       });
     } else {
       printOutput([
@@ -330,6 +334,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         clearHistory,
         selectedTaskId,
         setSelectedTaskId,
+        isVoiceCallActive,
+        setIsVoiceCallActive,
       }}
     >
       {children}

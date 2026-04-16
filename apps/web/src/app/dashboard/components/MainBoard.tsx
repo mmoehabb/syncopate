@@ -6,12 +6,16 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TaskDetailsPanel } from "./TaskDetailsPanel";
 import { formatRelativeOrAbsoluteDate } from "@/lib/utils/date";
 import { Search } from "lucide-react";
+import { VoiceCallPanel } from "./VoiceCallPanel";
+import { useCommand } from "@/context/CommandContext";
 
 export function MainBoard({ board }: { board?: any }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get("taskId");
+  const { isVoiceCallActive } = useCommand();
+
   const searchQueryParam = searchParams.get("search") || "";
 
   const [searchValue, setSearchValue] = useState(searchQueryParam);
@@ -393,6 +397,8 @@ export function MainBoard({ board }: { board?: any }) {
           onClose={() => router.push(`/dashboard/b/${board.id}`)}
         />
       )}
+
+      {isVoiceCallActive && board && <VoiceCallPanel boardId={board.id} />}
     </div>
   );
 }

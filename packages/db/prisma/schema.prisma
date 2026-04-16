@@ -184,12 +184,14 @@ model Board {
 }
 
 model BoardMember {
-  id        BigInt   @id @default(autoincrement())
-  boardId   String
-  userId    String
-  role      Role     @default(MEMBER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            BigInt    @id @default(autoincrement())
+  boardId       String
+  userId        String
+  role          Role      @default(MEMBER)
+  voicePeerId   String?
+  lastVoicePing DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)

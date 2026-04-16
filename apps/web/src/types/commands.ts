@@ -10,6 +10,8 @@ export interface Command {
     args?: string[];
     selectedTaskId?: string | null;
     activeBoardId?: string;
+    isVoiceCallActive?: boolean;
+    setIsVoiceCallActive?: (active: boolean) => void;
   }) => void;
 }
 
