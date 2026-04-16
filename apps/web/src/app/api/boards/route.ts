@@ -20,6 +20,15 @@ export async function POST(req: Request) {
       );
     }
 
+    const nameRegex = /^[a-zA-Z0-9-_]+$/;
+    if (!nameRegex.test(name)) {
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "Board name can only contain letters, numbers, hyphens, and underscores. No spaces or special characters are allowed.",
+        ),
+      );
+    }
+
     // Verify user has access to this workspace
     const workspaceMember = await prisma.workspaceMember.findUnique({
       where: {
