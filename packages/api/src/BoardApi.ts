@@ -1,11 +1,5 @@
 import { ApiClient } from "./ApiClient";
-
-export interface CreateBoardPayload {
-  workspaceId: string;
-  name: string;
-  repositoryName?: string;
-  githubRepoId?: string;
-}
+import type { CreateBoardPayload } from "@syncopate/types";
 
 export class BoardApi extends ApiClient {
   constructor() {

@@ -12,6 +12,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@syncopate/db": "workspace:*",
     "@syncopate/types": "workspace:*",
+    "@syncopate/api": "workspace:*",
     "axios": "^1.15.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.38.0",
@@ -28,6 +29,7 @@
     "@types/pg": "^8.11.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "8.57.0",
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4",
     "typescript": "^5"

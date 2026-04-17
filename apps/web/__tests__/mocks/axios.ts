@@ -12,11 +12,18 @@ export const mockAxiosInstance = {
   },
 };
 
-const mockAxios = {
-  create: mock(() => mockAxiosInstance),
-};
+// Return promises with required structure. By default these will resolve with empty objects if not overridden.
+mockAxiosInstance.post.mockImplementation(() => Promise.resolve({ data: {} }));
+mockAxiosInstance.get.mockImplementation(() => Promise.resolve({ data: {} }));
+mockAxiosInstance.patch.mockImplementation(() => Promise.resolve({ data: {} }));
+mockAxiosInstance.delete.mockImplementation(() => Promise.resolve({ data: {} }));
 
-mock.module("axios", () => ({
-  ...mockAxios,
-  default: mockAxios,
-}));
+// In bun:test, mocking entire modules must match the export shape exactly.
+mock.module("axios", () => {
+  return {
+    default: {
+      create: mock(() => mockAxiosInstance),
+    },
+    create: mock(() => mockAxiosInstance),
+  }
+});

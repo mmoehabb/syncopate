@@ -3,15 +3,16 @@ import { mockAxiosInstance } from "../mocks/axios";
 import { TaskStatus } from "@prisma/client";
 
 describe("TaskApi", () => {
-  let taskApi: import("@/lib/api/TaskApi").TaskApi;
+  let taskApi: import("@syncopate/api").TaskApi;
 
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();
     mockAxiosInstance.patch.mockReset();
     mockAxiosInstance.delete.mockReset();
 
-    const { TaskApi: TaskApiClass } = await import("@/lib/api/TaskApi");
+    const { TaskApi: TaskApiClass } = await import("@syncopate/api");
     taskApi = new TaskApiClass();
+    (taskApi as any)["client"] = mockAxiosInstance;
   });
 
   afterEach(() => {

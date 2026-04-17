@@ -1,11 +1,5 @@
 import { ApiClient } from "./ApiClient";
-
-export interface GithubRepo {
-  id: number;
-  name: string;
-  url: string;
-  private: boolean;
-}
+import type { GithubRepo } from "@syncopate/types";
 
 export class GithubApi extends ApiClient {
   constructor() {
