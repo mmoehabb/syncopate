@@ -7,7 +7,8 @@ describe("SubscriptionApi", () => {
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();
 
-    const { SubscriptionApi: SubscriptionApiClass } = await import("@syncopate/api");
+    const { SubscriptionApi: SubscriptionApiClass } =
+      await import("@syncopate/api");
     subscriptionApi = new SubscriptionApiClass();
     (subscriptionApi as any)["client"] = mockAxiosInstance;
   });
@@ -31,11 +32,7 @@ describe("SubscriptionApi", () => {
 
       const result = await subscriptionApi.subscribeToFreePlan();
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledWith(
-        "",
-        {},
-        undefined,
-      );
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith("", {}, undefined);
       expect(result).toEqual(mockSubscription);
     });
 
@@ -43,7 +40,9 @@ describe("SubscriptionApi", () => {
       const mockError = new Error("Already subscribed");
       mockAxiosInstance.post.mockRejectedValueOnce(mockError);
 
-      await expect(subscriptionApi.subscribeToFreePlan()).rejects.toThrow("Already subscribed");
+      await expect(subscriptionApi.subscribeToFreePlan()).rejects.toThrow(
+        "Already subscribed",
+      );
     });
   });
 });

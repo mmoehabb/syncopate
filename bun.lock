@@ -27,6 +27,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@auth/prisma-adapter": "^2.11.1",
+        "@syncopate/api": "workspace:*",
         "@syncopate/db": "workspace:*",
         "@syncopate/types": "workspace:*",
         "axios": "^1.15.0",

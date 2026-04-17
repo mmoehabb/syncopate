@@ -16,7 +16,9 @@ export const mockAxiosInstance = {
 mockAxiosInstance.post.mockImplementation(() => Promise.resolve({ data: {} }));
 mockAxiosInstance.get.mockImplementation(() => Promise.resolve({ data: {} }));
 mockAxiosInstance.patch.mockImplementation(() => Promise.resolve({ data: {} }));
-mockAxiosInstance.delete.mockImplementation(() => Promise.resolve({ data: {} }));
+mockAxiosInstance.delete.mockImplementation(() =>
+  Promise.resolve({ data: {} }),
+);
 
 // In bun:test, mocking entire modules must match the export shape exactly.
 mock.module("axios", () => {
@@ -25,5 +27,5 @@ mock.module("axios", () => {
       create: mock(() => mockAxiosInstance),
     },
     create: mock(() => mockAxiosInstance),
-  }
+  };
 });

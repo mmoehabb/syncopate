@@ -33,10 +33,9 @@ describe("WorkspaceApi", () => {
 
       const result = await workspaceApi.getUserWorkspaces();
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
-        "",
-        { params: { includeBoards: "false" } }
-      );
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith("", {
+        params: { includeBoards: "false" },
+      });
       expect(result).toEqual(mockWorkspaces);
     });
 
@@ -47,10 +46,9 @@ describe("WorkspaceApi", () => {
 
       const result = await workspaceApi.getUserWorkspaces(true);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
-        "",
-        { params: { includeBoards: "true" } }
-      );
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith("", {
+        params: { includeBoards: "true" },
+      });
       expect(result).toEqual(mockWorkspaces);
     });
   });
