@@ -4,8 +4,15 @@ export abstract class ApiClient {
   protected client: AxiosInstance;
 
   constructor(baseURL: string = "/api") {
+    // If not in browser and URL is relative, provide a default absolute base
+    const isServer = typeof window === "undefined";
+    const resolvedBaseURL =
+      isServer && baseURL.startsWith("/")
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost"}${baseURL}`
+        : baseURL;
+
     this.client = axios.create({
-      baseURL,
+      baseURL: resolvedBaseURL,
       headers: {
         "Content-Type": "application/json",
       },

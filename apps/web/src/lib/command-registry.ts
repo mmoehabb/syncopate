@@ -145,7 +145,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("./api/BoardApi").then(({ boardApi }) => {
+      import("@syncopate/api").then(({ boardApi }) => {
         boardApi
           .deleteBoard(workspaceName.trim(), boardName.trim())
           .then(() => {
@@ -192,7 +192,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("./api/BoardApi").then(({ boardApi }) => {
+      import("@syncopate/api").then(({ boardApi }) => {
         boardApi
           .addMember(workspaceName.trim(), boardName.trim(), identifier.trim())
           .then(() => {
@@ -236,7 +236,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("./api/BoardApi").then(({ boardApi }) => {
+      import("@syncopate/api").then(({ boardApi }) => {
         boardApi
           .removeMember(
             workspaceName.trim(),

@@ -1,8 +1,7 @@
 import { ApiClient } from "./ApiClient";
 import { AxiosRequestConfig } from "axios";
-import type { Workspace, Board } from "@prisma/client";
-
-export type WorkspaceWithBoards = Workspace & { boards: Board[] };
+import type { Workspace } from "@syncopate/db";
+import type { WorkspaceWithBoards } from "@syncopate/types";
 
 export class WorkspaceApi extends ApiClient {
   constructor(baseURL?: string) {

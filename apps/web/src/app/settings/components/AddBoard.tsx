@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { githubApi, GithubRepo } from "@/lib/api/GithubApi";
-import { boardApi } from "@/lib/api/BoardApi";
+import { githubApi } from "@syncopate/api";
+import type { GithubRepo } from "@syncopate/types";
+import { boardApi } from "@syncopate/api";
 import { useRouter } from "next/navigation";
 
 interface AddBoardProps {

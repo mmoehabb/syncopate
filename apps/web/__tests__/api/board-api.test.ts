@@ -1,16 +1,15 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
-import type { BoardApi as BoardApiType } from "@/lib/api/BoardApi";
+import { BoardApi } from "@syncopate/api";
 
 describe("BoardApi", () => {
-  let boardApi: BoardApiType;
+  let boardApi: BoardApi;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     mockAxiosInstance.post.mockClear();
     mockAxiosInstance.delete.mockClear();
-    // Dynamically import to ensure mock is registered first
-    const { BoardApi } = await import("@/lib/api/BoardApi");
     boardApi = new BoardApi();
+    boardApi["client"] = mockAxiosInstance as any;
   });
 
   describe("createBoard", () => {
@@ -22,7 +21,7 @@ describe("BoardApi", () => {
         githubRepoId: "123456",
       };
       const mockBoard = { id: "board_123", ...payload };
-      mockAxiosInstance.post.mockResolvedValue({
+      mockAxiosInstance.post.mockResolvedValueOnce({
         data: { board: mockBoard },
       });
 
@@ -42,7 +41,7 @@ describe("BoardApi", () => {
         name: "Minimal Board",
       };
       const mockBoard = { id: "board_456", ...payload };
-      mockAxiosInstance.post.mockResolvedValue({
+      mockAxiosInstance.post.mockResolvedValueOnce({
         data: { board: mockBoard },
       });
 
@@ -62,7 +61,7 @@ describe("BoardApi", () => {
         name: "Error Board",
       };
       const error = new Error("Network Error");
-      mockAxiosInstance.post.mockRejectedValue(error);
+      mockAxiosInstance.post.mockRejectedValueOnce(error);
 
       await expect(boardApi.createBoard(payload)).rejects.toThrow(
         "Network Error",
@@ -80,7 +79,7 @@ describe("BoardApi", () => {
         userId: "user_123",
         role: "MEMBER",
       };
-      mockAxiosInstance.post.mockResolvedValue({
+      mockAxiosInstance.post.mockResolvedValueOnce({
         data: { member: mockMember },
       });
 
@@ -107,7 +106,7 @@ describe("BoardApi", () => {
       const boardName = "my-board";
       const identifier = "user_123";
       const error = new Error("Network Error");
-      mockAxiosInstance.post.mockRejectedValue(error);
+      mockAxiosInstance.post.mockRejectedValueOnce(error);
 
       await expect(
         boardApi.addMember(workspaceName, boardName, identifier),
@@ -121,7 +120,7 @@ describe("BoardApi", () => {
       const boardName = "my-board";
       const identifier = "user_123";
       const mockResponse = { message: "Member removed successfully" };
-      mockAxiosInstance.delete.mockResolvedValue({
+      mockAxiosInstance.delete.mockResolvedValueOnce({
         data: mockResponse,
       });
 
@@ -146,7 +145,7 @@ describe("BoardApi", () => {
       const boardName = "my-board";
       const identifier = "user_123";
       const error = new Error("Delete failed");
-      mockAxiosInstance.delete.mockRejectedValue(error);
+      mockAxiosInstance.delete.mockRejectedValueOnce(error);
 
       await expect(
         boardApi.removeMember(workspaceName, boardName, identifier),
@@ -159,7 +158,7 @@ describe("BoardApi", () => {
       const workspaceName = "my-workspace";
       const boardName = "my-board";
       const mockResponse = { message: "Board deleted successfully" };
-      mockAxiosInstance.delete.mockResolvedValue({
+      mockAxiosInstance.delete.mockResolvedValueOnce({
         data: mockResponse,
       });
 
@@ -178,7 +177,7 @@ describe("BoardApi", () => {
       const workspaceName = "my-workspace";
       const boardName = "my-board";
       const error = new Error("Delete failed");
-      mockAxiosInstance.delete.mockRejectedValue(error);
+      mockAxiosInstance.delete.mockRejectedValueOnce(error);
 
       await expect(
         boardApi.deleteBoard(workspaceName, boardName),

@@ -2,14 +2,14 @@ import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
 
 describe("WorkspaceApi", () => {
-  let workspaceApi: import("@/lib/api/WorkspaceApi").WorkspaceApi;
+  let workspaceApi: import("@syncopate/api").WorkspaceApi;
 
   beforeEach(async () => {
     mockAxiosInstance.get.mockReset();
 
-    const { WorkspaceApi: WorkspaceApiClass } =
-      await import("@/lib/api/WorkspaceApi");
+    const { WorkspaceApi: WorkspaceApiClass } = await import("@syncopate/api");
     workspaceApi = new WorkspaceApiClass();
+    (workspaceApi as any)["client"] = mockAxiosInstance;
   });
 
   afterEach(() => {
@@ -17,14 +17,21 @@ describe("WorkspaceApi", () => {
   });
 
   describe("getUserWorkspaces", () => {
-    it("should fetch workspaces without boards", async () => {
-      const mockWorkspaces = [{ id: "1", name: "Workspace 1" }];
+    const mockWorkspaces = [
+      {
+        id: "1",
+        name: "Test Workspace",
+        role: "ADMIN",
+        boards: [],
+      },
+    ];
 
+    it("should fetch workspaces without boards", async () => {
       mockAxiosInstance.get.mockResolvedValueOnce({
         data: { workspaces: mockWorkspaces },
       });
 
-      const result = await workspaceApi.getUserWorkspaces(false);
+      const result = await workspaceApi.getUserWorkspaces();
 
       expect(mockAxiosInstance.get).toHaveBeenCalledWith("", {
         params: { includeBoards: "false" },
@@ -33,8 +40,6 @@ describe("WorkspaceApi", () => {
     });
 
     it("should fetch workspaces with boards", async () => {
-      const mockWorkspaces = [{ id: "1", name: "Workspace 1", boards: [] }];
-
       mockAxiosInstance.get.mockResolvedValueOnce({
         data: { workspaces: mockWorkspaces },
       });
