@@ -117,7 +117,7 @@ export function useKeyboardNavigation(
                 c.classList.contains("cmd-active-container"),
               );
 
-              if (e.key.toLowerCase() === "l") {
+              if (e.key.toLowerCase() === "l" || e.key.toLowerCase() === "j") {
                 e.preventDefault();
                 const nextIndex =
                   activeContainerIndex < containers.length - 1
@@ -129,7 +129,7 @@ export function useKeyboardNavigation(
                 containers[nextIndex].classList.add("cmd-active-container");
                 return;
               }
-              if (e.key.toLowerCase() === "h") {
+              if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "k") {
                 e.preventDefault();
                 const prevIndex =
                   activeContainerIndex > 0

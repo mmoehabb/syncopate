@@ -19,10 +19,20 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
   const searchQueryParam = searchParams.get("search") || "";
 
   const [searchValue, setSearchValue] = useState(searchQueryParam);
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>(
+    {},
+  );
 
   useEffect(() => {
     setSearchValue(searchQueryParam);
   }, [searchQueryParam]);
+
+  const loadMore = (status: string) => {
+    setVisibleCounts((prev) => ({
+      ...prev,
+      [status]: (prev[status] || 10) + 10,
+    }));
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -95,12 +105,9 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
 
   return (
     <div className="flex-1 flex overflow-hidden">
-      <div className="flex-1 flex flex-col bg-obsidian-night transition-all cmd-container">
+      <div className="flex-1 flex flex-col bg-obsidian-night transition-all">
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
           <h2 className="text-white font-mono font-bold"># {board.name}</h2>
-          <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
-            focused
-          </span>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
@@ -121,12 +128,24 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                 (t: MainBoardTask) => t.status === group.status,
               );
 
+              const visibleLimit = visibleCounts[group.status] || 10;
+              const visibleTasks = groupTasks.slice(0, visibleLimit);
+              const hasMore = groupTasks.length > visibleLimit;
+
               return (
-                <div key={group.status} className="flex flex-col gap-3">
+                <div
+                  key={group.status}
+                  className="flex flex-col gap-3 cmd-container relative"
+                >
                   <div
                     className={`font-mono text-sm font-bold flex items-center justify-between border-b border-white/10 pb-2 ${group.color}`}
                   >
-                    <span>{group.title}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{group.title}</span>
+                      <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity ml-2">
+                        focused
+                      </span>
+                    </div>
                     <span className="bg-white/5 px-2 py-0.5 rounded text-syntax-grey text-xs">
                       {groupTasks.length}
                     </span>
@@ -137,7 +156,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
-                      {groupTasks.map((task: MainBoardTask) => {
+                      {visibleTasks.map((task: MainBoardTask) => {
                         const assignees = task.assignees || [];
                         const reviewers = task.reviewers || [];
 
@@ -350,13 +369,25 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                           </div>
                         );
                       })}
+
+                      {hasMore && (
+                        <button
+                          onClick={() => loadMore(group.status)}
+                          className="mt-2 py-2 px-4 rounded-md border border-white/10 text-syntax-grey font-mono text-xs hover:border-git-green hover:text-git-green transition-colors cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:text-git-green [&.cmd-selected]:bg-git-green/5"
+                        >
+                          [VIEW MORE]
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
               );
             })}
           {tasks.length === 0 && (
-            <div className="text-syntax-grey font-mono text-sm text-center py-10 italic">
+            <div className="text-syntax-grey font-mono text-sm text-center py-10 italic cmd-container relative">
+              <span className="opacity-0 [.cmd-active-container_&]:opacity-100 text-git-green text-xs absolute top-2 right-2 transition-opacity">
+                focused
+              </span>
               No tasks found. Use /add-task to create one.
             </div>
           )}
