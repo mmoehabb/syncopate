@@ -406,24 +406,21 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
   "update-task": {
     name: "update-task",
     description:
-      "Update the selected task's status (usage: /update-task <status>)",
-    action: ({ args, printOutput, selectedTaskId, setMode }) => {
-      if (!selectedTaskId) {
+      "Update a task's status (usage: /update-task <task_id> <status>)",
+    action: ({ args, printOutput, setMode }) => {
+      if (!args || args.length < 2) {
         printOutput([
-          "Error: No task selected. Navigate to a task first using j/k.",
+          "Error: Missing arguments. Usage: /update-task <task_id> <status>",
         ]);
         return;
       }
-      if (!args || args.length === 0) {
-        printOutput(["Error: Missing status. Usage: /update-task <status>"]);
-        return;
-      }
-      const status = args[0].toUpperCase();
+      const taskId = args[0];
+      const status = args[1].toUpperCase();
       import("./actions/tasks").then(({ updateTaskStatus }) => {
-        updateTaskStatus(selectedTaskId, status)
+        updateTaskStatus(taskId, status)
           .then(() => {
             printOutput([
-              `Successfully updated task SYNC-${selectedTaskId} to ${status}`,
+              `Successfully updated task SYNC-${taskId} to ${status}`,
             ]);
             setMode("normal");
           })
@@ -437,18 +434,17 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
   },
   "delete-task": {
     name: "delete-task",
-    description: "Delete the selected task",
-    action: ({ printOutput, selectedTaskId, setMode }) => {
-      if (!selectedTaskId) {
-        printOutput([
-          "Error: No task selected. Navigate to a task first using j/k.",
-        ]);
+    description: "Delete a task (usage: /delete-task <task_id>)",
+    action: ({ args, printOutput, setMode }) => {
+      if (!args || args.length === 0) {
+        printOutput(["Error: Missing task id. Usage: /delete-task <task_id>"]);
         return;
       }
+      const taskId = args[0];
       import("./actions/tasks").then(({ deleteTask }) => {
-        deleteTask(selectedTaskId)
+        deleteTask(taskId)
           .then(() => {
-            printOutput([`Successfully deleted task SYNC-${selectedTaskId}`]);
+            printOutput([`Successfully deleted task SYNC-${taskId}`]);
             setMode("normal");
           })
           .catch((err: unknown) => {
