@@ -1,25 +1,19 @@
 import { Header } from "@/components/landing/Header";
-import { Hero } from "@/components/landing/Hero";
+import { PlansHero } from "@/components/landing/PlansHero";
 import { MatrixBackground } from "@/components/landing/MatrixBackground";
-import { Idea } from "@/components/landing/Idea";
 import { Plans } from "@/components/landing/Plans";
 import { Footer } from "@/components/landing/Footer";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { prisma } from "@syncopate/db";
+
+export const metadata = {
+  title: "Pricing | Syncopate",
+  description:
+    "View Syncopate plans and pricing. Start for free, upgrade when you need to collaborate.",
+};
 
 export const dynamic = "force-dynamic";
 
-export default async function Home(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const session = await auth();
-  const searchParams = await props.searchParams;
-
-  if (session?.user && searchParams.redirect !== "false") {
-    redirect("/dashboard");
-  }
-
+export default async function PlansPage() {
   const plans = await prisma.plan.findMany({
     include: {
       prices: true,
@@ -32,11 +26,10 @@ export default async function Home(props: {
   return (
     <div className="flex-1 flex flex-col items-center min-h-screen bg-obsidian-night relative overflow-x-hidden">
       <MatrixBackground />
-      <div className="w-full max-w-6xl px-6 flex flex-col">
+      <div className="w-full max-w-6xl px-6 flex flex-col min-h-screen">
         <Header />
-        <main className="flex flex-col w-full">
-          <Hero />
-          <Idea />
+        <main className="flex flex-col w-full flex-1">
+          <PlansHero />
           <Plans plans={plans} />
         </main>
         <Footer />

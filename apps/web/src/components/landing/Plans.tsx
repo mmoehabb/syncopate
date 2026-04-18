@@ -2,22 +2,46 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Plan, Price } from "@syncopate/db";
 
-export function Plans() {
-  const [duration, setDuration] = useState<"month" | "three_months" | "year">(
-    "month",
-  );
+export type PlanWithPrices = Plan & { prices: Price[] };
 
-  const teamPrice = {
-    month: 12,
-    three_months: 30, // $10/mo
-    year: 96, // $8/mo
+interface PlansProps {
+  plans: PlanWithPrices[];
+}
+
+export function Plans({ plans }: PlansProps) {
+  const [duration, setDuration] = useState<"MONTH" | "YEAR">("MONTH");
+
+  // Filter plans to show (we can hide inactive ones just in case)
+  const activePlans = plans.filter((p) => p.isActive);
+
+  // Helper to find the right price for a plan based on the selected duration
+  const getPriceForDuration = (
+    plan: PlanWithPrices,
+    selectedDuration: "MONTH" | "YEAR",
+  ) => {
+    // For free or lifetime, they usually have LIFETIME interval
+    const lifetime = plan.prices.find((p) => p.interval === "LIFETIME");
+    if (lifetime) return lifetime;
+
+    // For trials, they might have WEEK
+    const week = plan.prices.find((p) => p.interval === "WEEK");
+    if (week) return week;
+
+    // Otherwise, match the duration
+    const match = plan.prices.find(
+      (p) => p.interval === selectedDuration && p.intervalCount === 1,
+    );
+
+    // Fallback to first available if no exact match (e.g. they only have MONTH and we asked for YEAR)
+    if (!match && plan.prices.length > 0) return plan.prices[0];
+
+    return match;
   };
 
-  const enterprisePrice = {
-    month: 30,
-    three_months: 80,
-    year: 250,
+  const formatPrice = (amount: number) => {
+    return (amount / 100).toString();
   };
 
   return (
@@ -30,132 +54,163 @@ export function Plans() {
 
         <div className="mt-8 flex bg-void-grey p-1 rounded border border-white/10 font-mono text-sm">
           <button
-            className={`px-4 py-2 rounded ${duration === "month" ? "bg-obsidian-night text-neon-pulse border border-white/5" : "text-syntax-grey hover:text-white"}`}
-            onClick={() => setDuration("month")}
+            className={`px-4 py-2 rounded ${duration === "MONTH" ? "bg-obsidian-night text-neon-pulse border border-white/5" : "text-syntax-grey hover:text-white"}`}
+            onClick={() => setDuration("MONTH")}
           >
-            1 Month
+            Monthly
           </button>
           <button
-            className={`px-4 py-2 rounded ${duration === "three_months" ? "bg-obsidian-night text-neon-pulse border border-white/5" : "text-syntax-grey hover:text-white"}`}
-            onClick={() => setDuration("three_months")}
+            className={`px-4 py-2 rounded ${duration === "YEAR" ? "bg-obsidian-night text-neon-pulse border border-white/5" : "text-syntax-grey hover:text-white"}`}
+            onClick={() => setDuration("YEAR")}
           >
-            3 Months
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${duration === "year" ? "bg-obsidian-night text-neon-pulse border border-white/5" : "text-syntax-grey hover:text-white"}`}
-            onClick={() => setDuration("year")}
-          >
-            1 Year
+            Yearly
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Free Tier */}
-        <div className="surface-panel overflow-hidden p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
-          <h4 className="text-xl font-bold text-white mb-2">Solo</h4>
-          <div className="text-3xl font-bold text-white mb-6">
-            $0
-            <span className="text-sm font-normal text-syntax-grey">
-              /forever
-            </span>
-          </div>
-          <ul className="space-y-3 mb-8 text-syntax-grey flex-1">
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> 1 Workspace
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> Up to 5 Boards
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> 1 User (Solo)
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> Full Git Integration
-            </li>
-          </ul>
-          <Link
-            href="/login"
-            className="w-full py-2 text-center rounded border border-white/20 text-white font-mono hover:bg-white/5 transition-colors"
-          >
-            Get Started
-          </Link>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {activePlans.map((plan) => {
+          const price = getPriceForDuration(plan, duration);
+          const isStandard = plan.name === "Standard";
+          const isTrial = plan.isTrial;
+          const isFree = plan.name === "Free";
 
-        {/* Team Tier */}
-        <div className="surface-panel p-8 border border-neon-pulse/50 rounded-lg flex flex-col bg-obsidian-night relative shadow-[0_0_15px_rgba(0,245,255,0.1)]">
-          <div className="absolute -top-3 right-8 bg-neon-pulse text-obsidian-night px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            Most Popular
-          </div>
-          <h4 className="text-xl font-bold text-white mb-2">Team</h4>
-          <div className="text-3xl font-bold text-white mb-6">
-            ${teamPrice[duration]}
-            <span className="text-sm font-normal text-syntax-grey">
-              /
-              {duration
-                .replace("_", " ")
-                .replace("year", "yr")
-                .replace("month", "mo")
-                .replace("three mos", "3mo")}
-            </span>
-          </div>
-          <ul className="space-y-3 mb-8 text-syntax-grey flex-1">
-            <li className="flex items-center gap-2">
-              <span className="text-neon-pulse">✓</span> Unlimited Workspaces
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-neon-pulse">✓</span> Unlimited Boards
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-neon-pulse">✓</span> Up to 10 Members/Board
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-neon-pulse">✓</span> Priority Sync
-            </li>
-          </ul>
-          <Link
-            href="/login"
-            className="w-full py-2 text-center rounded bg-neon-pulse text-obsidian-night font-bold font-mono hover:bg-neon-pulse/90 transition-colors"
-          >
-            Start Free Trial
-          </Link>
-        </div>
+          let priceDisplay = "0";
+          let intervalDisplay = "/forever";
 
-        {/* Enterprise Tier */}
-        <div className="surface-panel overflow-hidden p-8 border border-white/10 rounded-lg flex flex-col bg-void-grey/30">
-          <h4 className="text-xl font-bold text-white mb-2">Enterprise</h4>
-          <div className="text-3xl font-bold text-white mb-6">
-            ${enterprisePrice[duration]}
-            <span className="text-sm font-normal text-syntax-grey">
-              /
-              {duration
-                .replace("_", " ")
-                .replace("year", "yr")
-                .replace("month", "mo")
-                .replace("three mos", "3mo")}
-            </span>
-          </div>
-          <ul className="space-y-3 mb-8 text-syntax-grey flex-1">
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> Everything in Team
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> Unlimited Members
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> SSO Integration
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-git-green">✓</span> Dedicated Support
-            </li>
-          </ul>
-          <Link
-            href="/login"
-            className="w-full py-2 text-center rounded border border-white/20 text-white font-mono hover:bg-white/5 transition-colors"
-          >
-            Contact Sales
-          </Link>
-        </div>
+          if (price) {
+            if (price.amount === 0) {
+              priceDisplay = "0";
+              if (price.interval === "WEEK") intervalDisplay = "/week";
+              else intervalDisplay = "/forever";
+            } else {
+              priceDisplay = formatPrice(price.amount);
+              intervalDisplay = price.interval === "MONTH" ? "/mo" : "/yr";
+            }
+          }
+
+          return (
+            <div
+              key={plan.id}
+              className={`surface-panel p-6 border rounded-lg flex flex-col relative ${
+                isStandard
+                  ? "border-neon-pulse/50 bg-obsidian-night shadow-[0_0_15px_rgba(0,245,255,0.1)]"
+                  : "border-white/10 bg-void-grey/30 overflow-hidden"
+              }`}
+            >
+              {isStandard && (
+                <div className="absolute -top-3 right-6 bg-neon-pulse text-obsidian-night px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                  Most Popular
+                </div>
+              )}
+              {isTrial && (
+                <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
+                  Trial
+                </div>
+              )}
+              <h4 className="text-xl font-bold text-white mb-2">{plan.name}</h4>
+              <div className="text-3xl font-bold text-white mb-6">
+                ${priceDisplay}
+                <span className="text-sm font-normal text-syntax-grey">
+                  {intervalDisplay}
+                </span>
+              </div>
+              <ul className="space-y-3 mb-8 text-syntax-grey flex-1 text-sm">
+                <li className="flex items-center gap-2">
+                  <span
+                    className={
+                      isStandard ? "text-neon-pulse" : "text-git-green"
+                    }
+                  >
+                    ✓
+                  </span>{" "}
+                  {plan.maxWorkspaces === -1 ? "Unlimited" : plan.maxWorkspaces}{" "}
+                  Workspace{plan.maxWorkspaces !== 1 && "s"}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span
+                    className={
+                      isStandard ? "text-neon-pulse" : "text-git-green"
+                    }
+                  >
+                    ✓
+                  </span>{" "}
+                  {plan.maxBoardsPerWorkspace === -1
+                    ? "Unlimited"
+                    : plan.maxBoardsPerWorkspace}{" "}
+                  Board{plan.maxBoardsPerWorkspace !== 1 && "s"}/Workspace
+                </li>
+                <li className="flex items-center gap-2">
+                  <span
+                    className={
+                      isStandard ? "text-neon-pulse" : "text-git-green"
+                    }
+                  >
+                    ✓
+                  </span>{" "}
+                  {plan.maxMembersPerBoard === -1
+                    ? "Unlimited"
+                    : plan.maxMembersPerBoard}{" "}
+                  Member{plan.maxMembersPerBoard !== 1 && "s"}/Board
+                </li>
+                <li className="flex items-center gap-2">
+                  <span
+                    className={
+                      isStandard ? "text-neon-pulse" : "text-git-green"
+                    }
+                  >
+                    ✓
+                  </span>{" "}
+                  {plan.maxActiveBoards === -1
+                    ? "Unlimited"
+                    : plan.maxActiveBoards}{" "}
+                  Active Board{plan.maxActiveBoards !== 1 && "s"} Total
+                </li>
+                {isFree && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-git-green">✓</span> Full Git
+                    Integration
+                  </li>
+                )}
+                {isStandard && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-neon-pulse">✓</span> Priority Sync
+                  </li>
+                )}
+                {isTrial && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-git-green">✓</span> Valid for 7 days
+                  </li>
+                )}
+                {plan.name === "Premium" && (
+                  <>
+                    <li className="flex items-center gap-2">
+                      <span className="text-git-green">✓</span> SSO Integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-git-green">✓</span> Dedicated
+                      Support
+                    </li>
+                  </>
+                )}
+              </ul>
+              <Link
+                href="/login"
+                className={`w-full py-2 text-center rounded font-mono transition-colors ${
+                  isStandard
+                    ? "bg-neon-pulse text-obsidian-night font-bold hover:bg-neon-pulse/90"
+                    : "border border-white/20 text-white hover:bg-white/5"
+                }`}
+              >
+                {isFree
+                  ? "Get Started"
+                  : isTrial
+                    ? "Start Free Trial"
+                    : "Subscribe"}
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
