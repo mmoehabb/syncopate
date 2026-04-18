@@ -11,6 +11,8 @@ export const metadata = {
     "View Syncopate plans and pricing. Start for free, upgrade when you need to collaborate.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function PlansPage() {
   const plans = await prisma.plan.findMany({
     include: {
