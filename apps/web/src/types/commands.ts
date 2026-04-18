@@ -12,6 +12,8 @@ export interface Command {
     activeBoardId?: string;
     isVoiceCallActive?: boolean;
     setIsVoiceCallActive?: (active: boolean) => void;
+    virtualPath: string;
+    setVirtualPath: (path: string) => void;
   }) => void;
 }
 

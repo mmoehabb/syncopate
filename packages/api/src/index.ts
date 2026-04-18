@@ -4,4 +4,5 @@ export * from "./GithubApi";
 export * from "./SubscriptionApi";
 export * from "./TaskApi";
 export * from "./WorkspaceApi";
+export * from "./DirectoryApi";
 export * from "./error";
