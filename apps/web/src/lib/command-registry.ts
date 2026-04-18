@@ -1,7 +1,116 @@
 import { Command } from "../types/commands";
 import { NORMAL_ACTIONS_REGISTRY } from "./normal-actions-registry";
 
+import { resolvePath } from "./utils/path";
+
 export const COMMAND_REGISTRY: Record<string, Command> = {
+  ls: {
+    name: "ls",
+    description: "List directory contents (Workspaces, Boards, Tasks)",
+    action: ({ args, printOutput, virtualPath }) => {
+      const targetPath = args && args.length > 0 ? args[0] : ".";
+      const resolvedPath = resolvePath(virtualPath, targetPath);
+
+      import("@syncopate/api").then(({ directoryApi }) => {
+        directoryApi
+          .getDirectory(resolvedPath)
+          .then((response) => {
+            if (response.entries.length === 0) {
+              printOutput([]);
+              return;
+            }
+
+            const outputLines = response.entries.map(
+              (entry) => `${entry.name} [${entry.type}]`,
+            );
+            printOutput(outputLines);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to list directory.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  cd: {
+    name: "cd",
+    description: "Change directory",
+    action: ({
+      args,
+      printOutput,
+      navigate,
+      virtualPath,
+      setVirtualPath,
+      setMode,
+    }) => {
+      const targetPath = args && args.length > 0 ? args[0] : "~";
+      const resolvedPath = resolvePath(virtualPath, targetPath);
+
+      import("@syncopate/api").then(({ directoryApi }) => {
+        directoryApi
+          .getDirectory(resolvedPath)
+          .then((response) => {
+            setVirtualPath(resolvedPath);
+
+            // Navigate based on type
+            if (response.type === "Root" || response.type === "Workspace") {
+              navigate("/dashboard");
+              setMode("normal");
+            } else if (response.type === "Board" && response.id) {
+              navigate(`/dashboard/b/${response.id}`);
+              setMode("normal");
+            } else if (response.type === "Task" && response.id) {
+              // Extract the board part from the path to get the boardId to navigate
+              const pathParts = resolvedPath.split("/").filter(Boolean);
+              if (pathParts.length === 3) {
+                // To safely get boardId, we could query the parent directory, but a simpler way is to just use search params
+                // Actually, if we go to dashboard root with ?taskId=..., it won't open side panel unless we're on the right board
+                // Let's fetch the parent board to get its ID
+                const parentPath = resolvePath(resolvedPath, "..");
+                directoryApi
+                  .getDirectory(parentPath)
+                  .then((parentRes) => {
+                    if (parentRes.id) {
+                      navigate(
+                        `/dashboard/b/${parentRes.id}?taskId=${response.id}`,
+                      );
+                      setMode("normal");
+                    } else {
+                      printOutput([`Changed directory to ${resolvedPath}`]);
+                    }
+                  })
+                  .catch(() => {
+                    printOutput([`Changed directory to ${resolvedPath}`]);
+                  });
+                return;
+              }
+              printOutput([`Changed directory to ${resolvedPath}`]);
+            } else {
+              printOutput([`Changed directory to ${resolvedPath}`]);
+            }
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to change directory.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  pwd: {
+    name: "pwd",
+    description: "Print working directory",
+    action: ({ printOutput, virtualPath }) => {
+      printOutput([virtualPath]);
+    },
+  },
   help: {
     name: "help",
     description: "List all available commands and shortcuts",

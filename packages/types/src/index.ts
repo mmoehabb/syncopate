@@ -49,6 +49,22 @@ export interface UpdateTaskStatusPayload {
 // Workspace types
 export type WorkspaceWithBoards = Workspace & { boards: Board[] };
 
+// Directory Types
+export type DirectoryEntryType = "Workspace" | "Board" | "Task";
+
+export interface DirectoryEntry {
+  id: string;
+  name: string; // The display name or title
+  type: DirectoryEntryType;
+}
+
+export interface DirectoryResponse {
+  path: string;
+  type: "Root" | "Workspace" | "Board" | "Task"; // The type of the current directory
+  id?: string; // The ID of the current directory entity, if applicable
+  entries: DirectoryEntry[];
+}
+
 // Error types
 export interface ApiErrorDefinition {
   error: string;

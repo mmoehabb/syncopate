@@ -10,6 +10,8 @@ import {
   useKeyboardNavigation,
 } from "../hooks/command";
 
+import { useEffect } from "react";
+
 interface CommandContextType {
   mode: AppMode;
   setMode: (mode: AppMode) => void;
@@ -21,6 +23,10 @@ interface CommandContextType {
   setSelectedTaskId: (id: string | null) => void;
   isVoiceCallActive: boolean;
   setIsVoiceCallActive: (active: boolean) => void;
+
+  commandLog: string[];
+  virtualPath: string;
+  setVirtualPath: (path: string) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -28,6 +34,8 @@ const CommandContext = createContext<CommandContextType | undefined>(undefined);
 export function CommandProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AppMode>("normal");
   const [outputHistory, setOutputHistory] = useState<string[]>([]);
+  const [commandLog, setCommandLog] = useState<string[]>([]);
+  const [virtualPath, setVirtualPath] = useState<string>("/");
   const router = useRouter();
   const params = useParams();
 
@@ -37,6 +45,27 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const { isInputFocused } = useInputFocusTracking();
   useActiveContainerSync();
   useKeyboardNavigation(mode, setMode);
+
+  // Load command log and virtual path from local storage on mount
+  useEffect(() => {
+    try {
+      const storedLog = localStorage.getItem("syncopate_command_log");
+      if (storedLog) {
+        setCommandLog(JSON.parse(storedLog));
+      }
+      const storedPath = localStorage.getItem("syncopate_virtual_path");
+      if (storedPath) {
+        setVirtualPath(storedPath);
+      }
+    } catch (e) {
+      console.error("Failed to load state from localStorage:", e);
+    }
+  }, []);
+
+  // Save virtual path to local storage when it changes
+  useEffect(() => {
+    localStorage.setItem("syncopate_virtual_path", virtualPath);
+  }, [virtualPath]);
 
   const clearHistory = () => setOutputHistory([]);
 
@@ -49,11 +78,24 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   };
 
   const executeCommand = (commandStr: string) => {
-    const parts = commandStr.trim().split(" ");
+    const trimmedCommand = commandStr.trim();
+    if (!trimmedCommand) return;
+
+    // Update command log
+    setCommandLog((prev) => {
+      const newLog = [
+        trimmedCommand,
+        ...prev.filter((c) => c !== trimmedCommand),
+      ].slice(0, 10);
+      localStorage.setItem("syncopate_command_log", JSON.stringify(newLog));
+      return newLog;
+    });
+
+    const parts = trimmedCommand.split(" ");
     const cmdName = parts[0].toLowerCase();
     const args = parts.slice(1);
 
-    printOutput([`$ /${commandStr.trim()}`]);
+    printOutput([`$ /${trimmedCommand}`]);
 
     if (COMMAND_REGISTRY[cmdName]) {
       COMMAND_REGISTRY[cmdName].action({
@@ -65,6 +107,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         activeBoardId: params?.boardId as string | undefined,
         isVoiceCallActive,
         setIsVoiceCallActive,
+        virtualPath,
+        setVirtualPath,
       });
     } else {
       printOutput([
@@ -85,6 +129,9 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setSelectedTaskId,
         isVoiceCallActive,
         setIsVoiceCallActive,
+        commandLog,
+        virtualPath,
+        setVirtualPath,
       }}
     >
       {children}

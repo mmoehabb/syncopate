@@ -4,10 +4,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCommand } from "../context/CommandContext";
 
 export function CommandBar() {
-  const { mode, setMode, outputHistory, executeCommand } = useCommand();
+  const { mode, setMode, outputHistory, executeCommand, commandLog, virtualPath } = useCommand();
   const [inputValue, setInputValue] = useState("");
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const outputEndRef = useRef<HTMLDivElement>(null);
+
+  // Reset history index when mode changes
+  useEffect(() => {
+    if (mode === "command") {
+      setHistoryIndex(-1);
+    }
+  }, [mode]);
 
   // Focus input when entering command mode
   useEffect(() => {
@@ -36,12 +44,33 @@ export function CommandBar() {
       if (inputValue.trim()) {
         executeCommand(inputValue);
         setInputValue("");
+        setHistoryIndex(-1);
         // After command execution, user might want to stay in command mode or we could switch.
         // We'll keep them in command mode so they can read the output. Escape handles exit.
       }
     } else if (e.key === "Escape") {
       e.preventDefault();
       setMode("normal");
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (commandLog.length > 0) {
+        const nextIndex = historyIndex + 1;
+        if (nextIndex < commandLog.length) {
+          setHistoryIndex(nextIndex);
+          setInputValue(commandLog[nextIndex]);
+        }
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIndex >= 0) {
+        const nextIndex = historyIndex - 1;
+        setHistoryIndex(nextIndex);
+        if (nextIndex === -1) {
+          setInputValue("");
+        } else {
+          setInputValue(commandLog[nextIndex]);
+        }
+      }
     }
   };
 
@@ -72,6 +101,9 @@ export function CommandBar() {
       {/* Command Input Area */}
       <div className="bg-void-grey border-t border-white/10 p-2 sm:p-4">
         <div className="max-w-5xl mx-auto w-full flex items-center gap-2">
+          {mode === "command" && (
+            <span className="text-neon-pulse font-mono text-sm mr-2">{virtualPath}</span>
+          )}
           <span className="text-neon-pulse font-mono font-bold">/</span>
           <input
             ref={inputRef}
