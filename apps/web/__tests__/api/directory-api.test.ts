@@ -19,9 +19,7 @@ describe("DirectoryApi", () => {
         path,
         type: "Board",
         id: "board_123",
-        entries: [
-          { id: "123", name: "SYNC-123", type: "Task" },
-        ],
+        entries: [{ id: "123", name: "SYNC-123", type: "Task" }],
       };
 
       mockAxiosInstance.get.mockResolvedValueOnce({
@@ -41,7 +39,9 @@ describe("DirectoryApi", () => {
       const error = new Error("Network Error");
       mockAxiosInstance.get.mockRejectedValueOnce(error);
 
-      await expect(directoryApi.getDirectory(path)).rejects.toThrow("Network Error");
+      await expect(directoryApi.getDirectory(path)).rejects.toThrow(
+        "Network Error",
+      );
     });
   });
 });

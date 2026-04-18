@@ -4,7 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCommand } from "../context/CommandContext";
 
 export function CommandBar() {
-  const { mode, setMode, outputHistory, executeCommand, commandLog, virtualPath } = useCommand();
+  const {
+    mode,
+    setMode,
+    outputHistory,
+    executeCommand,
+    commandLog,
+    virtualPath,
+  } = useCommand();
   const [inputValue, setInputValue] = useState("");
   const [historyIndex, setHistoryIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,7 +109,9 @@ export function CommandBar() {
       <div className="bg-void-grey border-t border-white/10 p-2 sm:p-4">
         <div className="max-w-5xl mx-auto w-full flex items-center gap-2">
           {mode === "command" && (
-            <span className="text-neon-pulse font-mono text-sm mr-2">{virtualPath}</span>
+            <span className="text-neon-pulse font-mono text-sm mr-2">
+              {virtualPath}
+            </span>
           )}
           <span className="text-neon-pulse font-mono font-bold">/</span>
           <input
