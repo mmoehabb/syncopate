@@ -17,6 +17,7 @@ interface CommandContextType {
   setMode: (mode: AppMode) => void;
   outputHistory: string[];
   executeCommand: (commandStr: string) => void;
+  printOutput: (output: string[]) => void;
   clearHistory: () => void;
 
   selectedTaskId: string | null;
@@ -124,6 +125,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setMode,
         outputHistory,
         executeCommand,
+        printOutput,
         clearHistory,
         selectedTaskId,
         setSelectedTaskId,

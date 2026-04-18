@@ -55,6 +55,7 @@ export type DirectoryEntryType = "Workspace" | "Board" | "Task";
 export interface DirectoryEntry {
   id: string;
   name: string; // The display name or title
+  title?: string; // Optional title, mainly for Tasks
   type: DirectoryEntryType;
 }
 

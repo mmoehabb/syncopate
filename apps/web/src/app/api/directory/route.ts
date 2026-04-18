@@ -52,15 +52,19 @@ export async function GET(req: Request) {
 
     const workspaceName = parts[0];
 
-    // Verify workspace access
-    const workspace = await prisma.workspace.findFirst({
+    // Get all workspaces for the user to find the matching one case-insensitively
+    const workspaces = await prisma.workspace.findMany({
       where: {
-        name: workspaceName,
         members: {
           some: { userId: session.user.id },
         },
       },
     });
+
+    const workspace = workspaces.find(
+      (w) =>
+        w.name.toLowerCase().replace(/ /g, "-") === workspaceName.toLowerCase(),
+    );
 
     if (!workspace) {
       return apiError(
@@ -117,13 +121,17 @@ export async function GET(req: Request) {
 
     const boardName = parts[1];
 
-    // Verify board access
-    const board = await prisma.board.findFirst({
+    // Get all boards in the workspace to find the matching one case-insensitively
+    const boards = await prisma.board.findMany({
       where: {
         workspaceId: workspace.id,
-        name: boardName,
       },
     });
+
+    const board = boards.find(
+      (b) =>
+        b.name.toLowerCase().replace(/ /g, "-") === boardName.toLowerCase(),
+    );
 
     if (!board) {
       return apiError(
@@ -178,6 +186,7 @@ export async function GET(req: Request) {
         entries: tasks.map((t) => ({
           id: t.id.toString(),
           name: `SYNC-${t.id}`,
+          title: t.title,
           type: "Task",
         })),
       };

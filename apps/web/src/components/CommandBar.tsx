@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useCommand } from "../context/CommandContext";
+import { resolvePath } from "../lib/utils/path";
 
 export function CommandBar() {
   const {
@@ -9,6 +10,7 @@ export function CommandBar() {
     setMode,
     outputHistory,
     executeCommand,
+    printOutput,
     commandLog,
     virtualPath,
   } = useCommand();
@@ -45,8 +47,89 @@ export function CommandBar() {
     }
   }, [outputHistory, mode]); // also scroll when mode opens
 
+  const handleTabCompletion = async () => {
+    const commandsWithPaths = [
+      "cd",
+      "ls",
+      "delete-board",
+      "add-member",
+      "rmv-member",
+    ];
+    const parts = inputValue.split(" ");
+    if (parts.length === 0) return;
+
+    const cmdName = parts[0].toLowerCase();
+
+    // Auto-complete command name itself
+    if (parts.length === 1) {
+      import("../lib/command-registry").then(({ COMMAND_REGISTRY }) => {
+        const matches = Object.keys(COMMAND_REGISTRY).filter((c) =>
+          c.startsWith(cmdName),
+        );
+        if (matches.length === 1) {
+          setInputValue(matches[0] + " ");
+        } else if (matches.length > 1) {
+          printOutput([`$ /${inputValue}`, ...matches]);
+        }
+      });
+      return;
+    }
+
+    if (!commandsWithPaths.includes(cmdName)) {
+      return;
+    }
+
+    // Auto-complete paths
+    const pathPrefix = parts.slice(1).join(" ");
+
+    const lastSlashIndex = pathPrefix.lastIndexOf("/");
+    const dirPath =
+      lastSlashIndex >= 0 ? pathPrefix.substring(0, lastSlashIndex) : ".";
+    const prefix =
+      lastSlashIndex >= 0
+        ? pathPrefix.substring(lastSlashIndex + 1)
+        : pathPrefix;
+
+    const resolvedPath = resolvePath(virtualPath, dirPath);
+
+    try {
+      const { directoryApi } = await import("@syncopate/api");
+      const response = await directoryApi.getDirectory(resolvedPath);
+
+      const entries = response.entries.map((e) => {
+        if (e.type === "Task") {
+          return e.name; // Keep SYNC-123 casing
+        }
+        const formattedName = e.name.toLowerCase().replace(/ /g, "-");
+        // Only return name, tasks should just use the ID
+        return formattedName;
+      });
+
+      const matches = entries.filter((e) =>
+        e.toLowerCase().startsWith(prefix.toLowerCase()),
+      );
+
+      if (matches.length === 1) {
+        const completedPath =
+          lastSlashIndex >= 0
+            ? pathPrefix.substring(0, lastSlashIndex + 1) + matches[0]
+            : matches[0];
+        // Only add trailing slash if it's not a task, but we don't necessarily know that easily here without matching the entry type.
+        // Let's just complete the path. If they want to go deeper, they can type slash.
+        setInputValue(`${cmdName} ${completedPath}`);
+      } else if (matches.length > 1) {
+        printOutput([`$ /${inputValue}`, ...matches]);
+      }
+    } catch (err) {
+      // Ignore errors for auto-completion (e.g., directory not found)
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      handleTabCompletion();
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (inputValue.trim()) {
         executeCommand(inputValue);
