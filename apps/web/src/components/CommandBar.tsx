@@ -108,11 +108,6 @@ export function CommandBar() {
       {/* Command Input Area */}
       <div className="bg-void-grey border-t border-white/10 p-2 sm:p-4">
         <div className="max-w-5xl mx-auto w-full flex items-center gap-2">
-          {mode === "command" && (
-            <span className="text-neon-pulse font-mono text-sm mr-2">
-              {virtualPath}
-            </span>
-          )}
           <span className="text-neon-pulse font-mono font-bold">/</span>
           <input
             ref={inputRef}
