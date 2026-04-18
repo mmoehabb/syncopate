@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 import { CommandProvider } from "../context/CommandContext";
+import { ToastProvider } from "../context/ToastContext";
 import { CommandBar } from "../components/CommandBar";
 import { Cursor } from "../components/Cursor";
 
@@ -36,10 +37,12 @@ export default function RootLayout({
     >
       <body className="antialiased min-h-screen flex flex-col relative">
         <Cursor />
-        <CommandProvider>
-          {children}
-          <CommandBar />
-        </CommandProvider>
+        <ToastProvider>
+          <CommandProvider>
+            {children}
+            <CommandBar />
+          </CommandProvider>
+        </ToastProvider>
       </body>
     </html>
   );
