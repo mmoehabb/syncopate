@@ -96,7 +96,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
         <div className="text-syntax-grey font-mono text-sm">
           Select a board to view tasks
         </div>
-        <span className="absolute top-4 right-4 text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
+        <span className="absolute top-4 right-4 text-neon-pulse font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
           focused
         </span>
       </div>
@@ -142,7 +142,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                   >
                     <div className="flex items-center gap-2">
                       <span>{group.title}</span>
-                      <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity ml-2">
+                      <span className="text-neon-pulse font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity ml-2">
                         focused
                       </span>
                     </div>
@@ -385,7 +385,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
             })}
           {tasks.length === 0 && (
             <div className="text-syntax-grey font-mono text-sm text-center py-10 italic cmd-container relative">
-              <span className="opacity-0 [.cmd-active-container_&]:opacity-100 text-git-green text-xs absolute top-2 right-2 transition-opacity">
+              <span className="opacity-0 [.cmd-active-container_&]:opacity-100 text-neon-pulse text-xs absolute top-2 right-2 transition-opacity">
                 focused
               </span>
               No tasks found. Use /add-task to create one.
