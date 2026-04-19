@@ -139,7 +139,7 @@ export function AppGuide() {
                   onClick={() => setCurrentPage(index)}
                   className={`w-2.5 h-2.5 rounded-full transition-colors focus:outline-none ${
                     index === currentPage
-                      ? "bg-git-blue"
+                      ? "bg-neon-pulse"
                       : "bg-white/20 hover:bg-white/40"
                   }`}
                   aria-label={`Go to page ${index + 1}`}
