@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useRef,
+} from "react";
 import { useRouter, useParams } from "next/navigation";
 import { AppMode } from "../types/commands";
 import { COMMAND_REGISTRY } from "../lib/command-registry";
@@ -28,6 +34,17 @@ interface CommandContextType {
   commandLog: string[];
   virtualPath: string;
   setVirtualPath: (path: string) => void;
+
+  deleteModalState: {
+    isOpen: boolean;
+    message?: string;
+    onConfirm?: () => Promise<void>;
+  };
+  setDeleteModalState: (state: {
+    isOpen: boolean;
+    message?: string;
+    onConfirm?: () => Promise<void>;
+  }) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
@@ -43,21 +60,31 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isVoiceCallActive, setIsVoiceCallActive] = useState(false);
 
+  const [deleteModalState, setDeleteModalState] = useState<{
+    isOpen: boolean;
+    message?: string;
+    onConfirm?: () => Promise<void>;
+  }>({ isOpen: false });
+
   const { isInputFocused } = useInputFocusTracking();
   useActiveContainerSync();
   useKeyboardNavigation(mode, setMode);
 
   // Load command log and virtual path from local storage on mount
+  const isLoaded = useRef(false);
   useEffect(() => {
+    if (isLoaded.current) return;
     try {
       const storedLog = localStorage.getItem("syncopate_command_log");
       if (storedLog) {
-        setCommandLog(JSON.parse(storedLog));
+        // use timeout to avoid setting state in effect synchronously
+        setTimeout(() => setCommandLog(JSON.parse(storedLog)), 0);
       }
       const storedPath = localStorage.getItem("syncopate_virtual_path");
       if (storedPath) {
-        setVirtualPath(storedPath);
+        setTimeout(() => setVirtualPath(storedPath), 0);
       }
+      isLoaded.current = true;
     } catch (e) {
       console.error("Failed to load state from localStorage:", e);
     }
@@ -110,6 +137,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setIsVoiceCallActive,
         virtualPath,
         setVirtualPath,
+        setDeleteModalState,
       });
     } else {
       printOutput([
@@ -134,6 +162,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         commandLog,
         virtualPath,
         setVirtualPath,
+        deleteModalState,
+        setDeleteModalState,
       }}
     >
       {children}

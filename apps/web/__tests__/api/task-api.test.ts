@@ -12,6 +12,7 @@ describe("TaskApi", () => {
 
     const { TaskApi: TaskApiClass } = await import("@syncopate/api");
     taskApi = new TaskApiClass();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (taskApi as any)["client"] = mockAxiosInstance;
   });
 
