@@ -68,10 +68,33 @@ const GUIDE_PAGES = [
   },
 ];
 
-export function AppGuide() {
+export function AppGuide({ userCreatedAt }: { userCreatedAt?: string | Date }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [shouldPulse, setShouldPulse] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (userCreatedAt) {
+      const createdDate = new Date(userCreatedAt);
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+      const isNewUser =
+        new Date().getTime() - createdDate.getTime() < oneDayInMs;
+      const hasOpened = localStorage.getItem("syncopate_guide_opened");
+
+      if (isNewUser && !hasOpened) {
+        setShouldPulse(true);
+      }
+    }
+  }, [userCreatedAt]);
+
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen && shouldPulse) {
+      setShouldPulse(false);
+      localStorage.setItem("syncopate_guide_opened", "true");
+    }
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -94,8 +117,12 @@ export function AppGuide() {
   return (
     <div className="relative" ref={containerRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center p-2 rounded text-syntax-grey hover:bg-white/5 hover:text-white transition-colors focus:outline-none"
+        onClick={handleOpen}
+        className={`flex items-center justify-center p-2 rounded transition-colors focus:outline-none ${
+          shouldPulse
+            ? "text-neon-pulse animate-pulse bg-neon-pulse/10 hover:bg-neon-pulse/20"
+            : "text-syntax-grey hover:bg-white/5 hover:text-white"
+        }`}
         aria-label="App Guide"
       >
         <HelpCircle size={20} />

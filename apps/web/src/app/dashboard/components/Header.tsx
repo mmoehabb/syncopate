@@ -21,7 +21,7 @@ export function Header() {
 
       {session?.user && (
         <div className="flex items-center gap-2">
-          <AppGuide />
+          <AppGuide userCreatedAt={session.user.createdAt as string | Date} />
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
