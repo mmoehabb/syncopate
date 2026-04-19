@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { HelpCircle, X } from "lucide-react";
+import { HelpCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const GUIDE_PAGES = [
   {
@@ -119,19 +119,49 @@ export function AppGuide() {
             {GUIDE_PAGES[currentPage].content}
           </div>
 
-          <div className="px-4 py-3 border-t border-white/10 flex justify-center items-center gap-2 bg-white/5">
-            {GUIDE_PAGES.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentPage(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-colors focus:outline-none ${
-                  index === currentPage
-                    ? "bg-git-blue"
-                    : "bg-white/20 hover:bg-white/40"
-                }`}
-                aria-label={`Go to page ${index + 1}`}
-              />
-            ))}
+          <div className="px-4 py-3 border-t border-white/10 flex justify-between items-center bg-white/5">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+              disabled={currentPage === 0}
+              className={`p-1 rounded transition-colors focus:outline-none ${
+                currentPage === 0
+                  ? "text-syntax-grey/30 cursor-not-allowed"
+                  : "text-syntax-grey hover:bg-white/10 hover:text-white"
+              }`}
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div className="flex gap-2">
+              {GUIDE_PAGES.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors focus:outline-none ${
+                    index === currentPage
+                      ? "bg-git-blue"
+                      : "bg-white/20 hover:bg-white/40"
+                  }`}
+                  aria-label={`Go to page ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(GUIDE_PAGES.length - 1, prev + 1),
+                )
+              }
+              disabled={currentPage === GUIDE_PAGES.length - 1}
+              className={`p-1 rounded transition-colors focus:outline-none ${
+                currentPage === GUIDE_PAGES.length - 1
+                  ? "text-syntax-grey/30 cursor-not-allowed"
+                  : "text-syntax-grey hover:bg-white/10 hover:text-white"
+              }`}
+              aria-label="Next page"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
       )}
