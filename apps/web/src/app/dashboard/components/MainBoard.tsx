@@ -30,7 +30,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
   const loadMore = (status: string) => {
     setVisibleCounts((prev) => ({
       ...prev,
-      [status]: (prev[status] || 10) + 10,
+      [status]: (prev[status] || 5) + 5,
     }));
   };
 
@@ -128,7 +128,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                 (t: MainBoardTask) => t.status === group.status,
               );
 
-              const visibleLimit = visibleCounts[group.status] || 10;
+              const visibleLimit = visibleCounts[group.status] || 5;
               const visibleTasks = groupTasks.slice(0, visibleLimit);
               const hasMore = groupTasks.length > visibleLimit;
 
@@ -200,7 +200,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                             onClick={() =>
                               router.push(`?taskId=${task.id.toString()}`)
                             }
-                            className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex flex-col gap-2 ${selectedTask?.id === task.id ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]" : "border-white/10 bg-void-grey hover:border-white/20"} cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-git-green/5 [&.cmd-selected]:shadow-md [&.cmd-selected]:scale-[1.01]`}
+                            className={`surface-panel p-3 rounded-md border transition-all cursor-pointer flex flex-col gap-2 ${selectedTask?.id === task.id ? "border-git-green bg-git-green/5 shadow-md scale-[1.01]" : "border-white/10 bg-void-grey hover:border-white/20"} cmd-selectable [&.cmd-selected]:border-neon-pulse [&.cmd-selected]:bg-neon-pulse/5 [&.cmd-selected]:shadow-md [&.cmd-selected]:scale-[1.01]`}
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex flex-col">
@@ -373,7 +373,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                       {hasMore && (
                         <button
                           onClick={() => loadMore(group.status)}
-                          className="mt-2 py-2 px-4 rounded-md border border-white/10 text-syntax-grey font-mono text-xs hover:border-git-green hover:text-git-green transition-colors cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:text-git-green [&.cmd-selected]:bg-git-green/5"
+                          className="mt-2 py-2 px-4 rounded-md border border-white/10 text-syntax-grey font-mono text-xs hover:border-neon-pulse hover:text-neon-pulse transition-colors cmd-selectable [&.cmd-selected]:border-neon-pulse [&.cmd-selected]:text-neon-pulse [&.cmd-selected]:bg-neon-pulse/5"
                         >
                           [VIEW MORE]
                         </button>

@@ -126,7 +126,12 @@ export function useKeyboardNavigation(
                 containers.forEach((c) =>
                   c.classList.remove("cmd-active-container"),
                 );
-                containers[nextIndex].classList.add("cmd-active-container");
+                const nextContainer = containers[nextIndex];
+                nextContainer.classList.add("cmd-active-container");
+                nextContainer.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                });
                 return;
               }
               if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "k") {
@@ -139,8 +144,13 @@ export function useKeyboardNavigation(
                   c.classList.remove("cmd-active-container"),
                 );
                 const targetContainer = containers[prevIndex] || containers[0];
-                if (targetContainer)
+                if (targetContainer) {
                   targetContainer.classList.add("cmd-active-container");
+                  targetContainer.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                  });
+                }
                 return;
               }
             }
