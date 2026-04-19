@@ -14,6 +14,11 @@ export interface Command {
     setIsVoiceCallActive?: (active: boolean) => void;
     virtualPath: string;
     setVirtualPath: (path: string) => void;
+    setDeleteModalState?: (state: {
+      isOpen: boolean;
+      message?: string;
+      onConfirm?: () => Promise<void>;
+    }) => void;
   }) => void;
 }
 

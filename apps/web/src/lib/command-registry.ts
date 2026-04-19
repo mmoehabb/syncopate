@@ -126,7 +126,6 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       const navCommands = commands.filter((c) =>
         [
           "dashboard",
-          "pulls",
           "settings",
           "back",
           "forward",
@@ -210,14 +209,6 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       printOutput(["Logging out..."]);
       const { signOut } = await import("next-auth/react");
       await signOut({ callbackUrl: "/login" });
-    },
-  },
-  pulls: {
-    name: "pulls",
-    description: "Navigate to the pull requests view",
-    action: ({ navigate, setMode }) => {
-      navigate("/pulls");
-      setMode("normal");
     },
   },
   settings: {

@@ -10,6 +10,7 @@ describe("SubscriptionApi", () => {
     const { SubscriptionApi: SubscriptionApiClass } =
       await import("@syncopate/api");
     subscriptionApi = new SubscriptionApiClass();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (subscriptionApi as any)["client"] = mockAxiosInstance;
   });
 
