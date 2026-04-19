@@ -68,10 +68,8 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
             // Navigate based on type
             if (response.type === "Root" || response.type === "Workspace") {
               navigate("/dashboard");
-              setMode("normal");
             } else if (response.type === "Board" && response.id) {
               navigate(`/dashboard/b/${response.id}`);
-              setMode("normal");
             } else if (response.type === "Task" && response.id) {
               // Extract the board part from the path to get the boardId to navigate
               const pathParts = resolvedPath.split("/").filter(Boolean);
@@ -87,7 +85,6 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
                       navigate(
                         `/dashboard/b/${parentRes.id}?taskId=${response.id}`,
                       );
-                      setMode("normal");
                     } else {
                       printOutput([`Changed directory to ${resolvedPath}`]);
                     }
