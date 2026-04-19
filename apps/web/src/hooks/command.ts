@@ -265,6 +265,20 @@ export function useKeyboardNavigation(
               } else {
                 selectedElement.click();
               }
+            } else {
+              // Trigger default action (like expand/collapse) if nothing is selected within the container
+              const activeContainer = document.querySelector(
+                ".cmd-active-container",
+              );
+              if (activeContainer) {
+                const collapsibleHeader = activeContainer.querySelector(
+                  ".cmd-collapsible",
+                ) as HTMLElement;
+                if (collapsibleHeader) {
+                  e.preventDefault();
+                  collapsibleHeader.click();
+                }
+              }
             }
             return;
           }
