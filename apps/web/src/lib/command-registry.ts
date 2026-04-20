@@ -481,7 +481,11 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       import("@syncopate/api").then(({ boardApi }) => {
         boardApi
-          .inviteMember(workspaceName.trim(), boardName.trim(), identifier.trim())
+          .inviteMember(
+            workspaceName.trim(),
+            boardName.trim(),
+            identifier.trim(),
+          )
           .then(() => {
             printOutput([
               `Successfully invited member '${identifier}' to board '${boardName}'.`,
