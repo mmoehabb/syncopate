@@ -117,7 +117,7 @@ export function useKeyboardNavigation(
                 c.classList.contains("cmd-active-container"),
               );
 
-              if (e.key.toLowerCase() === "l") {
+              if (e.key.toLowerCase() === "l" || e.key.toLowerCase() === "j") {
                 e.preventDefault();
                 const nextIndex =
                   activeContainerIndex < containers.length - 1
@@ -126,10 +126,15 @@ export function useKeyboardNavigation(
                 containers.forEach((c) =>
                   c.classList.remove("cmd-active-container"),
                 );
-                containers[nextIndex].classList.add("cmd-active-container");
+                const nextContainer = containers[nextIndex];
+                nextContainer.classList.add("cmd-active-container");
+                nextContainer.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                });
                 return;
               }
-              if (e.key.toLowerCase() === "h") {
+              if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "k") {
                 e.preventDefault();
                 const prevIndex =
                   activeContainerIndex > 0
@@ -139,8 +144,13 @@ export function useKeyboardNavigation(
                   c.classList.remove("cmd-active-container"),
                 );
                 const targetContainer = containers[prevIndex] || containers[0];
-                if (targetContainer)
+                if (targetContainer) {
                   targetContainer.classList.add("cmd-active-container");
+                  targetContainer.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                  });
+                }
                 return;
               }
             }
@@ -254,6 +264,20 @@ export function useKeyboardNavigation(
                 selectedElement.focus();
               } else {
                 selectedElement.click();
+              }
+            } else {
+              // Trigger default action (like expand/collapse) if nothing is selected within the container
+              const activeContainer = document.querySelector(
+                ".cmd-active-container",
+              );
+              if (activeContainer) {
+                const collapsibleHeader = activeContainer.querySelector(
+                  ".cmd-collapsible",
+                ) as HTMLElement;
+                if (collapsibleHeader) {
+                  e.preventDefault();
+                  collapsibleHeader.click();
+                }
               }
             }
             return;

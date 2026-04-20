@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronRight, ChevronDown, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { DashboardWorkspace } from "./types";
+import { FocusedLabel } from "@/components/ui/FocusedLabel";
 
 type FlatItem = {
   type: "workspace" | "board";
@@ -39,9 +40,7 @@ export function Sidebar({
     <div className="w-64 border-r border-white/10 bg-void-grey/50 flex flex-col font-mono text-sm transition-all cmd-container">
       <div className="p-4 border-b border-white/10 text-syntax-grey flex items-center justify-between">
         <span className="font-bold">Explorer</span>
-        <span className="text-git-green text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
-          focused
-        </span>
+        <FocusedLabel />
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {flatItems.length === 0 && (

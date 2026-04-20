@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserWorkspaces } from "./actions";
 import { AddBoard } from "./components/AddBoard";
+import { FocusedLabel } from "@/components/ui/FocusedLabel";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -21,9 +22,7 @@ export default async function SettingsPage() {
             <h3 className="text-syntax-grey font-bold uppercase tracking-wider text-xs">
               Settings
             </h3>
-            <span className="text-git-green text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
-              focused
-            </span>
+            <FocusedLabel />
           </div>
           <div className="flex flex-col gap-2">
             <button className="text-left px-3 py-2 bg-white/10 border-l-2 border-git-green text-white text-sm hover:bg-white/5 transition-colors cmd-selectable">
@@ -36,9 +35,7 @@ export default async function SettingsPage() {
         {/* Main Content */}
         <div className="flex-1 p-8 overflow-y-auto cmd-container relative">
           <div className="flex justify-end mb-4">
-            <span className="text-git-green font-mono text-xs opacity-0 [.cmd-active-container_&]:opacity-100 transition-opacity">
-              focused
-            </span>
+            <FocusedLabel />
           </div>
           <AddBoard workspaces={workspaces} />
         </div>
