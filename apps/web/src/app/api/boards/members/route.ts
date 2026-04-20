@@ -22,10 +22,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find the workspace
+    // Find the workspace that the user is a member of
     const workspace = await prisma.workspace.findFirst({
       where: {
         name: workspaceName,
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
       },
     });
 
@@ -33,11 +38,30 @@ export async function POST(req: Request) {
       return apiError(API_ERRORS.customNotFound("Workspace"));
     }
 
-    // Find the board
+    // Find the board that the user is a member of, or they are an admin of the workspace
     const board = await prisma.board.findFirst({
       where: {
         workspaceId: workspace.id,
         name: boardName,
+        OR: [
+          {
+            members: {
+              some: {
+                userId: session.user.id,
+              },
+            },
+          },
+          {
+            workspace: {
+              members: {
+                some: {
+                  userId: session.user.id,
+                  role: "ADMIN",
+                },
+              },
+            },
+          },
+        ],
       },
     });
 
@@ -146,10 +170,15 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // Find the workspace
+    // Find the workspace that the user is a member of
     const workspace = await prisma.workspace.findFirst({
       where: {
         name: workspaceName,
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
       },
     });
 
@@ -157,11 +186,30 @@ export async function DELETE(req: Request) {
       return apiError(API_ERRORS.customNotFound("Workspace"));
     }
 
-    // Find the board
+    // Find the board that the user is a member of, or they are an admin of the workspace
     const board = await prisma.board.findFirst({
       where: {
         workspaceId: workspace.id,
         name: boardName,
+        OR: [
+          {
+            members: {
+              some: {
+                userId: session.user.id,
+              },
+            },
+          },
+          {
+            workspace: {
+              members: {
+                some: {
+                  userId: session.user.id,
+                  role: "ADMIN",
+                },
+              },
+            },
+          },
+        ],
       },
     });
 
