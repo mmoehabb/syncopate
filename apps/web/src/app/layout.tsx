@@ -24,6 +24,7 @@ import { CommandProvider } from "../context/CommandContext";
 import { ToastProvider } from "../context/ToastContext";
 import { CommandBar } from "../components/CommandBar";
 import { Cursor } from "../components/Cursor";
+import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmationModal";
 
 export default function RootLayout({
   children,
@@ -41,6 +42,7 @@ export default function RootLayout({
           <CommandProvider>
             {children}
             <CommandBar />
+            <DeleteConfirmationModal />
           </CommandProvider>
         </ToastProvider>
       </body>

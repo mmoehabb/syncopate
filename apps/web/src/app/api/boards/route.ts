@@ -143,9 +143,12 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await prisma.board.delete({
+    await prisma.board.update({
       where: { id: board.id },
+      data: { isDeleted: true },
     });
+
+    // TODO: A background cron job should permanently delete this board after 3 months.
 
     return NextResponse.json({ message: "Board deleted successfully" });
   } catch (error) {

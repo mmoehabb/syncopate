@@ -9,7 +9,8 @@ describe("BoardApi", () => {
     mockAxiosInstance.post.mockClear();
     mockAxiosInstance.delete.mockClear();
     boardApi = new BoardApi();
-    boardApi["client"] = mockAxiosInstance as any;
+    boardApi["client"] = // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockAxiosInstance as any;
   });
 
   describe("createBoard", () => {

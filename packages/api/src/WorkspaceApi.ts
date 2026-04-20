@@ -1,7 +1,10 @@
 import { ApiClient } from "./ApiClient";
 import { AxiosRequestConfig } from "axios";
 import type { Workspace } from "@syncopate/db";
-import type { WorkspaceWithBoards } from "@syncopate/types";
+import type {
+  WorkspaceWithBoards,
+  CreateWorkspacePayload,
+} from "@syncopate/types";
 
 export class WorkspaceApi extends ApiClient {
   constructor(baseURL?: string) {
@@ -20,6 +23,24 @@ export class WorkspaceApi extends ApiClient {
       },
     });
     return response.data.workspaces;
+  }
+
+  public async createWorkspace(
+    payload: CreateWorkspacePayload,
+  ): Promise<Workspace> {
+    const response = await this.post<{ workspace: Workspace }>("", payload);
+    return response.data.workspace;
+  }
+
+  public async deleteWorkspace(
+    workspaceName: string,
+  ): Promise<{ message: string }> {
+    const response = await this.delete<{ message: string }>("", {
+      params: {
+        workspace: workspaceName,
+      },
+    });
+    return response.data;
   }
 }
 
