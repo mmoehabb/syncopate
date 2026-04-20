@@ -9,6 +9,7 @@ describe("WorkspaceApi", () => {
 
     const { WorkspaceApi: WorkspaceApiClass } = await import("@syncopate/api");
     workspaceApi = new WorkspaceApiClass();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (workspaceApi as any)["client"] = mockAxiosInstance;
   });
 

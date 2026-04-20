@@ -236,11 +236,52 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       setMode("normal");
     },
   },
+  "delete-workspace": {
+    name: "delete-workspace",
+    description:
+      "Delete a workspace (usage: /delete-workspace <workspace_name>)",
+    action: ({ args, printOutput, setDeleteModalState }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /delete-workspace <workspace_name>",
+        ]);
+        return;
+      }
+
+      const workspaceName = args.join(" ").trim();
+
+      if (setDeleteModalState) {
+        setDeleteModalState({
+          isOpen: true,
+          message: `Are you sure you want to delete the workspace '${workspaceName}'? This action will perform a soft-delete, and it will be permanently deleted after 3 months.`,
+          onConfirm: async () => {
+            const { workspaceApi } = await import("@syncopate/api");
+            try {
+              await workspaceApi.deleteWorkspace(workspaceName);
+              printOutput([
+                `Successfully deleted workspace '${workspaceName}'.`,
+              ]);
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } catch (err: unknown) {
+              const errorMessage =
+                (err as { response?: { data?: { error?: string } } }).response
+                  ?.data?.error ||
+                (err as Error).message ||
+                "Failed to delete workspace.";
+              printOutput([`Error: ${errorMessage}`]);
+            }
+          },
+        });
+      }
+    },
+  },
   "delete-board": {
     name: "delete-board",
     description:
       "Delete a board (usage: /delete-board <workspace_name>/<board_name>)",
-    action: ({ args, printOutput }) => {
+    action: ({ args, printOutput, setDeleteModalState }) => {
       if (!args || args.length === 0) {
         printOutput([
           "Error: Missing arguments. Usage: /delete-board <workspace_name>/<board_name>",
@@ -260,12 +301,62 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
+      if (setDeleteModalState) {
+        setDeleteModalState({
+          isOpen: true,
+          message: `Are you sure you want to delete the board '${boardName.trim()}' from workspace '${workspaceName.trim()}'? This action will perform a soft-delete, and it will be permanently deleted after 3 months.`,
+          onConfirm: async () => {
+            const { boardApi } = await import("@syncopate/api");
+            try {
+              await boardApi.deleteBoard(workspaceName.trim(), boardName.trim());
+              printOutput([
+                `Successfully deleted board '${boardName.trim()}' from workspace '${workspaceName.trim()}'.`,
+              ]);
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } catch (err: unknown) {
+              const errorMessage =
+                (err as { response?: { data?: { error?: string } } }).response
+                  ?.data?.error ||
+                (err as Error).message ||
+                "Failed to delete board.";
+              printOutput([`Error: ${errorMessage}`]);
+            }
+          },
+        });
+      }
+    },
+  },
+  "activate-board": {
+    name: "activate-board",
+    description: "Activate a board (usage: /activate-board <workspace_name>/<board_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /activate-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const fullPath = args.join(" ");
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /activate-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
       import("@syncopate/api").then(({ boardApi }) => {
         boardApi
-          .deleteBoard(workspaceName.trim(), boardName.trim())
+          .updateBoardStatus(workspaceName.trim(), boardName.trim(), true)
           .then(() => {
             printOutput([
-              `Successfully deleted board '${boardName}' from workspace '${workspaceName}'.`,
+              `Successfully activated board '${boardName.trim()}' in workspace '${workspaceName.trim()}'.`,
             ]);
             setTimeout(() => {
               window.location.reload();
@@ -276,7 +367,52 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
               (err as { response?: { data?: { error?: string } } }).response
                 ?.data?.error ||
               (err as Error).message ||
-              "Failed to delete board.";
+              "Failed to activate board.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "deactivate-board": {
+    name: "deactivate-board",
+    description: "Deactivate a board (usage: /deactivate-board <workspace_name>/<board_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /deactivate-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const fullPath = args.join(" ");
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /deactivate-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import("@syncopate/api").then(({ boardApi }) => {
+        boardApi
+          .updateBoardStatus(workspaceName.trim(), boardName.trim(), false)
+          .then(() => {
+            printOutput([
+              `Successfully deactivated board '${boardName.trim()}' in workspace '${workspaceName.trim()}'.`,
+            ]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to deactivate board.";
             printOutput([`Error: ${errorMessage}`]);
           });
       });
