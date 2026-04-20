@@ -89,16 +89,22 @@ export async function POST(req: NextRequest) {
     const registeredAssignees: string[] = [];
     const unregisteredAssignees: { login: string; avatar_url: string }[] = [];
 
-    for (const assignee of assignees) {
-      const account = await prisma.account.findFirst({
-        where: {
-          provider: "github",
-          providerAccountId: String(assignee.id),
-        },
-      });
+    const assigneeIds = assignees.map((a) => String(a.id));
+    const assigneeAccounts = await prisma.account.findMany({
+      where: {
+        provider: "github",
+        providerAccountId: { in: assigneeIds },
+      },
+    });
 
-      if (account) {
-        registeredAssignees.push(account.userId);
+    const assigneeAccountMap = new Map(
+      assigneeAccounts.map((a) => [a.providerAccountId, a.userId]),
+    );
+
+    for (const assignee of assignees) {
+      const userId = assigneeAccountMap.get(String(assignee.id));
+      if (userId) {
+        registeredAssignees.push(userId);
       } else {
         unregisteredAssignees.push({
           login: assignee.login,
@@ -112,6 +118,24 @@ export async function POST(req: NextRequest) {
 
     // The PR object has requested_reviewers (we can assume these are users, not teams, for our purposes right now, or filter if needed)
     // Actually, requested_reviewers can be User | Team. We'll only map those that have an 'id'.
+    const reviewerIds = requestedReviewers
+      .filter(
+        (r): r is Extract<typeof r, { id: number }> =>
+          "id" in r && "login" in r && "avatar_url" in r,
+      )
+      .map((r) => String(r.id));
+
+    const reviewerAccounts = await prisma.account.findMany({
+      where: {
+        provider: "github",
+        providerAccountId: { in: reviewerIds },
+      },
+    });
+
+    const reviewerAccountMap = new Map(
+      reviewerAccounts.map((a) => [a.providerAccountId, a.userId]),
+    );
+
     for (const reviewer of requestedReviewers) {
       if (
         !("id" in reviewer) ||
@@ -120,15 +144,9 @@ export async function POST(req: NextRequest) {
       )
         continue; // skip teams
 
-      const account = await prisma.account.findFirst({
-        where: {
-          provider: "github",
-          providerAccountId: String(reviewer.id),
-        },
-      });
-
-      if (account) {
-        registeredReviewers.push(account.userId);
+      const userId = reviewerAccountMap.get(String(reviewer.id));
+      if (userId) {
+        registeredReviewers.push(userId);
       } else {
         unregisteredReviewers.push({
           login: reviewer.login,
