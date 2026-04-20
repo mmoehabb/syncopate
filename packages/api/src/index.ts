@@ -5,4 +5,5 @@ export * from "./SubscriptionApi";
 export * from "./TaskApi";
 export * from "./WorkspaceApi";
 export * from "./DirectoryApi";
+export * from "./BugApi";
 export * from "./error";

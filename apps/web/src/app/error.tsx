@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
+import { bugApi } from "@syncopate/api";
 
 export default function ErrorBoundary({
   error,
@@ -19,10 +20,19 @@ export default function ErrorBoundary({
     console.error(error);
   }, [error]);
 
-  const handleReportBug = () => {
-    // TODO: Implement backend bug reporting logic
-    showToast("Bug reported successfully. Thank you!", "success");
-    router.push("/");
+  const handleReportBug = async () => {
+    try {
+      await bugApi.reportBug({
+        message: error.message,
+        stack: error.stack,
+        url: window.location.href,
+      });
+      showToast("Bug reported successfully. Thank you!", "success");
+      router.push("/");
+    } catch (err) {
+      console.error("Failed to report bug:", err);
+      showToast("Failed to report bug. Please try again later.", "error");
+    }
   };
 
   return (

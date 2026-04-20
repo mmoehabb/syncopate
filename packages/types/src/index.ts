@@ -71,3 +71,15 @@ export interface ApiErrorDefinition {
   error: string;
   status: number;
 }
+
+// Bug Report types
+export interface BugReportPayload {
+  message: string;
+  stack?: string;
+  url?: string;
+}
+
+export interface BugReportResponse {
+  success: boolean;
+  id: string;
+}
