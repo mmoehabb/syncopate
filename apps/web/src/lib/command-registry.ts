@@ -20,18 +20,49 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
               return;
             }
 
-            const outputLines = response.entries.map((entry) => {
-              if (entry.type === "Task" && entry.title) {
-                // Truncate title
-                const title =
-                  entry.title.length > 30
-                    ? entry.title.substring(0, 30) + "..."
-                    : entry.title;
-                return `${entry.name} (${title}) [${entry.type}]`;
-              }
-              const formattedName = entry.name.toLowerCase().replace(/ /g, "-");
-              return `${formattedName} [${entry.type}]`;
-            });
+            let outputLines: string[] = [];
+
+            if (response.type === "Board") {
+              const groupedTasks: Record<string, typeof response.entries> = {};
+              response.entries.forEach((entry) => {
+                if (entry.type === "Task" && entry.status) {
+                  if (!groupedTasks[entry.status]) {
+                    groupedTasks[entry.status] = [];
+                  }
+                  groupedTasks[entry.status].push(entry);
+                }
+              });
+
+              Object.entries(groupedTasks).forEach(([status, tasks]) => {
+                outputLines.push(`--- ${status} ---`);
+                tasks.forEach((entry) => {
+                  const title =
+                    entry.title && entry.title.length > 30
+                      ? entry.title.substring(0, 30) + "..."
+                      : entry.title || "";
+                  outputLines.push(`${entry.name} (${title}) [${entry.type}]`);
+                });
+                if (response.hasMoreByStatus?.[status]) {
+                  outputLines.push(`...`);
+                }
+              });
+            } else {
+              outputLines = response.entries.map((entry) => {
+                if (entry.type === "Task" && entry.title) {
+                  // Truncate title
+                  const title =
+                    entry.title.length > 30
+                      ? entry.title.substring(0, 30) + "..."
+                      : entry.title;
+                  return `${entry.name} (${title}) [${entry.type}]`;
+                }
+                const formattedName = entry.name
+                  .toLowerCase()
+                  .replace(/ /g, "-");
+                return `${formattedName} [${entry.type}]`;
+              });
+            }
+
             printOutput(outputLines);
           })
           .catch((err: unknown) => {
