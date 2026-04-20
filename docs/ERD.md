@@ -52,6 +52,7 @@ erDiagram
         uuid id PK
         string name
         string githubInstallationId
+        boolean isDeleted
     }
     Board {
         uuid id PK

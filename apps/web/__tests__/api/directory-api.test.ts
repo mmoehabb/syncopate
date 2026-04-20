@@ -10,7 +10,7 @@ describe("DirectoryApi", () => {
     mockAxiosInstance.get.mockClear();
     directoryApi = new DirectoryApi();
     directoryApi["client"] = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockAxiosInstance as any;
+    mockAxiosInstance as any;
   });
 
   describe("getDirectory", () => {

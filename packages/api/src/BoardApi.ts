@@ -24,6 +24,19 @@ export class BoardApi extends ApiClient {
     return response.data;
   }
 
+  public async updateBoardStatus(
+    workspaceName: string,
+    boardName: string,
+    isActive: boolean,
+  ): Promise<{ message: string; isActive: boolean }> {
+    const response = await this.put<{ message: string; isActive: boolean }>("/status", {
+      workspaceName,
+      boardName,
+      isActive,
+    });
+    return response.data;
+  }
+
   public async addMember(
     workspaceName: string,
     boardName: string,
