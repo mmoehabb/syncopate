@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
-import { DirectoryResponse, DirectoryEntry } from "@syncopate/types";
+import { DirectoryResponse } from "@syncopate/types";
 
 export async function GET(req: Request) {
   const session = await auth();

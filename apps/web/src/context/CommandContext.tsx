@@ -49,18 +49,21 @@ export function CommandProvider({ children }: { children: ReactNode }) {
 
   // Load command log and virtual path from local storage on mount
   useEffect(() => {
-    try {
-      const storedLog = localStorage.getItem("syncopate_command_log");
-      if (storedLog) {
-        setCommandLog(JSON.parse(storedLog));
+    const t = setTimeout(() => {
+      try {
+        const storedLog = localStorage.getItem("syncopate_command_log");
+        if (storedLog) {
+          setCommandLog(JSON.parse(storedLog));
+        }
+        const storedPath = localStorage.getItem("syncopate_virtual_path");
+        if (storedPath) {
+          setVirtualPath(storedPath);
+        }
+      } catch (e) {
+        console.error("Failed to load state from localStorage:", e);
       }
-      const storedPath = localStorage.getItem("syncopate_virtual_path");
-      if (storedPath) {
-        setVirtualPath(storedPath);
-      }
-    } catch (e) {
-      console.error("Failed to load state from localStorage:", e);
-    }
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   // Save virtual path to local storage when it changes

@@ -75,17 +75,20 @@ export function AppGuide({ userCreatedAt }: { userCreatedAt?: string | Date }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (userCreatedAt) {
-      const createdDate = new Date(userCreatedAt);
-      const oneDayInMs = 24 * 60 * 60 * 1000;
-      const isNewUser =
-        new Date().getTime() - createdDate.getTime() < oneDayInMs;
-      const hasOpened = localStorage.getItem("syncopate_guide_opened");
+    const checkUserPulse = setTimeout(() => {
+      if (userCreatedAt) {
+        const createdDate = new Date(userCreatedAt);
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+        const isNewUser =
+          new Date().getTime() - createdDate.getTime() < oneDayInMs;
+        const hasOpened = localStorage.getItem("syncopate_guide_opened");
 
-      if (isNewUser && !hasOpened) {
-        setShouldPulse(true);
+        if (isNewUser && !hasOpened) {
+          setShouldPulse(true);
+        }
       }
-    }
+    }, 0);
+    return () => clearTimeout(checkUserPulse);
   }, [userCreatedAt]);
 
   const handleOpen = () => {

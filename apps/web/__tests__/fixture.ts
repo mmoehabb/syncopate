@@ -31,14 +31,7 @@ export async function seedTestDatabase() {
   const workspace = await prisma.workspace.create({
     data: {
       name: "Test Workspace",
-    },
-  });
-
-  await prisma.workspaceMember.create({
-    data: {
-      workspaceId: workspace.id,
-      userId: user.id,
-      role: "ADMIN",
+      ownerId: user.id,
     },
   });
 
