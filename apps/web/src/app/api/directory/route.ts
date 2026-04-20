@@ -170,7 +170,7 @@ export async function GET(req: Request) {
 
     // Board level: list tasks
     if (parts.length === 2) {
-      const tasks = await prisma.task.findMany({
+      const allTasks = await prisma.task.findMany({
         where: {
           boardId: board.id,
         },
@@ -179,16 +179,40 @@ export async function GET(req: Request) {
         },
       });
 
+      const hasMoreByStatus: Record<string, boolean> = {};
+      const groupedTasks: Record<string, typeof allTasks> = {};
+
+      allTasks.forEach((t) => {
+        if (!groupedTasks[t.status]) {
+          groupedTasks[t.status] = [];
+        }
+        groupedTasks[t.status].push(t);
+      });
+
+      const tasksToReturn: typeof allTasks = [];
+
+      Object.entries(groupedTasks).forEach(([status, tasksInStatus]) => {
+        if (tasksInStatus.length > 5) {
+          hasMoreByStatus[status] = true;
+          tasksToReturn.push(...tasksInStatus.slice(0, 5));
+        } else {
+          hasMoreByStatus[status] = false;
+          tasksToReturn.push(...tasksInStatus);
+        }
+      });
+
       const response: DirectoryResponse = {
         path: normalizedPath,
         type: "Board",
         id: board.id,
-        entries: tasks.map((t) => ({
+        entries: tasksToReturn.map((t) => ({
           id: t.id.toString(),
           name: `SYNC-${t.id}`,
           title: t.title,
+          status: t.status,
           type: "Task",
         })),
+        hasMoreByStatus,
       };
 
       return NextResponse.json(response);
