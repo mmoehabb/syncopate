@@ -18,7 +18,9 @@ export function SettingsTabs({
   isActive,
   subscription,
 }: SettingsTabsProps) {
-  const [activeTab, setActiveTab] = useState<"add-board" | "account">("add-board");
+  const [activeTab, setActiveTab] = useState<"add-board" | "account">(
+    "add-board",
+  );
 
   return (
     <>

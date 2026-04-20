@@ -78,7 +78,10 @@ export async function reactivateAccount(userId: string) {
   revalidatePath("/settings");
 }
 
-export async function cancelSubscription(userId: string, subscriptionId: string) {
+export async function cancelSubscription(
+  userId: string,
+  subscriptionId: string,
+) {
   const session = await auth();
   if (!session?.user?.id || session.user.id !== userId) {
     throw new Error("Unauthorized");

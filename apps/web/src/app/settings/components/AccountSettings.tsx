@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { deactivateAccount, reactivateAccount, cancelSubscription } from "../actions";
+import {
+  deactivateAccount,
+  reactivateAccount,
+  cancelSubscription,
+} from "../actions";
 import { useRouter } from "next/navigation";
 
 interface AccountSettingsProps {
@@ -10,7 +14,11 @@ interface AccountSettingsProps {
   subscription: any;
 }
 
-export function AccountSettings({ userId, isActive, subscription }: AccountSettingsProps) {
+export function AccountSettings({
+  userId,
+  isActive,
+  subscription,
+}: AccountSettingsProps) {
   const router = useRouter();
   const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false);
   const [deactivateCountdown, setDeactivateCountdown] = useState(5);
@@ -80,17 +88,20 @@ export function AccountSettings({ userId, isActive, subscription }: AccountSetti
               {subscription.cancelAtPeriodEnd && " (Canceling at period end)"}
             </div>
 
-            {subscription.status === "ACTIVE" && !subscription.cancelAtPeriodEnd && (
-              <button
-                onClick={handleCancelSubscription}
-                disabled={isSubmitting}
-                className="w-full bg-red-500/20 text-red-500 border border-red-500/50 font-bold font-mono py-2 hover:bg-red-500/30 transition-colors disabled:opacity-50 cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-red-500 [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
-              >
-                Cancel Subscription
-              </button>
-            )}
+            {subscription.status === "ACTIVE" &&
+              !subscription.cancelAtPeriodEnd && (
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={isSubmitting}
+                  className="w-full bg-red-500/20 text-red-500 border border-red-500/50 font-bold font-mono py-2 hover:bg-red-500/30 transition-colors disabled:opacity-50 cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-red-500 [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
+                >
+                  Cancel Subscription
+                </button>
+              )}
 
-            {(!subscription || subscription.cancelAtPeriodEnd || subscription.status === "CANCELED") && (
+            {(!subscription ||
+              subscription.cancelAtPeriodEnd ||
+              subscription.status === "CANCELED") && (
               <button
                 onClick={handleResubscribe}
                 className="w-full bg-git-green text-obsidian-night font-bold font-mono py-2 hover:bg-opacity-90 transition-opacity cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-white [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
@@ -150,7 +161,9 @@ export function AccountSettings({ userId, isActive, subscription }: AccountSetti
             </p>
             <div className="bg-red-500/10 border-l-4 border-red-500 p-4 mb-6">
               <p className="text-red-200 font-mono text-sm">
-                <strong>Warning:</strong> All boards where you are an ADMIN will be deactivated. This action will not affect other members, but the board will appear as inactive to them.
+                <strong>Warning:</strong> All boards where you are an ADMIN will
+                be deactivated. This action will not affect other members, but
+                the board will appear as inactive to them.
               </p>
             </div>
 
@@ -169,8 +182,8 @@ export function AccountSettings({ userId, isActive, subscription }: AccountSetti
                 {isSubmitting
                   ? "Deactivating..."
                   : deactivateCountdown > 0
-                  ? `Wait (${deactivateCountdown}s)`
-                  : "Deactivate"}
+                    ? `Wait (${deactivateCountdown}s)`
+                    : "Deactivate"}
               </button>
             </div>
           </div>
