@@ -40,7 +40,19 @@ export class BoardApi extends ApiClient {
     return response.data;
   }
 
-  public async addMember(
+  public async leaveBoard(
+    workspaceName: string,
+    boardName: string,
+  ): Promise<void> {
+    await this.delete("/members/leave", {
+      params: {
+        workspace: workspaceName,
+        board: boardName,
+      },
+    });
+  }
+
+  public async inviteMember(
     workspaceName: string,
     boardName: string,
     identifier: string,
