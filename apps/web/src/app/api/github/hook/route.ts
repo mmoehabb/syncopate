@@ -116,6 +116,8 @@ export async function POST(req: NextRequest) {
     const registeredReviewers: string[] = [];
     const unregisteredReviewers: { login: string; avatar_url: string }[] = [];
 
+    // The PR object has requested_reviewers (we can assume these are users, not teams, for our purposes right now, or filter if needed)
+    // Actually, requested_reviewers can be User | Team. We'll only map those that have an 'id'.
     const reviewerIds = requestedReviewers
       .filter(
         (r): r is Extract<typeof r, { id: number }> =>
