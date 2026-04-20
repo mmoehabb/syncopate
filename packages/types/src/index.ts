@@ -49,6 +49,10 @@ export interface UpdateTaskStatusPayload {
 // Workspace types
 export type WorkspaceWithBoards = Workspace & { boards: Board[] };
 
+export interface CreateWorkspacePayload {
+  name: string;
+}
+
 // Directory Types
 export type DirectoryEntryType = "Workspace" | "Board" | "Task";
 

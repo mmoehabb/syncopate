@@ -57,4 +57,12 @@ export abstract class ApiClient {
   ): Promise<AxiosResponse<T>> {
     return this.client.delete<T>(url, config);
   }
+
+  protected async put<T, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
+    return this.client.put<T>(url, data, config);
+  }
 }

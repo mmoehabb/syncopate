@@ -77,7 +77,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
     try {
       const storedLog = localStorage.getItem("syncopate_command_log");
       if (storedLog) {
-        // use timeout to avoid setting state in effect synchronously
         setTimeout(() => setCommandLog(JSON.parse(storedLog)), 0);
       }
       const storedPath = localStorage.getItem("syncopate_virtual_path");
@@ -137,7 +136,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setIsVoiceCallActive,
         virtualPath,
         setVirtualPath,
-        setDeleteModalState,
       });
     } else {
       printOutput([

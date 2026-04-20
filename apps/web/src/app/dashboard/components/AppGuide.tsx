@@ -83,7 +83,7 @@ export function AppGuide({ userCreatedAt }: { userCreatedAt?: string | Date }) {
       const hasOpened = localStorage.getItem("syncopate_guide_opened");
 
       if (isNewUser && !hasOpened) {
-        setShouldPulse(true);
+        setTimeout(() => setShouldPulse(true), 0);
       }
     }
   }, [userCreatedAt]);

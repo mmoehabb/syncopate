@@ -17,12 +17,15 @@ export async function GET(req: Request) {
     if (includeBoards) {
       const workspaces = await prisma.workspace.findMany({
         where: {
+          isDeleted: false,
           members: {
             some: { userId: session.user.id },
           },
         },
         include: {
-          boards: true,
+          boards: {
+            where: { isDeleted: false },
+          },
         },
       });
       return NextResponse.json({ workspaces }, { status: 200 });
@@ -30,6 +33,7 @@ export async function GET(req: Request) {
 
     const workspaces = await prisma.workspace.findMany({
       where: {
+        isDeleted: false,
         members: {
           some: { userId: session.user.id },
         },
@@ -44,5 +48,155 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("Error fetching workspaces:", error);
     return apiError(API_ERRORS.customInternal("Failed to fetch workspaces"));
+  }
+}
+
+export async function POST(req: Request) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  try {
+    const body = await req.json();
+    const { name } = body;
+
+    if (!name) {
+      return apiError(
+        API_ERRORS.customBadRequest("Workspace name is required"),
+      );
+    }
+
+    const nameRegex = /^[a-zA-Z0-9-_]+$/;
+    if (!nameRegex.test(name)) {
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "Workspace name can only contain letters, numbers, hyphens, and underscores. No spaces or special characters are allowed.",
+        ),
+      );
+    }
+
+    // Check user's subscription limits
+    const userSubscription = await prisma.subscription.findFirst({
+      where: {
+        userId: session.user.id,
+        status: "ACTIVE",
+      },
+      include: {
+        price: {
+          include: { plan: true },
+        },
+      },
+    });
+
+    if (!userSubscription) {
+      return apiError(
+        API_ERRORS.customForbidden(
+          "Active subscription required to create a workspace",
+        ),
+      );
+    }
+
+    const maxWorkspaces = userSubscription.price.plan.maxWorkspaces;
+
+    const currentWorkspacesCount = await prisma.workspace.count({
+      where: {
+        isDeleted: false,
+        members: {
+          some: { userId: session.user.id, role: "ADMIN" },
+        },
+      },
+    });
+
+    if (maxWorkspaces !== -1 && currentWorkspacesCount >= maxWorkspaces) {
+      return apiError(
+        API_ERRORS.customForbidden(
+          `You have reached your limit of ${maxWorkspaces} workspaces on this plan.`,
+        ),
+      );
+    }
+
+    const workspace = await prisma.workspace.create({
+      data: {
+        name,
+      },
+    });
+
+    // Add user as admin of the newly created workspace
+    await prisma.workspaceMember.create({
+      data: {
+        workspaceId: workspace.id,
+        userId: session.user.id,
+        role: "ADMIN",
+      },
+    });
+
+    return NextResponse.json({ workspace }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating workspace:", error);
+    return apiError(API_ERRORS.customInternal("Failed to create workspace"));
+  }
+}
+
+export async function DELETE(req: Request) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  try {
+    const url = new URL(req.url);
+    const workspaceName = url.searchParams.get("workspace");
+
+    if (!workspaceName) {
+      return apiError(
+        API_ERRORS.customBadRequest("Workspace name is required"),
+      );
+    }
+
+    // Find the workspace that the user is a member of with the given name
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        name: workspaceName,
+        isDeleted: false,
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
+      },
+      include: {
+        members: {
+          where: { userId: session.user.id },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return apiError(API_ERRORS.customNotFound("Workspace"));
+    }
+
+    if (
+      workspace.members.length === 0 ||
+      workspace.members[0].role !== "ADMIN"
+    ) {
+      return apiError(
+        API_ERRORS.customForbidden("Unauthorized to delete this workspace"),
+      );
+    }
+
+    await prisma.workspace.update({
+      where: { id: workspace.id },
+      data: { isDeleted: true },
+    });
+
+    // TODO: A background cron job should permanently delete this workspace after 3 months.
+
+    return NextResponse.json({ message: "Workspace deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting workspace:", error);
+    return apiError(API_ERRORS.customInternal("Failed to delete workspace"));
   }
 }
