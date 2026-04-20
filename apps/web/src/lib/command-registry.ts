@@ -421,7 +421,25 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         return;
       }
       const taskId = args[0];
-      const status = args[1].toUpperCase();
+      const statusRaw = args.slice(1).join(" ");
+      const status = statusRaw.replace(/[\s-]+/g, "_").toUpperCase();
+
+      const validStatuses = [
+        "TODO",
+        "IN_PROGRESS",
+        "IN_REVIEW",
+        "CHANGES_REQUESTED",
+        "DONE",
+        "CLOSED",
+      ];
+      if (!validStatuses.includes(status)) {
+        printOutput([
+          `Error: Invalid status '${statusRaw}'.`,
+          `Allowed statuses: ${validStatuses.join(", ")}`,
+        ]);
+        return;
+      }
+
       import("./actions/tasks").then(({ updateTaskStatus }) => {
         updateTaskStatus(taskId, status)
           .then(() => {
