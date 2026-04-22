@@ -80,6 +80,17 @@ export async function PATCH(
       data: { status: status as TaskStatus },
     });
 
+    if (existingTask.status !== status) {
+      await prisma.boardActivityLog.create({
+        data: {
+          boardId: existingTask.boardId,
+          type: "TASK_UPDATE",
+          actorId: session.user.id,
+          taskId: BigInt(taskId),
+        },
+      });
+    }
+
     return NextResponse.json(
       { task: { ...task, id: task.id.toString() } },
       { status: 200 },

@@ -54,9 +54,12 @@ model User {
   sessions         Session[]
   workspaceMembers WorkspaceMember[]
   boardMembers     BoardMember[]
-  assignedTasks    Task[]            @relation("TaskAssignees")
-  reviewingTasks   Task[]            @relation("TaskReviewers")
+  assignedTasks    Task[]             @relation("TaskAssignees")
+  reviewingTasks   Task[]             @relation("TaskReviewers")
   subscriptions    Subscription[]
+  activityLogs     BoardActivityLog[] @relation("ActorLogs")
+  targetedLogs     BoardActivityLog[] @relation("TargetLogs")
+  readStates       UserLogReadState[]
 }
 
 model VerificationToken {
@@ -143,12 +146,12 @@ enum Role {
 }
 
 model Workspace {
-  id        String   @id @default(uuid(7))
-  name      String
+  id                   String   @id @default(uuid(7))
+  name                 String
   githubInstallationId String?
-  isDeleted Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isDeleted            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   members WorkspaceMember[]
   boards  Board[]
@@ -179,10 +182,11 @@ model Board {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  members   BoardMember[]
-  tasks     Task[]
-  labels    Label[]
+  workspace    Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members      BoardMember[]
+  tasks        Task[]
+  labels       Label[]
+  activityLogs BoardActivityLog[]
 }
 
 model BoardMember {
@@ -221,12 +225,13 @@ model Task {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  board                 Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  assignees             User[]  @relation("TaskAssignees")
-  reviewers             User[]  @relation("TaskReviewers")
-  unregisteredAssignees Json    @default("[]")
-  unregisteredReviewers Json    @default("[]")
+  board                 Board              @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  assignees             User[]             @relation("TaskAssignees")
+  reviewers             User[]             @relation("TaskReviewers")
+  unregisteredAssignees Json               @default("[]")
+  unregisteredReviewers Json               @default("[]")
   labels                Label[]
+  activityLogs          BoardActivityLog[]
 }
 
 model Label {
@@ -241,4 +246,42 @@ model Label {
   tasks Task[]
 
   @@unique([boardId, name])
+}
+
+enum ActivityType {
+  INVITATION
+  TASK_UPDATE
+  MEMBER_JOIN
+  MEMBER_LEAVE
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model BoardActivityLog {
+  id           String            @id @default(uuid(7))
+  boardId      String
+  type         ActivityType
+  actorId      String?
+  targetUserId String?
+  taskId       BigInt?
+  status       InvitationStatus?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  board      Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  actor      User? @relation("ActorLogs", fields: [actorId], references: [id], onDelete: SetNull)
+  targetUser User? @relation("TargetLogs", fields: [targetUserId], references: [id], onDelete: SetNull)
+  task       Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+}
+
+model UserLogReadState {
+  id       String   @id @default(uuid(7))
+  userId   String   @unique
+  lastRead DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
