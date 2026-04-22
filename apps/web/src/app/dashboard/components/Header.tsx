@@ -61,7 +61,10 @@ export function Header() {
                 </Link>
                 <div className="h-px bg-white/10 my-1"></div>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  onClick={() => {
+                    localStorage.clear();
+                    signOut({ callbackUrl: "/login" });
+                  }}
                   className="w-full px-4 py-2 text-left text-syntax-grey hover:bg-white/5 hover:text-white flex items-center gap-2 transition-colors"
                 >
                   <LogOut size={14} />

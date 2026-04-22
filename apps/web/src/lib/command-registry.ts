@@ -239,6 +239,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     description: "Logout of the application",
     action: async ({ printOutput }) => {
       printOutput(["Logging out..."]);
+      localStorage.clear();
       const { signOut } = await import("next-auth/react");
       await signOut({ callbackUrl: "/login" });
     },
