@@ -13,9 +13,7 @@ export async function GET(req: Request) {
 
   const isValidSubscription = await hasValidSubscription(session.user.id);
   if (!isValidSubscription) {
-    return apiError(
-      API_ERRORS.customForbidden("Active subscription required")
-    );
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
@@ -68,9 +66,7 @@ export async function POST(req: Request) {
 
   const isValidSubscription = await hasValidSubscription(session.user.id);
   if (!isValidSubscription) {
-    return apiError(
-      API_ERRORS.customForbidden("Active subscription required")
-    );
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
@@ -163,9 +159,7 @@ export async function DELETE(req: Request) {
 
   const isValidSubscription = await hasValidSubscription(session.user.id);
   if (!isValidSubscription) {
-    return apiError(
-      API_ERRORS.customForbidden("Active subscription required")
-    );
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {

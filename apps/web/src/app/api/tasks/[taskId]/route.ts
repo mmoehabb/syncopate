@@ -17,9 +17,7 @@ export async function PATCH(
 
   const isValidSubscription = await hasValidSubscription(session.user.id);
   if (!isValidSubscription) {
-    return apiError(
-      API_ERRORS.customForbidden("Active subscription required")
-    );
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
@@ -121,9 +119,7 @@ export async function DELETE(
 
   const isValidSubscription = await hasValidSubscription(session.user.id);
   if (!isValidSubscription) {
-    return apiError(
-      API_ERRORS.customForbidden("Active subscription required")
-    );
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
