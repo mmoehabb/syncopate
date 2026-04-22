@@ -76,13 +76,15 @@ export default async function BoardPage({
     }
   }
 
-  const workspaces = await getUserWorkspacesAndBoards(session.user.id);
   const userWithSubscriptions = await prisma.user.findFirst({
     where: { id: session.user.id },
     include: {
       subscriptions: {
         where: {
           status: "ACTIVE",
+          currentPeriodEnd: {
+            gt: new Date(),
+          },
         },
       },
     },
@@ -91,6 +93,12 @@ export default async function BoardPage({
   const hasActiveSubscription =
     userWithSubscriptions?.subscriptions &&
     userWithSubscriptions.subscriptions.length > 0;
+
+  // We only load workspaces for the sidebar, no complex redirect logic needed here
+  // though realistically users shouldn't reach here without a subscription.
+  const workspaces = hasActiveSubscription
+    ? await getUserWorkspacesAndBoards(session.user.id)
+    : [];
 
   // Create the unclosable modal component to pass to the client
   // Just reusing the empty state since we checked this in the root dashboard,

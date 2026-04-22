@@ -18,6 +18,9 @@ export default async function DashboardPage() {
       subscriptions: {
         where: {
           status: "ACTIVE",
+          currentPeriodEnd: {
+            gt: new Date(),
+          },
         },
       },
     },
@@ -27,27 +30,36 @@ export default async function DashboardPage() {
     userWithSubscriptions?.subscriptions &&
     userWithSubscriptions.subscriptions.length > 0;
 
-  const workspaces = await getUserWorkspacesAndBoards(session.user.id);
-
-  // If the user has no workspaces at all yet, wait for the background creation
-  // rather than triggering an infinite redirect loop
-  if (workspaces.length === 0) {
-    return (
-      <div className="flex h-screen items-center justify-center text-white font-mono">
-        Setting up your workspace...
-      </div>
-    );
-  }
+  let workspaces: any[] = [];
 
   // Check if any of the user's workspaces have a GitHub App installation
-  const hasGithubInstallation = workspaces.some(
-    (ws) => !!ws.githubInstallationId,
-  );
+  // We only redirect if they have an active subscription
+  if (hasActiveSubscription) {
+    workspaces = await getUserWorkspacesAndBoards(session.user.id);
 
-  if (!hasGithubInstallation) {
-    const githubAppName =
-      process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate";
-    redirect(`https://github.com/apps/${githubAppName}/installations/new`);
+    // If the user has no workspaces at all yet, wait for the background creation
+    // rather than triggering an infinite redirect loop
+    if (workspaces.length === 0) {
+      return (
+        <div className="flex h-screen items-center justify-center text-white font-mono">
+          Setting up your workspace...
+        </div>
+      );
+    }
+
+    const hasGithubInstallation = workspaces.some(
+      (ws) => !!ws.githubInstallationId,
+    );
+
+    if (!hasGithubInstallation) {
+      const githubAppName =
+        process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate";
+      redirect(`https://github.com/apps/${githubAppName}/installations/new`);
+    }
+  } else {
+    // If they don't have a subscription, we still want to render the dashboard
+    // but without waiting for the workspace creation. It can be an empty list.
+    workspaces = [];
   }
 
   // Create the unclosable modal component to pass to the client
