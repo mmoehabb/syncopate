@@ -169,7 +169,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         [
           "add-board",
           "delete-board",
-          "add-member",
+          "invite-member",
           "rmv-member",
           "join-voice-call",
         ].includes(c.name),
@@ -454,14 +454,14 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       });
     },
   },
-  "add-member": {
-    name: "add-member",
+  "invite-member": {
+    name: "invite-member",
     description:
-      "Add a member to a board (usage: /add-member <workspace_name>/<board_name> <user_id_or_email>)",
+      "Invite a member to a board (usage: /invite-member <workspace_name>/<board_name> <user_id_or_email>)",
     action: ({ args, printOutput }) => {
       if (!args || args.length < 2) {
         printOutput([
-          "Error: Missing arguments. Usage: /add-member <workspace_name>/<board_name> <user_id_or_email>",
+          "Error: Missing arguments. Usage: /invite-member <workspace_name>/<board_name> <user_id_or_email>",
         ]);
         return;
       }
@@ -472,7 +472,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       if (parts.length !== 2) {
         printOutput([
-          "Error: Invalid format. Usage: /add-member <workspace_name>/<board_name> <user_id_or_email>",
+          "Error: Invalid format. Usage: /invite-member <workspace_name>/<board_name> <user_id_or_email>",
         ]);
         return;
       }
@@ -481,10 +481,14 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       import("@syncopate/api").then(({ boardApi }) => {
         boardApi
-          .addMember(workspaceName.trim(), boardName.trim(), identifier.trim())
+          .inviteMember(
+            workspaceName.trim(),
+            boardName.trim(),
+            identifier.trim(),
+          )
           .then(() => {
             printOutput([
-              `Successfully added member '${identifier}' to board '${boardName}'.`,
+              `Successfully invited member '${identifier}' to board '${boardName}'.`,
             ]);
           })
           .catch((err: unknown) => {

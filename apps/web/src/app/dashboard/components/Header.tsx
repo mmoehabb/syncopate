@@ -7,6 +7,7 @@ import { LogOut, Settings, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { AppGuide } from "./AppGuide";
+import { NotificationsDropdown } from "./NotificationsDropdown";
 
 export function Header() {
   const { data: session } = useSession();
@@ -22,6 +23,7 @@ export function Header() {
       {session?.user && (
         <div className="flex items-center gap-2">
           <AppGuide userCreatedAt={session.user.createdAt as string | Date} />
+          <NotificationsDropdown />
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}

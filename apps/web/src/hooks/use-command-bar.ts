@@ -51,7 +51,8 @@ export function useCommandBar() {
       "cd",
       "ls",
       "delete-board",
-      "add-member",
+      "invite-member",
+      "leave-board",
       "rmv-member",
     ];
     const parts = inputValue.split(" ");

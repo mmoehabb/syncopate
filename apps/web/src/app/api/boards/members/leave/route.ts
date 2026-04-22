@@ -1,0 +1,104 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@syncopate/db";
+import { API_ERRORS, apiError } from "@/lib/api/error";
+
+export async function DELETE(req: Request) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  try {
+    const url = new URL(req.url);
+    const workspaceName = url.searchParams.get("workspace");
+    const boardName = url.searchParams.get("board");
+
+    if (!workspaceName || !boardName) {
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "Workspace name and board name are required",
+        ),
+      );
+    }
+
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        name: workspaceName,
+      },
+    });
+
+    if (!workspace) {
+      return apiError(API_ERRORS.customNotFound("Workspace"));
+    }
+
+    const board = await prisma.board.findFirst({
+      where: {
+        workspaceId: workspace.id,
+        name: boardName,
+      },
+    });
+
+    if (!board) {
+      return apiError(API_ERRORS.customNotFound("Board"));
+    }
+
+    const member = await prisma.boardMember.findUnique({
+      where: {
+        boardId_userId: {
+          boardId: board.id,
+          userId: session.user.id,
+        },
+      },
+    });
+
+    if (!member) {
+      return apiError(
+        API_ERRORS.customBadRequest("You are not a member of this board"),
+      );
+    }
+
+    // Check if owner is leaving
+    if (member.role === "ADMIN") {
+      const otherAdmins = await prisma.boardMember.count({
+        where: {
+          boardId: board.id,
+          role: "ADMIN",
+          userId: { not: session.user.id },
+        },
+      });
+
+      if (otherAdmins === 0) {
+        return apiError(
+          API_ERRORS.customBadRequest(
+            "You cannot leave the board as you are the only owner. Assign another owner first or delete the board.",
+          ),
+        );
+      }
+    }
+
+    await prisma.$transaction([
+      prisma.boardMember.delete({
+        where: {
+          boardId_userId: {
+            boardId: board.id,
+            userId: session.user.id,
+          },
+        },
+      }),
+      prisma.boardActivityLog.create({
+        data: {
+          boardId: board.id,
+          type: "MEMBER_LEAVE",
+          actorId: session.user.id,
+        },
+      }),
+    ]);
+
+    return NextResponse.json({ message: "Successfully left the board" });
+  } catch (error) {
+    console.error("Error leaving board:", error);
+    return apiError(API_ERRORS.customInternal("Failed to leave board"));
+  }
+}

@@ -70,7 +70,7 @@ describe("BoardApi", () => {
     });
   });
 
-  describe("addMember", () => {
+  describe("inviteMember", () => {
     it("should call POST /api/boards/members with correct payload", async () => {
       const workspaceName = "my-workspace";
       const boardName = "my-board";
@@ -84,7 +84,7 @@ describe("BoardApi", () => {
         data: { member: mockMember },
       });
 
-      const result = await boardApi.addMember(
+      const result = await boardApi.inviteMember(
         workspaceName,
         boardName,
         identifier,
@@ -110,7 +110,7 @@ describe("BoardApi", () => {
       mockAxiosInstance.post.mockRejectedValueOnce(error);
 
       await expect(
-        boardApi.addMember(workspaceName, boardName, identifier),
+        boardApi.inviteMember(workspaceName, boardName, identifier),
       ).rejects.toThrow("Network Error");
     });
   });

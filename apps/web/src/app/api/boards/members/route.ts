@@ -93,7 +93,9 @@ export async function POST(req: Request) {
       workspaceMemberReq?.role !== "ADMIN"
     ) {
       return apiError(
-        API_ERRORS.customForbidden("Unauthorized to add members to this board"),
+        API_ERRORS.customForbidden(
+          "Unauthorized to invite members to this board",
+        ),
       );
     }
 
@@ -124,28 +126,51 @@ export async function POST(req: Request) {
       );
     }
 
-    const newMember = await prisma.boardMember.create({
-      data: {
+    // Instead of instantly adding them, create an invitation log
+    // First verify they don't already have a pending invite
+    const existingInvite = await prisma.boardActivityLog.findFirst({
+      where: {
         boardId: board.id,
-        userId: targetUser.id,
-        role: "MEMBER",
+        type: "INVITATION",
+        targetUserId: targetUser.id,
+        status: "PENDING",
       },
     });
 
-    // To prevent bigInt serialization error, we don't return bigInt ID
+    if (existingInvite) {
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "User already has a pending invitation to this board",
+        ),
+      );
+    }
+
+    const invitationLog = await prisma.boardActivityLog.create({
+      data: {
+        boardId: board.id,
+        type: "INVITATION",
+        actorId: session.user.id,
+        targetUserId: targetUser.id,
+        status: "PENDING",
+      },
+    });
+
     return NextResponse.json(
       {
-        member: {
-          boardId: newMember.boardId,
-          userId: newMember.userId,
-          role: newMember.role,
+        invitation: {
+          id: invitationLog.id,
+          boardId: invitationLog.boardId,
+          targetUserId: invitationLog.targetUserId,
+          status: invitationLog.status,
         },
       },
       { status: 201 },
     );
   } catch (error) {
     console.error("Error adding member to board:", error);
-    return apiError(API_ERRORS.customInternal("Failed to add member to board"));
+    return apiError(
+      API_ERRORS.customInternal("Failed to invite member to board"),
+    );
   }
 }
 
