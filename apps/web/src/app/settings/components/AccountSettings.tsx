@@ -89,13 +89,25 @@ export function AccountSettings({
             </div>
 
             {subscription.status === "ACTIVE" &&
-              !subscription.cancelAtPeriodEnd && (
+              !subscription.cancelAtPeriodEnd &&
+              subscription.price?.plan?.name !== "Free" && (
                 <button
                   onClick={handleCancelSubscription}
                   disabled={isSubmitting}
                   className="w-full bg-red-500/20 text-red-500 border border-red-500/50 font-bold font-mono py-2 hover:bg-red-500/30 transition-colors disabled:opacity-50 cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-red-500 [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
                 >
                   Cancel Subscription
+                </button>
+              )}
+
+            {subscription.status === "ACTIVE" &&
+              !subscription.cancelAtPeriodEnd &&
+              subscription.price?.plan?.name === "Free" && (
+                <button
+                  onClick={() => router.push("/plans")}
+                  className="w-full bg-git-green text-obsidian-night font-bold font-mono py-2 hover:bg-opacity-90 transition-opacity cmd-selectable [&.cmd-selected]:ring-2 [&.cmd-selected]:ring-white [&.cmd-selected]:ring-offset-2 [&.cmd-selected]:ring-offset-void-grey"
+                >
+                  Upgrade
                 </button>
               )}
 

@@ -109,6 +109,13 @@ export async function getUserDetails(userId: string) {
   const subscription = await prisma.subscription.findFirst({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    include: {
+      price: {
+        include: {
+          plan: true,
+        },
+      },
+    },
   });
 
   return { user, subscription };
