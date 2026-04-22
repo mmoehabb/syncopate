@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
+import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function GET(req: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
     return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  const isValidSubscription = await hasValidSubscription(session.user.id);
+  if (!isValidSubscription) {
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
@@ -56,6 +62,11 @@ export async function POST(req: Request) {
 
   if (!session?.user?.id) {
     return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  const isValidSubscription = await hasValidSubscription(session.user.id);
+  if (!isValidSubscription) {
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
@@ -144,6 +155,11 @@ export async function DELETE(req: Request) {
 
   if (!session?.user?.id) {
     return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  const isValidSubscription = await hasValidSubscription(session.user.id);
+  if (!isValidSubscription) {
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {

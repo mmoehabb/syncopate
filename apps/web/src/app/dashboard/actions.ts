@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { revalidatePath } from "next/cache";
+import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function subscribeToFreePlan() {
   const session = await auth();
@@ -41,6 +42,11 @@ export async function subscribeToFreePlan() {
 }
 
 export async function getUserWorkspacesAndBoards(userId: string) {
+  const isValidSubscription = await hasValidSubscription(userId);
+  if (!isValidSubscription) {
+    throw new Error("Active subscription required");
+  }
+
   const workspaces = await prisma.workspace.findMany({
     where: {
       members: {

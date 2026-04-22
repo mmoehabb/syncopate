@@ -3,12 +3,18 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import type { DirectoryResponse } from "@syncopate/types";
+import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function GET(req: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
     return apiError(API_ERRORS.UNAUTHORIZED);
+  }
+
+  const isValidSubscription = await hasValidSubscription(session.user.id);
+  if (!isValidSubscription) {
+    return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
 
   try {
