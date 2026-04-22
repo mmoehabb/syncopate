@@ -18,7 +18,7 @@ export function DashboardClient({
   board?: MainBoardData | null;
 }) {
   return (
-    <div className="flex-1 w-full flex flex-col bg-obsidian-night overflow-hidden">
+    <div className="w-full h-screen flex flex-col bg-obsidian-night overflow-hidden">
       <Header />
 
       <div className="flex-1 flex overflow-hidden relative">
