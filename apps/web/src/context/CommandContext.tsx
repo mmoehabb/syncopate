@@ -166,7 +166,6 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setVirtualPath,
         deleteModalState,
         setDeleteModalState,
-
       }}
     >
       {children}

@@ -60,7 +60,9 @@ export async function enforceSubscriptionLimits(userId: string) {
       });
 
       await prisma.board.updateMany({
-        where: { workspaceId: { in: workspacesToDeactivate.map((ws) => ws.id) } },
+        where: {
+          workspaceId: { in: workspacesToDeactivate.map((ws) => ws.id) },
+        },
         data: { isActive: false },
       });
     }
