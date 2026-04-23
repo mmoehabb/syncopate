@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
+import { FREE_MAX_WORKSPACES } from "@/lib/constants";
 
 export async function PUT(req: Request) {
   const session = await auth();
@@ -58,7 +59,7 @@ export async function PUT(req: Request) {
         },
       });
 
-      let maxWorkspaces = 1; // Default to free plan limit
+      let maxWorkspaces = FREE_MAX_WORKSPACES;
 
       if (userSubscription?.price?.plan) {
         maxWorkspaces = userSubscription.price.plan.maxWorkspaces;
@@ -71,7 +72,7 @@ export async function PUT(req: Request) {
         }
       }
 
-      if (maxWorkspaces !== -1) {
+      if (maxWorkspaces > 0) {
         const activeWorkspacesCount = await prisma.workspace.count({
           where: {
             isDeleted: false,
