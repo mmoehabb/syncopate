@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, ChevronDown, Plus } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronDown,
+  Plus,
+  Lightbulb,
+  LightbulbOff,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { DashboardWorkspace } from "./types";
 import { FocusedLabel } from "@/components/ui/FocusedLabel";
@@ -10,6 +16,7 @@ type FlatItem = {
   type: "workspace" | "board";
   id: string;
   label: string;
+  isActive: boolean;
 };
 
 export function Sidebar({
@@ -24,10 +31,20 @@ export function Sidebar({
 
   const flatItems: FlatItem[] = [];
   workspaces.forEach((ws) => {
-    flatItems.push({ type: "workspace", id: ws.id, label: ws.name });
+    flatItems.push({
+      type: "workspace",
+      id: ws.id,
+      label: ws.name,
+      isActive: ws.isActive,
+    });
     if (!collapsed[ws.id]) {
       ws.boards?.forEach((board) => {
-        flatItems.push({ type: "board", id: board.id, label: board.name });
+        flatItems.push({
+          type: "board",
+          id: board.id,
+          label: board.name,
+          isActive: board.isActive,
+        });
       });
     }
   });
@@ -51,7 +68,10 @@ export function Sidebar({
         {flatItems.map((item) => {
           if (item.type === "workspace") {
             return (
-              <div key={`ws-${item.id}`} className="group relative">
+              <div
+                key={`ws-${item.id}`}
+                className={`group relative ${!item.isActive ? "opacity-50" : ""}`}
+              >
                 <button
                   onClick={() => toggleWorkspace(item.id)}
                   className="w-full text-left px-4 py-1.5 flex items-center gap-2 hover:bg-white/5 text-syntax-grey [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white cmd-selectable"
@@ -61,7 +81,22 @@ export function Sidebar({
                   ) : (
                     <ChevronDown size={14} />
                   )}
-                  <span className="font-bold">{item.label}</span>
+                  <span className="font-bold flex-1">{item.label}</span>
+                  {item.isActive ? (
+                    <div title="Active Workspace" className="mr-6">
+                      <Lightbulb
+                        size={12}
+                        className="text-neon-pulse/80"
+                      />
+                    </div>
+                  ) : (
+                    <div title="Inactive Workspace" className="mr-6">
+                      <LightbulbOff
+                        size={12}
+                        className="text-syntax-grey/50"
+                      />
+                    </div>
+                  )}
                 </button>
                 <button
                   onClick={() => router.push("/settings")}
@@ -74,13 +109,32 @@ export function Sidebar({
             );
           }
           return (
-            <button
+            <div
               key={`b-${item.id}`}
-              onClick={() => router.push(`/dashboard/b/${item.id}`)}
-              className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${activeBoardId === item.id ? "bg-white/10 text-white border-l-2 border-git-green" : "text-syntax-grey border-l-2 border-transparent"} [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white [&.cmd-selected]:border-git-green cmd-selectable`}
+              className={`group relative ${!item.isActive ? "opacity-50" : ""}`}
             >
-              # {item.label}
-            </button>
+              <button
+                onClick={() => router.push(`/dashboard/b/${item.id}`)}
+                className={`w-full text-left pl-10 pr-4 py-1.5 flex items-center gap-2 hover:bg-white/5 ${activeBoardId === item.id ? "bg-white/10 text-white border-l-2 border-git-green" : "text-syntax-grey border-l-2 border-transparent"} [&.cmd-selected]:bg-white/10 [&.cmd-selected]:text-white [&.cmd-selected]:border-git-green cmd-selectable`}
+              >
+                <span className="flex-1"># {item.label}</span>
+                {item.isActive ? (
+                  <div title="Active Board">
+                    <Lightbulb
+                      size={12}
+                      className="text-git-green/80 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+                ) : (
+                  <div title="Inactive Board">
+                    <LightbulbOff
+                      size={12}
+                      className="text-syntax-grey/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+                )}
+              </button>
+            </div>
           );
         })}
       </div>
