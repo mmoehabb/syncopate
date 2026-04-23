@@ -98,6 +98,14 @@ export async function PUT(req: Request) {
       data: { isActive },
     });
 
+    if (!isActive) {
+      // Deactivate all inner boards when workspace is deactivated
+      await prisma.board.updateMany({
+        where: { workspaceId: workspace.id },
+        data: { isActive: false },
+      });
+    }
+
     return NextResponse.json({
       message: "Workspace status updated successfully",
       isActive,

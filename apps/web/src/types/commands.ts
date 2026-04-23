@@ -19,6 +19,7 @@ export interface Command {
       message?: string;
       onConfirm?: () => Promise<void>;
     }) => void;
+    showToast?: (message: string, type?: "success" | "error" | "info") => void;
   }) => void;
 }
 

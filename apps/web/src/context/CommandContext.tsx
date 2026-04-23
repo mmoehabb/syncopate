@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useToast } from "./ToastContext";
 import { AppMode } from "../types/commands";
 import { COMMAND_REGISTRY } from "../lib/command-registry";
 import {
@@ -55,6 +56,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   const [commandLog, setCommandLog] = useState<string[]>([]);
   const [virtualPath, setVirtualPath] = useState<string>("/");
   const router = useRouter();
+  const { showToast } = useToast();
   const params = useParams();
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -136,6 +138,8 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setIsVoiceCallActive,
         virtualPath,
         setVirtualPath,
+        setDeleteModalState,
+        showToast,
       });
     } else {
       printOutput([
@@ -162,6 +166,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         setVirtualPath,
         deleteModalState,
         setDeleteModalState,
+
       }}
     >
       {children}
