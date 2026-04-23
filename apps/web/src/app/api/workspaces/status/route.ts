@@ -44,6 +44,54 @@ export async function PUT(req: Request) {
       return apiError(API_ERRORS.customNotFound("Workspace"));
     }
 
+    if (isActive) {
+      const userSubscription = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          status: "ACTIVE",
+          currentPeriodEnd: { gt: new Date() },
+        },
+        include: {
+          price: {
+            include: { plan: true },
+          },
+        },
+      });
+
+      let maxWorkspaces = 1; // Default to free plan limit
+
+      if (userSubscription?.price?.plan) {
+        maxWorkspaces = userSubscription.price.plan.maxWorkspaces;
+      } else {
+        const freePlan = await prisma.plan.findFirst({
+          where: { name: "Free" },
+        });
+        if (freePlan) {
+          maxWorkspaces = freePlan.maxWorkspaces;
+        }
+      }
+
+      if (maxWorkspaces !== -1) {
+        const activeWorkspacesCount = await prisma.workspace.count({
+          where: {
+            isDeleted: false,
+            isActive: true,
+            members: {
+              some: { userId: session.user.id, role: "ADMIN" },
+            },
+          },
+        });
+
+        if (activeWorkspacesCount >= maxWorkspaces) {
+          return apiError(
+            API_ERRORS.customForbidden(
+              `You have reached your limit of ${maxWorkspaces} active workspaces on this plan.`,
+            ),
+          );
+        }
+      }
+    }
+
     await prisma.workspace.update({
       where: { id: workspace.id },
       data: { isActive },
