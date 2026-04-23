@@ -156,8 +156,12 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const navCommands = commands.filter((c) =>
         [
+          "ls",
+          "cd",
+          "pwd",
+          "help",
+          "board",
           "dashboard",
-          "pulls",
           "settings",
           "back",
           "forward",
@@ -165,10 +169,19 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
           "clear",
         ].includes(c.name),
       );
+      const workspaceCommands = commands.filter((c) =>
+        [
+          "delete-workspace",
+          "activate-workspace",
+          "deactivate-workspace",
+        ].includes(c.name),
+      );
       const boardCommands = commands.filter((c) =>
         [
           "add-board",
           "delete-board",
+          "activate-board",
+          "deactivate-board",
           "invite-member",
           "rmv-member",
           "join-voice-call",
@@ -187,6 +200,9 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         "--- SYNC-OS v1.0.0 ---",
         "Navigation & System:",
         ...navCommands.map(formatCmd),
+        "",
+        "Workspaces:",
+        ...workspaceCommands.map(formatCmd),
         "",
         "Boards:",
         ...boardCommands.map(formatCmd),
@@ -242,14 +258,6 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       localStorage.clear();
       const { signOut } = await import("next-auth/react");
       await signOut({ callbackUrl: "/login" });
-    },
-  },
-  pulls: {
-    name: "pulls",
-    description: "Navigate to the pull requests view",
-    action: ({ navigate, setMode }) => {
-      navigate("/pulls");
-      setMode("normal");
     },
   },
   settings: {
