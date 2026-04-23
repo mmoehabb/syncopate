@@ -58,13 +58,21 @@ describe("enforceSubscriptionLimits", () => {
 
     // Verify workspace limit enforcement (1 allowed, so 2 deactivated)
     expect((prisma.workspace.updateMany as any).mock.calls.length).toBe(1);
-    expect((prisma.workspace.updateMany as any).mock.calls[0][0].where.id.in).toEqual(["ws2", "ws1"]);
-    expect((prisma.workspace.updateMany as any).mock.calls[0][0].data.isActive).toBe(false);
+    expect(
+      (prisma.workspace.updateMany as any).mock.calls[0][0].where.id.in,
+    ).toEqual(["ws2", "ws1"]);
+    expect(
+      (prisma.workspace.updateMany as any).mock.calls[0][0].data.isActive,
+    ).toBe(false);
 
     // Verify board limit enforcement (1 allowed, so 2 deactivated)
     expect((prisma.board.updateMany as any).mock.calls.length).toBe(1);
-    expect((prisma.board.updateMany as any).mock.calls[0][0].where.id.in).toEqual(["b2", "b1"]);
-    expect((prisma.board.updateMany as any).mock.calls[0][0].data.isActive).toBe(false);
+    expect(
+      (prisma.board.updateMany as any).mock.calls[0][0].where.id.in,
+    ).toEqual(["b2", "b1"]);
+    expect(
+      (prisma.board.updateMany as any).mock.calls[0][0].data.isActive,
+    ).toBe(false);
   });
 
   test("should not deactivate if under the limits", async () => {
@@ -75,8 +83,8 @@ describe("enforceSubscriptionLimits", () => {
         plan: {
           maxWorkspaces: 3,
           maxActiveBoards: 5,
-        }
-      }
+        },
+      },
     });
 
     (prisma.workspace.findMany as any).mockResolvedValue([
@@ -105,12 +113,15 @@ describe("enforceSubscriptionLimits", () => {
         plan: {
           maxWorkspaces: -1,
           maxActiveBoards: -1,
-        }
-      }
+        },
+      },
     });
 
     // Even with many items, no deactivation
-    const manyItems = Array.from({ length: 50 }).map((_, i) => ({ id: `id-${i}`, createdAt: new Date() }));
+    const manyItems = Array.from({ length: 50 }).map((_, i) => ({
+      id: `id-${i}`,
+      createdAt: new Date(),
+    }));
     (prisma.workspace.findMany as any).mockResolvedValue(manyItems);
     (prisma.board.findMany as any).mockResolvedValue(manyItems);
 

@@ -13,13 +13,13 @@ export async function enforceSubscriptionLimits(userId: string) {
     where: {
       userId,
       status: "ACTIVE",
-      currentPeriodEnd: { gt: new Date() }
+      currentPeriodEnd: { gt: new Date() },
     },
     include: {
       price: {
-        include: { plan: true }
-      }
-    }
+        include: { plan: true },
+      },
+    },
   });
 
   // If no active sub, assume Free plan limits. Let's find the Free plan or use safe defaults.
@@ -31,7 +31,7 @@ export async function enforceSubscriptionLimits(userId: string) {
     maxActiveBoards = activeSubscription.price.plan.maxActiveBoards;
   } else {
     const freePlan = await prisma.plan.findFirst({
-      where: { name: "Free" }
+      where: { name: "Free" },
     });
     if (freePlan) {
       maxWorkspaces = freePlan.maxWorkspaces;
@@ -45,18 +45,18 @@ export async function enforceSubscriptionLimits(userId: string) {
       isDeleted: false,
       isActive: true,
       members: {
-        some: { userId, role: "ADMIN" }
-      }
+        some: { userId, role: "ADMIN" },
+      },
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   if (maxWorkspaces !== -1 && userAdminWorkspaces.length > maxWorkspaces) {
     const workspacesToDeactivate = userAdminWorkspaces.slice(maxWorkspaces);
     if (workspacesToDeactivate.length > 0) {
       await prisma.workspace.updateMany({
-        where: { id: { in: workspacesToDeactivate.map(ws => ws.id) } },
-        data: { isActive: false }
+        where: { id: { in: workspacesToDeactivate.map((ws) => ws.id) } },
+        data: { isActive: false },
       });
     }
   }
@@ -70,19 +70,19 @@ export async function enforceSubscriptionLimits(userId: string) {
         isDeleted: false,
         isActive: true,
         members: {
-          some: { userId, role: "ADMIN" }
-        }
-      }
+          some: { userId, role: "ADMIN" },
+        },
+      },
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   if (maxActiveBoards !== -1 && userAdminBoards.length > maxActiveBoards) {
     const boardsToDeactivate = userAdminBoards.slice(maxActiveBoards);
     if (boardsToDeactivate.length > 0) {
       await prisma.board.updateMany({
-        where: { id: { in: boardsToDeactivate.map(b => b.id) } },
-        data: { isActive: false }
+        where: { id: { in: boardsToDeactivate.map((b) => b.id) } },
+        data: { isActive: false },
       });
     }
   }

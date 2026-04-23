@@ -34,7 +34,7 @@ export async function PUT(req: Request) {
         members: {
           some: {
             userId: session.user.id,
-            role: "ADMIN"
+            role: "ADMIN",
           },
         },
       },
@@ -55,6 +55,8 @@ export async function PUT(req: Request) {
     });
   } catch (error) {
     console.error("Error updating workspace status:", error);
-    return apiError(API_ERRORS.customInternal("Failed to update workspace status"));
+    return apiError(
+      API_ERRORS.customInternal("Failed to update workspace status"),
+    );
   }
 }

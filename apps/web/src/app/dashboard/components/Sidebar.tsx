@@ -84,17 +84,11 @@ export function Sidebar({
                   <span className="font-bold flex-1">{item.label}</span>
                   {item.isActive ? (
                     <div title="Active Workspace" className="mr-6">
-                      <Lightbulb
-                        size={12}
-                        className="text-neon-pulse/80"
-                      />
+                      <Lightbulb size={12} className="text-neon-pulse/80" />
                     </div>
                   ) : (
                     <div title="Inactive Workspace" className="mr-6">
-                      <LightbulbOff
-                        size={12}
-                        className="text-syntax-grey/50"
-                      />
+                      <LightbulbOff size={12} className="text-syntax-grey/50" />
                     </div>
                   )}
                 </button>
