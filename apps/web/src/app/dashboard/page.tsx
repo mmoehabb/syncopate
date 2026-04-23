@@ -1,7 +1,11 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { redirect } from "next/navigation";
-import { subscribeToFreePlan, getUserWorkspacesAndBoards } from "./actions";
+import {
+  subscribeToFreePlan,
+  getUserWorkspacesAndBoards,
+  subscribeToTrialPlan,
+} from "./actions";
 import { DashboardClient } from "./components/DashboardClient";
 import { SessionProvider } from "next-auth/react";
 
@@ -62,6 +66,12 @@ export default async function DashboardPage() {
     workspaces = [];
   }
 
+  const allPlans = await prisma.plan.findMany({
+    where: { isActive: true },
+    include: { prices: true },
+    orderBy: { createdAt: "asc" },
+  });
+
   // Create the unclosable modal component to pass to the client
   const SubscriptionModal = (
     <div className="absolute inset-0 bg-obsidian-night/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -77,123 +87,146 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Free Plan */}
-          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative group transition-all hover:border-git-green/50">
-            <h3 className="text-xl font-bold text-white mb-2">Free</h3>
-            <div className="text-2xl text-git-green font-mono mb-6">$0</div>
-            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
-              <li className="flex items-center gap-2">
-                <span className="text-git-green">✓</span> 1 Workspace
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-git-green">✓</span> 1 Board per Workspace
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-git-green">✓</span> 1 Member per Board
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-git-green">✓</span> 1 Active Board Total
-              </li>
-            </ul>
-            <form action={subscribeToFreePlan} className="mt-auto">
-              <button className="w-full bg-void-grey border border-git-green/30 hover:border-git-green hover:bg-git-green/10 transition-all rounded py-2.5 text-white font-mono text-sm cursor-pointer">
-                Get Started
-              </button>
-            </form>
-          </div>
+          {allPlans.map((plan) => {
+            const price = plan.prices[0];
+            const isFree = plan.name === "Free";
+            const isTrial = plan.isTrial;
+            const requiresPayment = !isFree && !isTrial;
 
-          {/* Standard Plan */}
-          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
-            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
-              soon
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Standard</h3>
-            <div className="text-2xl text-white font-mono mb-6">
-              $12<span className="text-sm text-syntax-grey">/mo</span>
-            </div>
-            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 10 Workspaces
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 10 Boards/Workspace
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 20 Members/Board
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 5 Active Boards
-                Total
-              </li>
-            </ul>
-            <button
-              disabled
-              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
-            >
-              Unavailable
-            </button>
-          </div>
+            return (
+              <div
+                key={plan.id}
+                className={`flex flex-col border rounded-md p-6 relative group transition-all ${isFree || isTrial ? "border-white/10 bg-obsidian-night/50 hover:border-git-green/50" : "border-white/10 bg-obsidian-night/50 opacity-60"}`}
+              >
+                {requiresPayment && (
+                  <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
+                    soon
+                  </div>
+                )}
+                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  {plan.name}{" "}
+                  {plan.name === "Premium" && (
+                    <span className="text-neon-pulse">★</span>
+                  )}
+                </h3>
+                <div className="text-2xl font-mono mb-6 text-white">
+                  {isFree || isTrial ? (
+                    <span
+                      className={isTrial ? "text-neon-pulse" : "text-git-green"}
+                    >
+                      Free
+                    </span>
+                  ) : (
+                    <>
+                      ${price ? (price.amount / 100).toFixed(0) : "0"}
+                      <span className="text-sm text-syntax-grey">
+                        /{price?.interval.toLowerCase()}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        isTrial || plan.name === "Premium"
+                          ? "text-neon-pulse"
+                          : isFree
+                            ? "text-git-green"
+                            : "text-syntax-grey"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {plan.maxWorkspaces === -1
+                      ? "Unlimited"
+                      : plan.maxWorkspaces}{" "}
+                    Workspaces
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        isTrial || plan.name === "Premium"
+                          ? "text-neon-pulse"
+                          : isFree
+                            ? "text-git-green"
+                            : "text-syntax-grey"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {plan.maxBoardsPerWorkspace === -1
+                      ? "Unlimited"
+                      : plan.maxBoardsPerWorkspace}{" "}
+                    Boards/Workspace
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        isTrial || plan.name === "Premium"
+                          ? "text-neon-pulse"
+                          : isFree
+                            ? "text-git-green"
+                            : "text-syntax-grey"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {plan.maxMembersPerBoard === -1
+                      ? "Unlimited"
+                      : plan.maxMembersPerBoard}{" "}
+                    Members/Board
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        isTrial || plan.name === "Premium"
+                          ? "text-neon-pulse"
+                          : isFree
+                            ? "text-git-green"
+                            : "text-syntax-grey"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {plan.maxActiveBoards === -1
+                      ? "Unlimited"
+                      : plan.maxActiveBoards}{" "}
+                    Active Boards Total
+                  </li>
+                </ul>
 
-          {/* Trial Plan */}
-          <div className="flex flex-col border border-white/10 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
-            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
-              soon
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">1-Week Trial</h3>
-            <div className="text-2xl text-neon-pulse font-mono mb-6">Free</div>
-            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
-              <li className="flex items-center gap-2">
-                <span className="text-neon-pulse">✓</span> Full Standard
-                Features
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-neon-pulse">✓</span> Valid for 7 days
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-neon-pulse">✓</span> One-time use
-              </li>
-            </ul>
-            <button
-              disabled
-              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
-            >
-              Unavailable
-            </button>
-          </div>
+                {isFree && (
+                  <form action={subscribeToFreePlan} className="mt-auto">
+                    <button className="w-full bg-void-grey border border-git-green/30 hover:border-git-green hover:bg-git-green/10 transition-all rounded py-2.5 text-white font-mono text-sm cursor-pointer">
+                      Get Started
+                    </button>
+                  </form>
+                )}
 
-          {/* Premium Plan */}
-          <div className="flex flex-col border border-neon-pulse/20 bg-obsidian-night/50 rounded-md p-6 relative opacity-60">
-            <div className="absolute top-4 right-4 bg-white/10 text-syntax-grey text-xs px-2 py-0.5 rounded font-mono">
-              soon
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-              Premium <span className="text-neon-pulse">★</span>
-            </h3>
-            <div className="text-2xl text-white font-mono mb-6">
-              $30<span className="text-sm text-syntax-grey">/mo</span>
-            </div>
-            <ul className="text-sm font-mono text-syntax-grey flex flex-col gap-3 flex-1 mb-8">
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 25 Workspaces
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-syntax-grey">✓</span> 50 Boards/Workspace
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-neon-pulse">✓</span> Unlimited Members
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-neon-pulse">✓</span> Unlimited Active
-                Boards
-              </li>
-            </ul>
-            <button
-              disabled
-              className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
-            >
-              Unavailable
-            </button>
-          </div>
+                {isTrial && (
+                  <form
+                    action={subscribeToTrialPlan.bind(null, plan.id)}
+                    className="mt-auto"
+                  >
+                    <button className="w-full bg-void-grey border border-neon-pulse/30 hover:border-neon-pulse hover:bg-neon-pulse/10 transition-all rounded py-2.5 text-white font-mono text-sm cursor-pointer">
+                      Start Trial
+                    </button>
+                  </form>
+                )}
+
+                {requiresPayment && (
+                  // TODO: This shall be implemented whenever the payment provider will get integrated into the app
+                  <button
+                    disabled
+                    className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
+                  >
+                    Unavailable
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="text-center mt-4">

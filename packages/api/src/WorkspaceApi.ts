@@ -42,6 +42,20 @@ export class WorkspaceApi extends ApiClient {
     });
     return response.data;
   }
+
+  public async updateWorkspaceStatus(
+    workspaceName: string,
+    isActive: boolean,
+  ): Promise<{ message: string; isActive: boolean }> {
+    const response = await this.put<{ message: string; isActive: boolean }>(
+      "/status",
+      {
+        workspaceName,
+        isActive,
+      },
+    );
+    return response.data;
+  }
 }
 
 export const workspaceApi = new WorkspaceApi();

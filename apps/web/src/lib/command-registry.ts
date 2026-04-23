@@ -363,6 +363,78 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       }
     },
   },
+  "activate-workspace": {
+    name: "activate-workspace",
+    description:
+      "Activate a workspace (usage: /activate-workspace <workspace_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /activate-workspace <workspace_name>",
+        ]);
+        return;
+      }
+
+      const workspaceName = args.join(" ").trim();
+
+      import("@syncopate/api").then(({ workspaceApi }) => {
+        workspaceApi
+          .updateWorkspaceStatus(workspaceName, true)
+          .then(() => {
+            printOutput([
+              `Successfully activated workspace '${workspaceName}'.`,
+            ]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to activate workspace.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "deactivate-workspace": {
+    name: "deactivate-workspace",
+    description:
+      "Deactivate a workspace (usage: /deactivate-workspace <workspace_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /deactivate-workspace <workspace_name>",
+        ]);
+        return;
+      }
+
+      const workspaceName = args.join(" ").trim();
+
+      import("@syncopate/api").then(({ workspaceApi }) => {
+        workspaceApi
+          .updateWorkspaceStatus(workspaceName, false)
+          .then(() => {
+            printOutput([
+              `Successfully deactivated workspace '${workspaceName}'.`,
+            ]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to deactivate workspace.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
   "activate-board": {
     name: "activate-board",
     description:
