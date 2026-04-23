@@ -54,6 +54,14 @@ export async function PUT(req: Request) {
       return apiError(API_ERRORS.customNotFound("Board"));
     }
 
+    if (isActive && !workspace.isActive) {
+      return apiError(
+        API_ERRORS.customForbidden(
+          "Cannot activate board in an inactive workspace. Please activate the workspace first.",
+        ),
+      );
+    }
+
     const boardMember = await prisma.boardMember.findUnique({
       where: {
         boardId_userId: {

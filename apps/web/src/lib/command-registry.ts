@@ -447,7 +447,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     name: "activate-board",
     description:
       "Activate a board (usage: /activate-board <workspace_name>/<board_name>)",
-    action: ({ args, printOutput }) => {
+    action: ({ args, printOutput, showToast }) => {
       if (!args || args.length === 0) {
         printOutput([
           "Error: Missing arguments. Usage: /activate-board <workspace_name>/<board_name>",
@@ -485,6 +485,9 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
               (err as Error).message ||
               "Failed to activate board.";
             printOutput([`Error: ${errorMessage}`]);
+            if (showToast) {
+              showToast(errorMessage, "error");
+            }
           });
       });
     },

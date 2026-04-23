@@ -58,6 +58,13 @@ export async function enforceSubscriptionLimits(userId: string) {
         where: { id: { in: workspacesToDeactivate.map((ws) => ws.id) } },
         data: { isActive: false },
       });
+
+      await prisma.board.updateMany({
+        where: {
+          workspaceId: { in: workspacesToDeactivate.map((ws) => ws.id) },
+        },
+        data: { isActive: false },
+      });
     }
   }
 

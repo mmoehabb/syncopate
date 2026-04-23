@@ -66,12 +66,20 @@ describe("enforceSubscriptionLimits", () => {
     ).toBe(false);
 
     // Verify board limit enforcement (1 allowed, so 2 deactivated)
-    expect((prisma.board.updateMany as any).mock.calls.length).toBe(1);
+    expect((prisma.board.updateMany as any).mock.calls.length).toBe(2);
+
     expect(
-      (prisma.board.updateMany as any).mock.calls[0][0].where.id.in,
-    ).toEqual(["b2", "b1"]);
+      (prisma.board.updateMany as any).mock.calls[0][0].where.workspaceId.in,
+    ).toEqual(["ws2", "ws1"]);
     expect(
       (prisma.board.updateMany as any).mock.calls[0][0].data.isActive,
+    ).toBe(false);
+
+    expect(
+      (prisma.board.updateMany as any).mock.calls[1][0].where.id.in,
+    ).toEqual(["b2", "b1"]);
+    expect(
+      (prisma.board.updateMany as any).mock.calls[1][0].data.isActive,
     ).toBe(false);
   });
 
