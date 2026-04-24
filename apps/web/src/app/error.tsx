@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
-import { bugApi } from "@syncopate/api";
+import { reportBugAction } from "@/lib/actions/bugs";
 
 export default function ErrorBoundary({
   error,
@@ -22,13 +22,23 @@ export default function ErrorBoundary({
 
   const handleReportBug = async () => {
     try {
-      await bugApi.reportBug({
+      const browser =
+        typeof navigator !== "undefined" ? navigator.userAgent : "Unknown";
+
+      const result = await reportBugAction({
         message: error.message,
+        digest: error.digest,
         stack: error.stack,
-        url: window.location.href,
+        browser,
+        url: typeof window !== "undefined" ? window.location.href : "Unknown",
       });
-      showToast("Bug reported successfully. Thank you!", "success");
-      router.push("/");
+
+      if (result.success) {
+        showToast("Bug reported successfully. Thank you!", "success");
+        router.push("/");
+      } else {
+        throw new Error(result.error);
+      }
     } catch (err) {
       console.error("Failed to report bug:", err);
       showToast("Failed to report bug. Please try again later.", "error");
