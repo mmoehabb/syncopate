@@ -199,12 +199,16 @@ describe("BoardApi", () => {
 
       const result = await boardApi.restoreBoard(workspaceName, boardName);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith("/restore", undefined, {
-        params: {
-          workspace: workspaceName,
-          board: boardName,
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+        "/restore",
+        undefined,
+        {
+          params: {
+            workspace: workspaceName,
+            board: boardName,
+          },
         },
-      });
+      );
       expect(result).toEqual(mockResponse);
     });
 
