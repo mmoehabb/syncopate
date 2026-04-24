@@ -4,7 +4,11 @@ import { NextRequest } from "next/server";
 
 const mockPrisma = {
   task: {
-    findUnique: mock().mockResolvedValue({ id: BigInt(1), boardId: "board1", board: { workspaceId: "ws1" } }),
+    findUnique: mock().mockResolvedValue({
+      id: BigInt(1),
+      boardId: "board1",
+      board: { workspaceId: "ws1" },
+    }),
     update: mock().mockResolvedValue({ id: BigInt(1) }),
     delete: mock().mockResolvedValue(true),
   },
@@ -16,7 +20,7 @@ const mockPrisma = {
   },
   boardActivityLog: {
     create: mock().mockResolvedValue(true),
-  }
+  },
 };
 
 mock.module("@syncopate/db", () => ({
@@ -38,7 +42,10 @@ mock.module("@/lib/api/error", () => ({
     customForbidden: (msg: string) => ({ error: msg, status: 403 }),
     customBadRequest: (msg: string) => ({ error: msg, status: 400 }),
     UNAUTHORIZED: { error: "Unauthorized", status: 401 },
-    customNotFound: (msg: string) => ({ error: msg + " not found", status: 404 }),
+    customNotFound: (msg: string) => ({
+      error: msg + " not found",
+      status: 404,
+    }),
     customInternal: (msg: string) => ({ error: msg, status: 500 }),
   },
   apiError: (err: any) => {
@@ -65,7 +72,9 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         body: JSON.stringify({ status: "DONE" }),
       });
 
-      const response = await PATCH(req, { params: Promise.resolve({ taskId: "1" }) });
+      const response = await PATCH(req, {
+        params: Promise.resolve({ taskId: "1" }),
+      });
       expect(response.status).toBe(403);
       const data = await response.json();
       expect(data.error).toBe("Unauthorized access to this task");
@@ -82,7 +91,9 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         body: JSON.stringify({ status: "DONE" }),
       });
 
-      const response = await PATCH(req, { params: Promise.resolve({ taskId: "1" }) });
+      const response = await PATCH(req, {
+        params: Promise.resolve({ taskId: "1" }),
+      });
       expect(response.status).toBe(200);
     });
   });
@@ -98,7 +109,9 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         method: "DELETE",
       });
 
-      const response = await DELETE(req, { params: Promise.resolve({ taskId: "1" }) });
+      const response = await DELETE(req, {
+        params: Promise.resolve({ taskId: "1" }),
+      });
       expect(response.status).toBe(403);
       const data = await response.json();
       expect(data.error).toBe("Unauthorized access to delete this task");
@@ -114,7 +127,9 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         method: "DELETE",
       });
 
-      const response = await DELETE(req, { params: Promise.resolve({ taskId: "1" }) });
+      const response = await DELETE(req, {
+        params: Promise.resolve({ taskId: "1" }),
+      });
       expect(response.status).toBe(200);
     });
   });

@@ -13,7 +13,11 @@ const mockPrisma = {
     findUnique: mock().mockResolvedValue(null),
   },
   task: {
-    create: mock().mockResolvedValue({ id: BigInt(1), title: "Test", status: "TODO" }),
+    create: mock().mockResolvedValue({
+      id: BigInt(1),
+      title: "Test",
+      status: "TODO",
+    }),
   },
 };
 
@@ -36,7 +40,10 @@ mock.module("@/lib/api/error", () => ({
     customForbidden: (msg: string) => ({ error: msg, status: 403 }),
     customBadRequest: (msg: string) => ({ error: msg, status: 400 }),
     UNAUTHORIZED: { error: "Unauthorized", status: 401 },
-    customNotFound: (msg: string) => ({ error: msg + " not found", status: 404 }),
+    customNotFound: (msg: string) => ({
+      error: msg + " not found",
+      status: 404,
+    }),
     customInternal: (msg: string) => ({ error: msg, status: 500 }),
   },
   apiError: (err: any) => {
@@ -56,7 +63,7 @@ describe("POST /api/tasks (IDOR Fix)", () => {
     mockPrisma.workspaceMember.findUnique.mockResolvedValueOnce({
       role: "MEMBER",
       workspaceId: "ws1",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     const req = new NextRequest("http://localhost:3000/api/tasks", {
@@ -75,7 +82,7 @@ describe("POST /api/tasks (IDOR Fix)", () => {
     mockPrisma.workspaceMember.findUnique.mockResolvedValueOnce({
       role: "ADMIN",
       workspaceId: "ws1",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     const req = new NextRequest("http://localhost:3000/api/tasks", {
