@@ -1,8 +1,5 @@
 import { prisma } from "@syncopate/db";
 
-// TODO: Create a cron job to periodically find users with expired subscriptions
-// and automatically run this revocation logic for them, downgrading them to the Free plan.
-
 /**
  * Revokes excess perks (workspaces, boards) when a user's subscription changes
  * (e.g. Trial expires, user downgrades to Free).

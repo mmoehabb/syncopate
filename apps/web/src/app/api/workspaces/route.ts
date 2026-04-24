@@ -208,8 +208,6 @@ export async function DELETE(req: Request) {
       data: { isDeleted: true },
     });
 
-    // TODO: A background cron job should permanently delete this workspace after 3 months.
-
     return NextResponse.json({ message: "Workspace deleted successfully" });
   } catch (error) {
     console.error("Error deleting workspace:", error);

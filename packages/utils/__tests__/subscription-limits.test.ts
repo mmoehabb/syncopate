@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, mock, afterEach } from "bun:test";
-import { enforceSubscriptionLimits } from "../../src/lib/api/subscription-limits";
+import { enforceSubscriptionLimits } from "../src/subscription-limits";
 import { prisma } from "@syncopate/db";
 
 // Mocking prisma globally

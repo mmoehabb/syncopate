@@ -1,0 +1,16 @@
+{
+  "name": "@syncopate/utils",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "@syncopate/db": "workspace:*"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "typescript": "^5.0.0"
+  }
+}
