@@ -83,10 +83,122 @@ export function AccountSettings({
 
         {subscription ? (
           <div className="space-y-4">
-            <div className="text-sm font-mono text-syntax-grey">
-              Status: {subscription.status}
-              {subscription.cancelAtPeriodEnd && " (Canceling at period end)"}
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h4 className="text-xl font-bold text-white">
+                  {subscription.price?.plan?.name || "Unknown Plan"}
+                </h4>
+                <div className="text-sm font-mono text-syntax-grey">
+                  Status: {subscription.status}
+                  {subscription.cancelAtPeriodEnd &&
+                    " (Canceling at period end)"}
+                </div>
+              </div>
             </div>
+
+            {subscription.price?.plan && (
+              <div className="bg-void-grey/50 border border-white/10 p-4 rounded mb-4">
+                <h5 className="text-sm font-bold text-white mb-3">
+                  Plan Perks
+                </h5>
+                <ul className="space-y-2 text-syntax-grey text-sm font-mono">
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        subscription.price.plan.name === "Standard"
+                          ? "text-neon-pulse"
+                          : "text-git-green"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {subscription.price.plan.maxWorkspaces === -1
+                      ? "Unlimited"
+                      : subscription.price.plan.maxWorkspaces}{" "}
+                    Workspace
+                    {subscription.price.plan.maxWorkspaces !== 1 && "s"}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        subscription.price.plan.name === "Standard"
+                          ? "text-neon-pulse"
+                          : "text-git-green"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {subscription.price.plan.maxBoardsPerWorkspace === -1
+                      ? "Unlimited"
+                      : subscription.price.plan.maxBoardsPerWorkspace}{" "}
+                    Board
+                    {subscription.price.plan.maxBoardsPerWorkspace !== 1 && "s"}
+                    /Workspace
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        subscription.price.plan.name === "Standard"
+                          ? "text-neon-pulse"
+                          : "text-git-green"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {subscription.price.plan.maxMembersPerBoard === -1
+                      ? "Unlimited"
+                      : subscription.price.plan.maxMembersPerBoard}{" "}
+                    Member
+                    {subscription.price.plan.maxMembersPerBoard !== 1 && "s"}
+                    /Board
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      className={
+                        subscription.price.plan.name === "Standard"
+                          ? "text-neon-pulse"
+                          : "text-git-green"
+                      }
+                    >
+                      ✓
+                    </span>{" "}
+                    {subscription.price.plan.maxActiveBoards === -1
+                      ? "Unlimited"
+                      : subscription.price.plan.maxActiveBoards}{" "}
+                    Active Board
+                    {subscription.price.plan.maxActiveBoards !== 1 && "s"} Total
+                  </li>
+                  {subscription.price.plan.name === "Free" && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-git-green">✓</span> Full Git
+                      Integration
+                    </li>
+                  )}
+                  {subscription.price.plan.name === "Standard" && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-neon-pulse">✓</span> Priority Sync
+                    </li>
+                  )}
+                  {subscription.price.plan.isTrial && (
+                    <li className="flex items-center gap-2">
+                      <span className="text-git-green">✓</span> Valid for 7 days
+                    </li>
+                  )}
+                  {subscription.price.plan.name === "Premium" && (
+                    <>
+                      <li className="flex items-center gap-2">
+                        <span className="text-git-green">✓</span> SSO
+                        Integration
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-git-green">✓</span> Dedicated
+                        Support
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </div>
+            )}
 
             {subscription.status === "ACTIVE" &&
               !subscription.cancelAtPeriodEnd &&
