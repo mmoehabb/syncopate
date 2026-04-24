@@ -1,0 +1,5 @@
+$ tsc --watch
+[2J[3J[H1:48:49 PM - Starting compilation in watch mode...
+
+
+1:48:51 PM - Found 0 errors. Watching for file changes.

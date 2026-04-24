@@ -1,0 +1,15 @@
+$ bun run --filter "*" dev
+@syncopate/types dev: [2J[3J[H1:57:46 PM - Starting compilation in watch mode...
+@syncopate/types dev:
+@syncopate/api dev: [2J[3J[H1:57:46 PM - Starting compilation in watch mode...
+@syncopate/api dev:
+web dev: ▲ Next.js 16.2.2 (Turbopack)
+web dev: - Local:         http://localhost:3000
+web dev: - Network:       http://192.168.0.2:3000
+web dev: ✓ Ready in 629ms
+web dev:
+@syncopate/types dev:
+@syncopate/types dev: 1:57:48 PM - Found 0 errors. Watching for file changes.
+@syncopate/api dev:
+@syncopate/api dev: 1:57:49 PM - Found 0 errors. Watching for file changes.
+web dev: Signaled with code SIGKILL
