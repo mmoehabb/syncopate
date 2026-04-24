@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
+import { FREE_MAX_ACTIVE_BOARDS } from "@/lib/constants";
 
 export async function PUT(req: Request) {
   const session = await auth();
@@ -60,6 +61,54 @@ export async function PUT(req: Request) {
           "Cannot activate board in an inactive workspace. Please activate the workspace first.",
         ),
       );
+    }
+
+    if (isActive) {
+      const userSubscription = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          status: "ACTIVE",
+          currentPeriodEnd: { gt: new Date() },
+        },
+        include: {
+          price: {
+            include: { plan: true },
+          },
+        },
+      });
+
+      let maxActiveBoards = FREE_MAX_ACTIVE_BOARDS;
+
+      if (userSubscription?.price?.plan) {
+        maxActiveBoards = userSubscription.price.plan.maxActiveBoards;
+      } else {
+        const freePlan = await prisma.plan.findFirst({
+          where: { name: "Free" },
+        });
+        if (freePlan) {
+          maxActiveBoards = freePlan.maxActiveBoards;
+        }
+      }
+
+      if (maxActiveBoards > 0) {
+        const activeBoardsCount = await prisma.board.count({
+          where: {
+            isDeleted: false,
+            isActive: true,
+            members: {
+              some: { userId: session.user.id, role: "ADMIN" },
+            },
+          },
+        });
+
+        if (activeBoardsCount >= maxActiveBoards) {
+          return apiError(
+            API_ERRORS.customForbidden(
+              `You have reached your limit of ${maxActiveBoards} active boards on this plan.`,
+            ),
+          );
+        }
+      }
     }
 
     const boardMember = await prisma.boardMember.findUnique({

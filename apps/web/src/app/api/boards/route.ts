@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
+import { FREE_MAX_ACTIVE_BOARDS } from "@/lib/constants";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -43,17 +44,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verify user has access to this workspace
-    const workspaceMember = await prisma.workspaceMember.findUnique({
-      where: {
-        workspaceId_userId: {
-          workspaceId,
-          userId: session.user.id,
+    // Verify user has access to this workspace and check if it's active
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      include: {
+        members: {
+          where: { userId: session.user.id },
         },
       },
     });
 
-    if (!workspaceMember) {
+    if (!workspace || workspace.members.length === 0) {
       return apiError(
         API_ERRORS.custom404("Workspace not found or unauthorized"),
       );
@@ -84,12 +85,60 @@ export async function POST(req: Request) {
       );
     }
 
+    let isBoardActive = true;
+    if (!workspace.isActive) {
+      isBoardActive = false;
+    } else {
+      const userSubscription = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          status: "ACTIVE",
+          currentPeriodEnd: { gt: new Date() },
+        },
+        include: {
+          price: {
+            include: { plan: true },
+          },
+        },
+      });
+
+      let maxActiveBoards = FREE_MAX_ACTIVE_BOARDS;
+
+      if (userSubscription?.price?.plan) {
+        maxActiveBoards = userSubscription.price.plan.maxActiveBoards;
+      } else {
+        const freePlan = await prisma.plan.findFirst({
+          where: { name: "Free" },
+        });
+        if (freePlan) {
+          maxActiveBoards = freePlan.maxActiveBoards;
+        }
+      }
+
+      if (maxActiveBoards > 0) {
+        const activeBoardsCount = await prisma.board.count({
+          where: {
+            isDeleted: false,
+            isActive: true,
+            members: {
+              some: { userId: session.user.id, role: "ADMIN" },
+            },
+          },
+        });
+
+        if (activeBoardsCount >= maxActiveBoards) {
+          isBoardActive = false;
+        }
+      }
+    }
+
     const board = await prisma.board.create({
       data: {
         workspaceId,
         name,
         repositoryName,
         githubRepoId: String(githubRepoId),
+        isActive: isBoardActive,
       },
     });
 

@@ -1,2 +1,3 @@
 export const SIMILARITY_THRESHOLD = 0.9;
 export const FREE_MAX_WORKSPACES = 1;
+export const FREE_MAX_ACTIVE_BOARDS = 1;
