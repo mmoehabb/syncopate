@@ -180,6 +180,8 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
         [
           "add-board",
           "delete-board",
+          "restore-board",
+          "list-deleted-boards",
           "activate-board",
           "deactivate-board",
           "invite-member",
@@ -315,6 +317,85 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
           },
         });
       }
+    },
+  },
+  "restore-board": {
+    name: "restore-board",
+    description:
+      "Restore a soft-deleted board (usage: /restore-board <workspace_name>/<board_name>)",
+    action: ({ args, printOutput }) => {
+      if (!args || args.length === 0) {
+        printOutput([
+          "Error: Missing arguments. Usage: /restore-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const fullPath = args.join(" ");
+      const parts = fullPath.split("/");
+
+      if (parts.length !== 2) {
+        printOutput([
+          "Error: Invalid format. Usage: /restore-board <workspace_name>/<board_name>",
+        ]);
+        return;
+      }
+
+      const [workspaceName, boardName] = parts;
+
+      import("@syncopate/api").then(({ boardApi }) => {
+        boardApi
+          .restoreBoard(workspaceName.trim(), boardName.trim())
+          .then(() => {
+            printOutput([
+              `Successfully restored board '${boardName.trim()}' in workspace '${workspaceName.trim()}'.`,
+            ]);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to restore board.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
+    },
+  },
+  "list-deleted-boards": {
+    name: "list-deleted-boards",
+    description:
+      "List all soft-deleted boards and time remaining until permanent deletion",
+    action: ({ printOutput }) => {
+      import("@syncopate/api").then(({ boardApi }) => {
+        boardApi
+          .getDeletedBoards()
+          .then((boards) => {
+            if (boards.length === 0) {
+              printOutput(["No soft-deleted boards found."]);
+              return;
+            }
+
+            const outputLines = ["--- Deleted Boards ---"];
+            boards.forEach((board) => {
+              outputLines.push(
+                `- ${board.workspaceName}/${board.name} (Repo: ${board.repositoryName || "None"}) | ${board.timeLeftString} until permanent deletion`,
+              );
+            });
+            printOutput(outputLines);
+          })
+          .catch((err: unknown) => {
+            const errorMessage =
+              (err as { response?: { data?: { error?: string } } }).response
+                ?.data?.error ||
+              (err as Error).message ||
+              "Failed to list deleted boards.";
+            printOutput([`Error: ${errorMessage}`]);
+          });
+      });
     },
   },
   "delete-board": {
