@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import type { CreateBoardPayload } from "@syncopate/types";
+import type { CreateBoardPayload, DeletedBoard } from "@syncopate/types";
 
 export class BoardApi extends ApiClient {
   constructor() {
@@ -22,6 +22,28 @@ export class BoardApi extends ApiClient {
       },
     });
     return response.data;
+  }
+
+  public async restoreBoard(
+    workspaceName: string,
+    boardName: string,
+  ): Promise<{ message: string }> {
+    const response = await this.put<{ message: string }>(
+      "/restore",
+      undefined,
+      {
+        params: {
+          workspace: workspaceName,
+          board: boardName,
+        },
+      },
+    );
+    return response.data;
+  }
+
+  public async getDeletedBoards(): Promise<DeletedBoard[]> {
+    const response = await this.get<{ boards: DeletedBoard[] }>("/deleted");
+    return response.data.boards;
   }
 
   public async updateBoardStatus(

@@ -26,6 +26,14 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!githubRepoId) {
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "A linked GitHub repository is required to create a board",
+        ),
+      );
+    }
+
     const nameRegex = /^[a-zA-Z0-9-_]+$/;
     if (!nameRegex.test(name)) {
       return apiError(
@@ -51,12 +59,37 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if a board with this GitHub repo ID already exists globally
+    const existingBoard = await prisma.board.findFirst({
+      where: {
+        githubRepoId: String(githubRepoId),
+      },
+      include: {
+        workspace: true,
+      },
+    });
+
+    if (existingBoard) {
+      if (existingBoard.isDeleted) {
+        return apiError(
+          API_ERRORS.customBadRequest(
+            `A board for this repository already exists but is soft-deleted. You can restore it using the command: /restore-board ${existingBoard.workspace.name}/${existingBoard.name}`,
+          ),
+        );
+      }
+      return apiError(
+        API_ERRORS.customBadRequest(
+          "A board for this repository already exists. Every repository can only have one active board.",
+        ),
+      );
+    }
+
     const board = await prisma.board.create({
       data: {
         workspaceId,
         name,
         repositoryName,
-        githubRepoId: githubRepoId ? String(githubRepoId) : null,
+        githubRepoId: String(githubRepoId),
       },
     });
 

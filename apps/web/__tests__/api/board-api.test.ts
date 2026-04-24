@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
-import { BoardApi } from "@syncopate/api";
+import { BoardApi } from "../../../../packages/api/src/BoardApi";
 
 describe("BoardApi", () => {
   let boardApi: BoardApi;
@@ -8,6 +8,8 @@ describe("BoardApi", () => {
   beforeEach(() => {
     mockAxiosInstance.post.mockClear();
     mockAxiosInstance.delete.mockClear();
+    mockAxiosInstance.put.mockClear();
+    mockAxiosInstance.get.mockClear();
     boardApi = new BoardApi();
     boardApi["client"] = // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockAxiosInstance as any;
@@ -183,6 +185,76 @@ describe("BoardApi", () => {
       await expect(
         boardApi.deleteBoard(workspaceName, boardName),
       ).rejects.toThrow("Delete failed");
+    });
+  });
+
+  describe("restoreBoard", () => {
+    it("should call PUT /api/boards/restore with correct query parameters", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const mockResponse = { message: "Board restored successfully" };
+      mockAxiosInstance.put.mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await boardApi.restoreBoard(workspaceName, boardName);
+
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+        "/restore",
+        undefined,
+        {
+          params: {
+            workspace: workspaceName,
+            board: boardName,
+          },
+        },
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("should propagate errors", async () => {
+      const workspaceName = "my-workspace";
+      const boardName = "my-board";
+      const error = new Error("Restore failed");
+      mockAxiosInstance.put.mockRejectedValueOnce(error);
+
+      await expect(
+        boardApi.restoreBoard(workspaceName, boardName),
+      ).rejects.toThrow("Restore failed");
+    });
+  });
+
+  describe("getDeletedBoards", () => {
+    it("should call GET /api/boards/deleted", async () => {
+      const mockResponse = {
+        boards: [
+          {
+            id: "b1",
+            name: "Deleted Board",
+            workspaceName: "Workspace 1",
+            repositoryName: "owner/repo",
+            githubRepoId: "123",
+            deletedAt: new Date(),
+            daysLeftForPermDeletion: 90,
+            timeLeftString: "3 months left",
+          },
+        ],
+      };
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: mockResponse,
+      });
+
+      const result = await boardApi.getDeletedBoards();
+
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith("/deleted", undefined);
+      expect(result).toEqual(mockResponse.boards);
+    });
+
+    it("should propagate errors", async () => {
+      const error = new Error("Fetch failed");
+      mockAxiosInstance.get.mockRejectedValueOnce(error);
+
+      await expect(boardApi.getDeletedBoards()).rejects.toThrow("Fetch failed");
     });
   });
 });
