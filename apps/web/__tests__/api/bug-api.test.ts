@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { AxiosInstance } from "axios";
 import { BugApi as BugApiClass } from "../../../../packages/api/src/BugApi";
 
 describe("BugApi", () => {
@@ -7,8 +8,8 @@ describe("BugApi", () => {
 
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();
-    bugApi = new BugApiClass() as any;
-    (bugApi as any)["client"] = mockAxiosInstance;
+    bugApi = new BugApiClass();
+    bugApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });
 
   afterEach(() => {

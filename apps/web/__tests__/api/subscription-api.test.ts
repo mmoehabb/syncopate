@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { AxiosInstance } from "axios";
 
 describe("SubscriptionApi", () => {
   let subscriptionApi: import("@syncopate/api").SubscriptionApi;
@@ -10,8 +11,7 @@ describe("SubscriptionApi", () => {
     const { SubscriptionApi: SubscriptionApiClass } =
       await import("@syncopate/api");
     subscriptionApi = new SubscriptionApiClass();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (subscriptionApi as any)["client"] = mockAxiosInstance;
+    subscriptionApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });
 
   afterEach(() => {
