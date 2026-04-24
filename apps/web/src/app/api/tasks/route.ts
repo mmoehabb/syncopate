@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         },
       });
 
-      if (!workspaceMember) {
+      if (workspaceMember?.role !== "ADMIN") {
         return apiError(
           API_ERRORS.customForbidden("Unauthorized access to this board"),
         );
