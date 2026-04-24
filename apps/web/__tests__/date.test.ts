@@ -1,4 +1,11 @@
-import { test, expect, describe, beforeAll, afterAll, setSystemTime } from "bun:test";
+import {
+  test,
+  expect,
+  describe,
+  beforeAll,
+  afterAll,
+  setSystemTime,
+} from "bun:test";
 import { formatRelativeOrAbsoluteDate } from "../src/lib/utils/date";
 
 describe("formatRelativeOrAbsoluteDate", () => {
@@ -29,8 +36,12 @@ describe("formatRelativeOrAbsoluteDate", () => {
   });
 
   test("handles string inputs correctly", () => {
-    expect(formatRelativeOrAbsoluteDate("2024-01-14T12:00:00.000Z")).toBe("1 day ago");
-    expect(formatRelativeOrAbsoluteDate("2024-01-05T12:00:00.000Z")).toBe("Jan 5, 2024");
+    expect(formatRelativeOrAbsoluteDate("2024-01-14T12:00:00.000Z")).toBe(
+      "1 day ago",
+    );
+    expect(formatRelativeOrAbsoluteDate("2024-01-05T12:00:00.000Z")).toBe(
+      "Jan 5, 2024",
+    );
   });
 
   test("returns absolute date for dates exactly 3 days ago", () => {
