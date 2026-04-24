@@ -6,7 +6,8 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "services/*"
   ],
   "scripts": {
     "dev": "bun run --filter \"*\" dev",

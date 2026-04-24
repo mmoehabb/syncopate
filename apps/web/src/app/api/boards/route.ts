@@ -159,8 +159,6 @@ export async function DELETE(req: Request) {
       data: { isDeleted: true },
     });
 
-    // TODO: A background cron job should permanently delete this board after 3 months.
-
     return NextResponse.json({ message: "Board deleted successfully" });
   } catch (error) {
     console.error("Error deleting board:", error);
