@@ -2,7 +2,16 @@ import { describe, it, expect, mock } from "bun:test";
 import { executeTabCompletion } from "../src/lib/utils/tab-completion";
 
 describe("executeTabCompletion", () => {
-  const defaultCommandRegistryKeys = ["cd", "ls", "delete-board", "invite-member", "leave-board", "rmv-member", "clear", "add-task"];
+  const defaultCommandRegistryKeys = [
+    "cd",
+    "ls",
+    "delete-board",
+    "invite-member",
+    "leave-board",
+    "rmv-member",
+    "clear",
+    "add-task",
+  ];
 
   it("should do nothing if parts length is 0 (simulating edge case)", async () => {
     const setInputValue = mock();
@@ -11,7 +20,7 @@ describe("executeTabCompletion", () => {
 
     // Using an object that overrides split to return an empty array to simulate this exact edge case
     const mockInputValue = {
-      split: () => [] as any
+      split: () => [] as any,
     } as any as string;
 
     await executeTabCompletion({
@@ -90,7 +99,7 @@ describe("executeTabCompletion", () => {
       entries: [
         { name: "My Workspace", type: "Workspace" },
         { name: "Another Workspace", type: "Workspace" },
-      ]
+      ],
     });
 
     await executeTabCompletion({
@@ -114,7 +123,7 @@ describe("executeTabCompletion", () => {
       entries: [
         { name: "SYNC-123", type: "Task" },
         { name: "SYNC-456", type: "Task" },
-      ]
+      ],
     });
 
     await executeTabCompletion({
@@ -137,7 +146,7 @@ describe("executeTabCompletion", () => {
       entries: [
         { name: "Workspace 1", type: "Workspace" },
         { name: "Workspace 2", type: "Workspace" },
-      ]
+      ],
     });
 
     await executeTabCompletion({
@@ -151,13 +160,19 @@ describe("executeTabCompletion", () => {
 
     expect(getDirectoryEntries).toHaveBeenCalledWith("/");
     expect(setInputValue).not.toHaveBeenCalled();
-    expect(printOutput).toHaveBeenCalledWith(["$ /cd wor", "workspace-1", "workspace-2"]);
+    expect(printOutput).toHaveBeenCalledWith([
+      "$ /cd wor",
+      "workspace-1",
+      "workspace-2",
+    ]);
   });
 
   it("should gracefully handle getDirectoryEntries errors", async () => {
     const setInputValue = mock();
     const printOutput = mock();
-    const getDirectoryEntries = mock().mockRejectedValue(new Error("Network Error"));
+    const getDirectoryEntries = mock().mockRejectedValue(
+      new Error("Network Error"),
+    );
 
     await executeTabCompletion({
       inputValue: "cd wor",
