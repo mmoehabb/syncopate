@@ -286,3 +286,17 @@ model UserLogReadState {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// -----------------------------------------------------------------------------
+// Bug Reports
+// -----------------------------------------------------------------------------
+
+model BugReport {
+  id        String   @id @default(uuid(7))
+  message   String?  @db.Text
+  digest    String?
+  stack     String?  @db.Text
+  browser   String?
+  url       String?
+  createdAt DateTime @default(now())
+}
