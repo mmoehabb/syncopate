@@ -24,6 +24,10 @@ export async function updateTaskStatus(taskId: string, status: string) {
     throw new Error(`Invalid task status: ${status}`);
   }
 
+  if (!/^\d+$/.test(taskId)) {
+    throw new Error("Invalid task ID format");
+  }
+
   const existingTask = await prisma.task.findUnique({
     where: { id: BigInt(taskId) },
     include: { board: true },
@@ -124,6 +128,10 @@ export async function deleteTask(taskId: string) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
+  }
+
+  if (!/^\d+$/.test(taskId)) {
+    throw new Error("Invalid task ID format");
   }
 
   const task = await prisma.task.findUnique({
