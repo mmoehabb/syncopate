@@ -74,7 +74,7 @@ export async function PATCH(
         },
       });
 
-      if (!workspaceMember) {
+      if (workspaceMember?.role !== "ADMIN") {
         return apiError(
           API_ERRORS.customForbidden("Unauthorized access to this task"),
         );
@@ -155,7 +155,7 @@ export async function DELETE(
         },
       });
 
-      if (!workspaceMember) {
+      if (workspaceMember?.role !== "ADMIN") {
         return apiError(
           API_ERRORS.customForbidden("Unauthorized access to delete this task"),
         );
