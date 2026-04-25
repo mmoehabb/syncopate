@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { AxiosInstance } from "axios";
 import { BoardApi } from "../../../../packages/api/src/BoardApi";
 
 describe("BoardApi", () => {
@@ -11,8 +12,7 @@ describe("BoardApi", () => {
     mockAxiosInstance.put.mockClear();
     mockAxiosInstance.get.mockClear();
     boardApi = new BoardApi();
-    boardApi["client"] = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockAxiosInstance as any;
+    boardApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });
 
   describe("createBoard", () => {

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { AxiosInstance } from "axios";
 import { DirectoryApi } from "@syncopate/api";
 import type { DirectoryResponse } from "@syncopate/types";
 
@@ -9,8 +10,7 @@ describe("DirectoryApi", () => {
   beforeEach(() => {
     mockAxiosInstance.get.mockClear();
     directoryApi = new DirectoryApi();
-    directoryApi["client"] = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockAxiosInstance as any;
+    directoryApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });
 
   describe("getDirectory", () => {

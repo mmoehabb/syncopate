@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach, mock } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
+import type { AxiosInstance } from "axios";
 import { TaskStatus } from "@prisma/client";
 
 describe("TaskApi", () => {
@@ -12,8 +13,7 @@ describe("TaskApi", () => {
 
     const { TaskApi: TaskApiClass } = await import("@syncopate/api");
     taskApi = new TaskApiClass();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (taskApi as any)["client"] = mockAxiosInstance;
+    taskApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });
 
   afterEach(() => {
