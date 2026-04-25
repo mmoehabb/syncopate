@@ -1,6 +1,12 @@
 import { prisma } from "../index";
 
 async function main() {
+  const existingPlansCount = await prisma.plan.count();
+  if (existingPlansCount > 0) {
+    console.log("Data already seeded. Skipping...");
+    return;
+  }
+
   console.log("Seeding plans...");
 
   // 1. Free Plan
