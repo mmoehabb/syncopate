@@ -194,20 +194,30 @@ export function Plans({ plans }: PlansProps) {
                   </>
                 )}
               </ul>
-              <Link
-                href="/login"
-                className={`w-full py-2 text-center rounded font-mono transition-colors ${
-                  isStandard
-                    ? "bg-neon-pulse text-obsidian-night font-bold hover:bg-neon-pulse/90"
-                    : "border border-white/20 text-white hover:bg-white/5"
-                }`}
-              >
-                {isFree
-                  ? "Get Started"
-                  : isTrial
-                    ? "Start Free Trial"
-                    : "Subscribe"}
-              </Link>
+              {/* TODO: This shall be modified when the payment provider will get integrated into the app */}
+              {!isFree && !isTrial ? (
+                <button
+                  disabled
+                  className={`w-full py-2 text-center rounded font-mono transition-colors opacity-50 cursor-not-allowed ${
+                    isStandard
+                      ? "bg-neon-pulse text-obsidian-night font-bold"
+                      : "border border-white/20 text-white"
+                  }`}
+                >
+                  Subscribe (soon)
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className={`w-full py-2 text-center rounded font-mono transition-colors ${
+                    isStandard
+                      ? "bg-neon-pulse text-obsidian-night font-bold hover:bg-neon-pulse/90"
+                      : "border border-white/20 text-white hover:bg-white/5"
+                  }`}
+                >
+                  {isFree ? "Get Started" : "Start Free Trial"}
+                </Link>
+              )}
             </div>
           );
         })}
