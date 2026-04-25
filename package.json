@@ -12,6 +12,8 @@
   "scripts": {
     "dev": "bun run --filter \"*\" dev",
     "start": "bun run --filter \"*\" start",
+    "start:web": "bun run --filter web start",
+    "start:cron": "bun run --filter @syncopate/cron start",
     "build": "bun run --filter \"*\" generate && bun run --filter \"*\" build",
     "lint": "bun run --filter \"*\" lint",
     "format": "bun prettier --write .",
