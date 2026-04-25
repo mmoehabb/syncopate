@@ -32,6 +32,11 @@ export async function DELETE(req: Request) {
     const workspace = await prisma.workspace.findFirst({
       where: {
         name: workspaceName,
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
       },
     });
 
@@ -43,6 +48,11 @@ export async function DELETE(req: Request) {
       where: {
         workspaceId: workspace.id,
         name: boardName,
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
       },
     });
 
@@ -60,6 +70,8 @@ export async function DELETE(req: Request) {
     });
 
     if (!member) {
+      // This case should be rare now since we filter boards by membership above,
+      // but it's safe to keep the explicit check.
       return apiError(
         API_ERRORS.customBadRequest("You are not a member of this board"),
       );
