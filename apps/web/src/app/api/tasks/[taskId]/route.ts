@@ -23,6 +23,11 @@ export async function PATCH(
   try {
     const resolvedParams = await params;
     const taskId = resolvedParams.taskId;
+
+    if (!/^\d+$/.test(taskId)) {
+      return apiError(API_ERRORS.customBadRequest("Invalid task ID format"));
+    }
+
     const body = await req.json();
     const { status } = body;
 
@@ -125,6 +130,10 @@ export async function DELETE(
   try {
     const resolvedParams = await params;
     const taskId = resolvedParams.taskId;
+
+    if (!/^\d+$/.test(taskId)) {
+      return apiError(API_ERRORS.customBadRequest("Invalid task ID format"));
+    }
 
     const task = await prisma.task.findUnique({
       where: { id: BigInt(taskId) },

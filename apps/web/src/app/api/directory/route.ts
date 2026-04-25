@@ -235,16 +235,16 @@ export async function GET(req: Request) {
     }
 
     const taskIdStr = taskName.replace("SYNC-", "");
-    let taskId: bigint;
-    try {
-      taskId = BigInt(taskIdStr);
-    } catch {
+
+    if (!/^\d+$/.test(taskIdStr)) {
       return apiError(
         API_ERRORS.customNotFound(
           `Directory '${normalizedPath}' not found (Invalid task ID)`,
         ),
       );
     }
+
+    const taskId = BigInt(taskIdStr);
 
     const task = await prisma.task.findUnique({
       where: { id: taskId, boardId: board.id },
