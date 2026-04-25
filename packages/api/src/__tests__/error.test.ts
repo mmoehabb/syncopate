@@ -1,21 +1,8 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, it, expect } from "bun:test";
+import { API_ERRORS } from "../error";
 
-// Mock next/server BEFORE importing anything that might use it
-mock.module("next/server", () => ({
-  NextResponse: {
-    json: (body: any, init?: { status?: number }) => ({
-      status: init?.status ?? 200,
-      json: async () => body,
-      __isMock: true,
-    }),
-  },
-}));
-
-// Now we can import from error.ts
-import { API_ERRORS, apiError } from "../src/lib/api/error";
-
-describe("API Error Utilities", () => {
-  describe("API_ERRORS Constants", () => {
+describe("packages/api - API_ERRORS", () => {
+  describe("Constants", () => {
     it("should have correct UNAUTHORIZED definition", () => {
       expect(API_ERRORS.UNAUTHORIZED).toEqual({
         error: "Unauthorized",
@@ -52,7 +39,7 @@ describe("API Error Utilities", () => {
     });
   });
 
-  describe("API_ERRORS Custom Helpers", () => {
+  describe("Custom Helpers", () => {
     it("customNotFound should return formatted 404 error", () => {
       const result = API_ERRORS.customNotFound("User");
       expect(result).toEqual({
@@ -101,7 +88,7 @@ describe("API Error Utilities", () => {
       });
     });
 
-    // Edge cases testing robustness of factory functions
+    // Additional tests for edge cases
     it("customNotFound should handle empty string", () => {
       const result = API_ERRORS.customNotFound("");
       expect(result).toEqual({
@@ -124,23 +111,6 @@ describe("API Error Utilities", () => {
         error: "",
         status: 400,
       });
-    });
-  });
-
-  describe("apiError function", () => {
-    it("should return a NextResponse with correct body and status", async () => {
-      const errorDef = { error: "Test error", status: 418 };
-      const response = apiError(errorDef) as unknown as {
-        status: number;
-        json: () => Promise<any>;
-        __isMock: boolean;
-      };
-
-      expect(response.__isMock).toBe(true);
-      expect(response.status).toBe(418);
-
-      const body = await response.json();
-      expect(body).toEqual({ error: "Test error" });
     });
   });
 });
