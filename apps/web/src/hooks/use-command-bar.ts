@@ -47,79 +47,21 @@ export function useCommandBar() {
   }, [outputHistory, mode]);
 
   const handleTabCompletion = async () => {
-    const commandsWithPaths = [
-      "cd",
-      "ls",
-      "delete-board",
-      "invite-member",
-      "leave-board",
-      "rmv-member",
-    ];
-    const parts = inputValue.split(" ");
-    if (parts.length === 0) return;
+    const { executeTabCompletion } =
+      await import("../lib/utils/tab-completion");
+    const { COMMAND_REGISTRY } = await import("../lib/command-registry");
 
-    const cmdName = parts[0].toLowerCase();
-
-    // Auto-complete command name itself
-    if (parts.length === 1) {
-      import("../lib/command-registry").then(({ COMMAND_REGISTRY }) => {
-        const matches = Object.keys(COMMAND_REGISTRY).filter((c) =>
-          c.startsWith(cmdName),
-        );
-        if (matches.length === 1) {
-          setInputValue(matches[0] + " ");
-        } else if (matches.length > 1) {
-          printOutput([`$ /${inputValue}`, ...matches]);
-        }
-      });
-      return;
-    }
-
-    if (!commandsWithPaths.includes(cmdName)) {
-      return;
-    }
-
-    // Auto-complete paths
-    const pathPrefix = parts.slice(1).join(" ");
-
-    const lastSlashIndex = pathPrefix.lastIndexOf("/");
-    const dirPath =
-      lastSlashIndex >= 0 ? pathPrefix.substring(0, lastSlashIndex) : ".";
-    const prefix =
-      lastSlashIndex >= 0
-        ? pathPrefix.substring(lastSlashIndex + 1)
-        : pathPrefix;
-
-    const resolvedPath = resolvePath(virtualPath, dirPath);
-
-    try {
-      const { directoryApi } = await import("@syncopate/api");
-      const response = await directoryApi.getDirectory(resolvedPath);
-
-      const entries = response.entries.map((e) => {
-        if (e.type === "Task") {
-          return e.name; // Keep SYNC-123 casing
-        }
-        const formattedName = e.name.toLowerCase().replace(/ /g, "-");
-        return formattedName;
-      });
-
-      const matches = entries.filter((e) =>
-        e.toLowerCase().startsWith(prefix.toLowerCase()),
-      );
-
-      if (matches.length === 1) {
-        const completedPath =
-          lastSlashIndex >= 0
-            ? pathPrefix.substring(0, lastSlashIndex + 1) + matches[0]
-            : matches[0];
-        setInputValue(`${cmdName} ${completedPath}`);
-      } else if (matches.length > 1) {
-        printOutput([`$ /${inputValue}`, ...matches]);
-      }
-    } catch (err) {
-      // Ignore errors for auto-completion (e.g., directory not found)
-    }
+    await executeTabCompletion({
+      inputValue,
+      virtualPath,
+      commandRegistryKeys: Object.keys(COMMAND_REGISTRY),
+      getDirectoryEntries: async (path) => {
+        const { directoryApi } = await import("@syncopate/api");
+        return directoryApi.getDirectory(path);
+      },
+      setInputValue,
+      printOutput,
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
