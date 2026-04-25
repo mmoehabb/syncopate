@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "bun run --filter \"*\" dev",
     "start": "bun run --filter \"*\" start",
+    "start:pm2": "pm2 start ecosystem.config.js",
     "start:web": "bun run --filter web start",
     "start:cron": "bun run --filter @syncopate/cron start",
     "build": "bun run --filter \"*\" generate && bun run --filter \"*\" build",
