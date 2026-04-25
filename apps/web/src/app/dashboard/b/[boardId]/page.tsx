@@ -254,12 +254,12 @@ export default async function BoardPage({
                 )}
 
                 {requiresPayment && (
-                  // TODO: This shall be implemented whenever the payment provider will get integrated into the app
+                  // TODO: This shall be modified when the payment provider will get integrated into the app
                   <button
                     disabled
                     className="w-full bg-void-grey border border-white/10 rounded py-2.5 text-syntax-grey font-mono text-sm cursor-not-allowed mt-auto"
                   >
-                    Unavailable
+                    Subscribe (soon)
                   </button>
                 )}
               </div>
