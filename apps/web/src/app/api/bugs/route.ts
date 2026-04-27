@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { API_ERRORS, apiError } from "@/lib/api/error";
+import { prisma } from "@syncopate/db";
 import type { BugReportPayload, BugReportResponse } from "@syncopate/types";
 
 export async function POST(req: Request) {
@@ -17,17 +18,18 @@ export async function POST(req: Request) {
       return apiError(API_ERRORS.customBadRequest("Message is required"));
     }
 
-    // TODO: Integrate with a real bug tracking service like Sentry, LogRocket, or a DB table
-    console.log("--- BUG REPORT RECEIVED ---");
-    console.log(`User ID: ${userId || "Anonymous"}`);
-    console.log(`Message: ${message}`);
-    console.log(`Stack: ${stack || "N/A"}`);
-    console.log(`URL: ${url || "N/A"}`);
-    console.log("---------------------------");
+    const bugReport = await prisma.bugReport.create({
+      data: {
+        userId,
+        message,
+        stack,
+        url,
+      },
+    });
 
     const response: BugReportResponse = {
       success: true,
-      id: crypto.randomUUID(),
+      id: bugReport.id,
     };
 
     return NextResponse.json(response, { status: 201 });
