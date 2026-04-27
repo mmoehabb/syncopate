@@ -56,7 +56,7 @@ describe("POST /api/bugs", () => {
     const payload = {
       message: "Test bug",
       stack: "Test stack trace",
-      url: "http://localhost/test"
+      url: "http://localhost/test",
     };
 
     const mockCreatedBug = {
@@ -68,7 +68,7 @@ describe("POST /api/bugs", () => {
     mockPrisma.bugReport.create.mockResolvedValueOnce(mockCreatedBug);
 
     const req = {
-      json: async () => payload
+      json: async () => payload,
     };
 
     const response = await POST(req as any);
@@ -85,7 +85,7 @@ describe("POST /api/bugs", () => {
         message: "Test bug",
         stack: "Test stack trace",
         url: "http://localhost/test",
-      }
+      },
     });
 
     // Verify console logs are GONE
@@ -106,7 +106,7 @@ describe("POST /api/bugs", () => {
     });
 
     const req = {
-      json: async () => payload
+      json: async () => payload,
     };
 
     const response = await POST(req as any);
@@ -118,14 +118,14 @@ describe("POST /api/bugs", () => {
         message: "Anonymous bug",
         stack: undefined,
         url: undefined,
-      }
+      },
     });
   });
 
   it("should return bad request if message is missing", async () => {
     const payload = {};
     const req = {
-      json: async () => payload
+      json: async () => payload,
     };
 
     const response = await POST(req as any);
