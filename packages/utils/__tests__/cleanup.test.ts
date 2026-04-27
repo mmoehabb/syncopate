@@ -1,4 +1,12 @@
-import { expect, test, describe, beforeEach, mock, setSystemTime, afterEach } from "bun:test";
+import {
+  expect,
+  test,
+  describe,
+  beforeEach,
+  mock,
+  setSystemTime,
+  afterEach,
+} from "bun:test";
 import { cleanupDeletedEntities } from "../src/cleanup";
 
 // Use relative path for @syncopate/db to bypass resolution issues in some environments
@@ -90,7 +98,10 @@ describe("cleanupDeletedEntities", () => {
 
     await expect(cleanupDeletedEntities()).rejects.toThrow("Database error");
 
-    expect(consoleSpy).toHaveBeenCalledWith("Error during cleanup of deleted entities:", error);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error during cleanup of deleted entities:",
+      error,
+    );
 
     // Restore console.error
     console.error = originalConsoleError;
