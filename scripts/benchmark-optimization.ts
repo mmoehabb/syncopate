@@ -41,7 +41,9 @@ async function benchmark() {
 
   console.log(`Current pattern: ${timeCurrent.toFixed(2)}ms`);
   console.log(`Optimized pattern: ${timeOptimized.toFixed(2)}ms`);
-  console.log(`Improvement: ${(((timeCurrent - timeOptimized) / timeCurrent) * 100).toFixed(2)}%`);
+  console.log(
+    `Improvement: ${(((timeCurrent - timeOptimized) / timeCurrent) * 100).toFixed(2)}%`,
+  );
 
   // Note: This benchmark is mostly showing the overhead of the extra promise and array mapping in JS.
   // In a real DB scenario, the reduction in round-trips and DB-side optimization would be even more significant.
