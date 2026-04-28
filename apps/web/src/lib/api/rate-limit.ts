@@ -1,3 +1,11 @@
+/**
+ * A simple IP-based, in-memory rate limiting utility.
+ *
+ * Note: This rate limiter stores data in the local memory of the running Node.js process.
+ * While effective for basic anti-spam and DoS protection on a single instance, it does not
+ * synchronize state across multiple serverless function instances or distributed deployments.
+ * It includes a background cleanup interval to automatically prune expired records.
+ */
 export class RateLimiter {
   private cache = new Map<string, { count: number; expiresAt: number }>();
   private windowMs: number;
