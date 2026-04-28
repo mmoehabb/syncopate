@@ -293,7 +293,6 @@ model UserLogReadState {
 
 model BugReport {
   id        String   @id @default(uuid(7))
-  userId    String?
   message   String?  @db.Text
   digest    String?
   stack     String?  @db.Text

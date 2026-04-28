@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { API_ERRORS, apiError } from "@/lib/api/error";
-import { prisma } from "@syncopate/db";
 import type { BugReportPayload, BugReportResponse } from "@syncopate/types";
 import { isRateLimited } from "@/lib/api/rate-limit";
 
@@ -11,10 +10,7 @@ const MAX_URL_LENGTH = 500;
 
 function sanitize(str: string): string {
   // Replace control characters with spaces, collapse multiple spaces, and trim
-  return str
-    .replace(/[\x00-\x1F\x7F]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return str.replace(/[\x00-\x1F\x7F]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 export async function POST(req: Request) {
@@ -27,14 +23,16 @@ export async function POST(req: Request) {
 
   const session = await auth();
 
+  // We allow bug reporting even for unauthenticated users, but we log the user ID if available
   const userId = session?.user?.id;
-  if (!userId) {
-    return apiError(API_ERRORS.UNAUTHORIZED);
-  }
 
   try {
     const body: BugReportPayload = await req.json();
     const { message, stack, url } = body;
+
+    if (!message) {
+      return apiError(API_ERRORS.customBadRequest("Message is required"));
+    }
 
     // Input validation: Length checks
     if (message.length > MAX_MESSAGE_LENGTH) {
@@ -52,22 +50,17 @@ export async function POST(req: Request) {
     const safeStack = stack ? sanitize(stack) : "N/A";
     const safeUrl = url ? sanitize(url) : "N/A";
 
-    if (!message) {
-      return apiError(API_ERRORS.customBadRequest("Message is required"));
-    }
-
-    const bugReport = await prisma.bugReport.create({
-      data: {
-        userId,
-        message: safeMessage,
-        stack: safeStack,
-        url: safeUrl,
-      },
-    });
+    // TODO: Integrate with a real bug tracking service like Sentry, LogRocket, or a DB table
+    console.log("--- BUG REPORT RECEIVED ---");
+    console.log(`User ID: ${userId || "Anonymous"}`);
+    console.log(`Message: ${safeMessage}`);
+    console.log(`Stack: ${safeStack}`);
+    console.log(`URL: ${safeUrl}`);
+    console.log("---------------------------");
 
     const response: BugReportResponse = {
       success: true,
-      id: bugReport.id,
+      id: crypto.randomUUID(),
     };
 
     return NextResponse.json(response, { status: 201 });

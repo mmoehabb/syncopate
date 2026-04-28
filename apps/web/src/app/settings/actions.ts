@@ -36,8 +36,8 @@ export async function deactivateAccount(userId: string) {
       data: { isActive: false },
     });
 
-    // Deactivate all boards where the user is an ADMIN
-    await tx.board.updateMany({
+    // Find boards where user is an ADMIN
+    const boardsToDeactivate = await tx.board.findMany({
       where: {
         members: {
           some: {
@@ -46,8 +46,19 @@ export async function deactivateAccount(userId: string) {
           },
         },
       },
-      data: { isActive: false },
+      select: { id: true },
     });
+
+    if (boardsToDeactivate.length > 0) {
+      await tx.board.updateMany({
+        where: {
+          id: {
+            in: boardsToDeactivate.map((b) => b.id),
+          },
+        },
+        data: { isActive: false },
+      });
+    }
   });
 
   revalidatePath("/settings");

@@ -38,13 +38,10 @@ describe("POST /api/bugs security", () => {
 
   it("should rate limit requests from the same IP", async () => {
     const payload = { message: "Test bug" };
-    const req = (ip: string) =>
-      ({
-        headers: {
-          get: (name: string) => (name === "x-forwarded-for" ? ip : null),
-        },
-        json: async () => payload,
-      }) as unknown as Request;
+    const req = (ip: string) => ({
+      headers: { get: (name: string) => (name === "x-forwarded-for" ? ip : null) },
+      json: async () => payload,
+    } as unknown as Request);
 
     const testIp = "1.2.3.4";
 
@@ -88,9 +85,7 @@ describe("POST /api/bugs security", () => {
     // The expected sanitized string: "Line 1 Line 2 Line 3 Tabbed"
     // because \n, \r, \t are replaced by spaces and then multiple spaces collapsed.
     const calls = (console.log as any).mock.calls;
-    const messageLog = calls.find((call: any[]) =>
-      call[0].startsWith("Message: "),
-    );
+    const messageLog = calls.find((call: any[]) => call[0].startsWith("Message: "));
     expect(messageLog[0]).toBe("Message: Line 1 Line 2 Line 3 Tabbed");
   });
 });
