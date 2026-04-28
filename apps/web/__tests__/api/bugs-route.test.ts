@@ -69,6 +69,11 @@ describe("POST /api/bugs", () => {
 
     const req = {
       json: async () => payload,
+      headers: {
+        get: (key: string) => {
+          return "127.0.0.1";
+        },
+      },
     };
 
     const response = await POST(req as any);
@@ -107,6 +112,11 @@ describe("POST /api/bugs", () => {
 
     const req = {
       json: async () => payload,
+      headers: {
+        get: (key: string) => {
+          return "127.0.0.1";
+        },
+      },
     };
 
     const response = await POST(req as any);
@@ -126,6 +136,11 @@ describe("POST /api/bugs", () => {
     const payload = {};
     const req = {
       json: async () => payload,
+      headers: {
+        get: (key: string) => {
+          return "127.0.0.1";
+        },
+      },
     };
 
     const response = await POST(req as any);
@@ -141,7 +156,14 @@ describe("POST /api/bugs", () => {
     mockPrisma.bugReport.create.mockRejectedValueOnce(new Error("DB error"));
 
     const payload = { message: "Bug report" };
-    const req = { json: async () => payload };
+    const req = {
+      json: async () => payload,
+      headers: {
+        get: (key: string) => {
+          return "127.0.0.1";
+        },
+      },
+    };
 
     const response = await POST(req as any);
     const data = await response.json();
@@ -150,4 +172,100 @@ describe("POST /api/bugs", () => {
     expect(data.error).toBe("Failed to report bug");
     expect(console.error).toHaveBeenCalled();
   });
+});
+
+it("should return bad request if message is too long", async () => {
+  const payload = { message: "a".repeat(2001) };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => {
+        return "127.0.0.2";
+      },
+    },
+  };
+
+  const response = await POST(req as any);
+  const data = await response.json();
+
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("Message is too long");
+});
+
+it("should return bad request if stack trace is too long", async () => {
+  const payload = { message: "Bug", stack: "a".repeat(5001) };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => {
+        return "127.0.0.3";
+      },
+    },
+  };
+
+  const response = await POST(req as any);
+  const data = await response.json();
+
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("Stack trace is too long");
+});
+
+it("should return bad request if url is too long", async () => {
+  const payload = { message: "Bug", url: "a".repeat(2001) };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => {
+        return "127.0.0.4";
+      },
+    },
+  };
+
+  const response = await POST(req as any);
+  const data = await response.json();
+
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("URL is too long");
+});
+
+it("should return bad request if message is not a string", async () => {
+  const payload = { message: { foo: "bar" } };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => "127.0.0.5",
+    },
+  };
+  const response = await POST(req as any);
+  const data = await response.json();
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("Message must be a string");
+});
+
+it("should return bad request if stack is not a string", async () => {
+  const payload = { message: "bug", stack: 123 };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => "127.0.0.6",
+    },
+  };
+  const response = await POST(req as any);
+  const data = await response.json();
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("Stack must be a string");
+});
+
+it("should return bad request if url is not a string", async () => {
+  const payload = { message: "bug", url: true };
+  const req = {
+    json: async () => payload,
+    headers: {
+      get: (key: string) => "127.0.0.7",
+    },
+  };
+  const response = await POST(req as any);
+  const data = await response.json();
+  expect(response.status).toBe(400);
+  expect(data.error).toBe("URL must be a string");
 });

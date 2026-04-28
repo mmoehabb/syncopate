@@ -14,6 +14,10 @@ export const API_ERRORS = {
     error: "Internal Server Error",
     status: 500,
   } as ApiErrorDefinition,
+  TOO_MANY_REQUESTS: {
+    error: "Too Many Requests",
+    status: 429,
+  } as ApiErrorDefinition,
 
   // Custom helpers
   customNotFound: (entity: string): ApiErrorDefinition => ({
@@ -39,6 +43,10 @@ export const API_ERRORS = {
   customUnauthorized: (message: string): ApiErrorDefinition => ({
     error: message,
     status: 401,
+  }),
+  customTooManyRequests: (message: string): ApiErrorDefinition => ({
+    error: message,
+    status: 429,
   }),
 };
 

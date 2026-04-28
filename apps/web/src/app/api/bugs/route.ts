@@ -2,9 +2,27 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { prisma } from "@syncopate/db";
+import { RateLimiter } from "@/lib/api/rate-limit";
 import type { BugReportPayload, BugReportResponse } from "@syncopate/types";
 
+// Limit to 5 requests per minute per IP
+const rateLimiter = new RateLimiter(60 * 1000, 5);
+
 export async function POST(req: Request) {
+  // Simple IP extraction (this is basic and might need adjustment if behind a proxy like Cloudflare)
+  const ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+
+  if (rateLimiter.isLimited(ip)) {
+    return apiError(
+      API_ERRORS.customTooManyRequests(
+        "Too many requests, please try again later",
+      ),
+    );
+  }
+
   const session = await auth();
 
   // We allow bug reporting even for unauthenticated users, but we log the user ID if available
@@ -12,10 +30,40 @@ export async function POST(req: Request) {
 
   try {
     const body: BugReportPayload = await req.json();
-    const { message, stack, url } = body;
+    let { message, stack, url } = body;
 
     if (!message) {
       return apiError(API_ERRORS.customBadRequest("Message is required"));
+    }
+
+    if (typeof message !== "string") {
+      return apiError(API_ERRORS.customBadRequest("Message must be a string"));
+    }
+
+    // Sanitize and validate inputs
+    if (message.length > 2000) {
+      return apiError(API_ERRORS.customBadRequest("Message is too long"));
+    }
+    message = message.replace(/[\x00-\x1F\x7F]/g, " ");
+
+    if (stack) {
+      if (typeof stack !== "string") {
+        return apiError(API_ERRORS.customBadRequest("Stack must be a string"));
+      }
+      if (stack.length > 5000) {
+        return apiError(API_ERRORS.customBadRequest("Stack trace is too long"));
+      }
+      stack = stack.replace(/[\x00-\x1F\x7F]/g, " ");
+    }
+
+    if (url) {
+      if (typeof url !== "string") {
+        return apiError(API_ERRORS.customBadRequest("URL must be a string"));
+      }
+      if (url.length > 2000) {
+        return apiError(API_ERRORS.customBadRequest("URL is too long"));
+      }
+      url = url.replace(/[\x00-\x1F\x7F]/g, " ");
     }
 
     const bugReport = await prisma.bugReport.create({
