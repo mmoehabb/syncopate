@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useCommand } from "../context/CommandContext";
-import { resolvePath } from "../lib/utils/path";
 
 export function useCommandBar() {
   const {
