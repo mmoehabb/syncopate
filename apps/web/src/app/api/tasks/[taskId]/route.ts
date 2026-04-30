@@ -50,40 +50,25 @@ export async function PATCH(
       );
     }
 
-    const existingTask = await prisma.task.findUnique({
-      where: { id: BigInt(taskId) },
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        id: BigInt(taskId),
+        board: {
+          OR: [
+            { members: { some: { userId: session.user.id } } },
+            {
+              workspace: {
+                members: { some: { userId: session.user.id, role: "ADMIN" } },
+              },
+            },
+          ],
+        },
+      },
       include: { board: true },
     });
 
     if (!existingTask) {
       return apiError(API_ERRORS.customNotFound("Task"));
-    }
-
-    // Verify user has access to this board
-    const boardMember = await prisma.boardMember.findUnique({
-      where: {
-        boardId_userId: {
-          boardId: existingTask.boardId,
-          userId: session.user.id,
-        },
-      },
-    });
-
-    if (!boardMember) {
-      const workspaceMember = await prisma.workspaceMember.findUnique({
-        where: {
-          workspaceId_userId: {
-            workspaceId: existingTask.board.workspaceId,
-            userId: session.user.id,
-          },
-        },
-      });
-
-      if (workspaceMember?.role !== "ADMIN") {
-        return apiError(
-          API_ERRORS.customForbidden("Unauthorized access to this task"),
-        );
-      }
     }
 
     const task = await prisma.task.update({
@@ -135,40 +120,25 @@ export async function DELETE(
       return apiError(API_ERRORS.customBadRequest("Invalid task ID format"));
     }
 
-    const task = await prisma.task.findUnique({
-      where: { id: BigInt(taskId) },
+    const task = await prisma.task.findFirst({
+      where: {
+        id: BigInt(taskId),
+        board: {
+          OR: [
+            { members: { some: { userId: session.user.id } } },
+            {
+              workspace: {
+                members: { some: { userId: session.user.id, role: "ADMIN" } },
+              },
+            },
+          ],
+        },
+      },
       include: { board: true },
     });
 
     if (!task) {
       return apiError(API_ERRORS.customNotFound("Task"));
-    }
-
-    // Verify user has access to this board
-    const boardMember = await prisma.boardMember.findUnique({
-      where: {
-        boardId_userId: {
-          boardId: task.boardId,
-          userId: session.user.id,
-        },
-      },
-    });
-
-    if (!boardMember) {
-      const workspaceMember = await prisma.workspaceMember.findUnique({
-        where: {
-          workspaceId_userId: {
-            workspaceId: task.board.workspaceId,
-            userId: session.user.id,
-          },
-        },
-      });
-
-      if (workspaceMember?.role !== "ADMIN") {
-        return apiError(
-          API_ERRORS.customForbidden("Unauthorized access to delete this task"),
-        );
-      }
     }
 
     await prisma.task.delete({
