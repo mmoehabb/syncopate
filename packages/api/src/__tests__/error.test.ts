@@ -37,6 +37,13 @@ describe("packages/api - API_ERRORS", () => {
         status: 500,
       });
     });
+
+    it("should have correct TOO_MANY_REQUESTS definition", () => {
+      expect(API_ERRORS.TOO_MANY_REQUESTS).toEqual({
+        error: "Too Many Requests",
+        status: 429,
+      });
+    });
   });
 
   describe("Custom Helpers", () => {
@@ -85,6 +92,14 @@ describe("packages/api - API_ERRORS", () => {
       expect(result).toEqual({
         error: "Please log in",
         status: 401,
+      });
+    });
+
+    it("customTooManyRequests should return formatted 429 error", () => {
+      const result = API_ERRORS.customTooManyRequests("Rate limit exceeded");
+      expect(result).toEqual({
+        error: "Rate limit exceeded",
+        status: 429,
       });
     });
 
