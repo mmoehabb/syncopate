@@ -91,7 +91,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
 
   describe("DELETE /api/tasks/[taskId]", () => {
     it("should deny task deletion and return 404 if user has no access", async () => {
-       mockPrisma.task.findFirst.mockResolvedValueOnce(null);
+      mockPrisma.task.findFirst.mockResolvedValueOnce(null);
 
       const req = new NextRequest("http://localhost:3000/api/tasks/1", {
         method: "DELETE",
@@ -106,7 +106,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
     });
 
     it("should allow task deletion if user has access", async () => {
-       mockPrisma.task.findFirst.mockResolvedValueOnce({
+      mockPrisma.task.findFirst.mockResolvedValueOnce({
         id: BigInt(1),
         boardId: "board1",
         board: { workspaceId: "ws1" },
