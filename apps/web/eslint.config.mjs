@@ -9,13 +9,15 @@ const eslintConfig = [
   },
   {
     plugins: {
-      "unused-imports": await import("eslint-plugin-unused-imports").then(m => m.default)
+      "unused-imports": await import("eslint-plugin-unused-imports").then(
+        (m) => m.default,
+      ),
     },
     rules: {
-      "unused-imports/no-unused-imports": "error",
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off"
+      "unused-imports/no-unused-imports": "warn",
+      "no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
     },
   },
 ];
