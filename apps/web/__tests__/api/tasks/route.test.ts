@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterAll, mock } from "bun:test";
 import { POST } from "@/app/api/tasks/route";
-import { NextRequest } from "next/server";
 
 const mockPrisma = {
   boardMember: {
@@ -26,6 +25,9 @@ mock.module("@syncopate/db", () => ({
 }));
 
 mock.module("@/lib/auth", () => ({
+  getSessionOrPat: mock().mockImplementation(async () => {
+    return "test-user-id";
+  }),
   getSessionOrPat: mock().mockImplementation(async () => {
     return "test-user-id";
   }),
@@ -69,7 +71,7 @@ describe("POST /api/tasks (IDOR Fix)", () => {
       userId: "user-123",
     });
 
-    const req = new NextRequest("http://localhost:3000/api/tasks", {
+    const req = new Request("http://localhost:3000/api/tasks", {
       method: "POST",
       body: JSON.stringify({ boardId: "board1", title: "Task 1" }),
     });
@@ -88,7 +90,7 @@ describe("POST /api/tasks (IDOR Fix)", () => {
       userId: "user-123",
     });
 
-    const req = new NextRequest("http://localhost:3000/api/tasks", {
+    const req = new Request("http://localhost:3000/api/tasks", {
       method: "POST",
       body: JSON.stringify({ boardId: "board1", title: "Task 1" }),
     });

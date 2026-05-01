@@ -12,6 +12,14 @@ mock.module("@/lib/auth", () => ({
       return null;
     }
   }),
+  getSessionOrPat: mock().mockImplementation(async () => {
+    try {
+      const s = await mockAuth();
+      return s?.user?.id;
+    } catch {
+      return null;
+    }
+  }),
 }));
 
 mock.module("next/server", () => ({

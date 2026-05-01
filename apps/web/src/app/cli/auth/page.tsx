@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
-export default function CliAuthPage() {
+function AuthForm() {
   const searchParams = useSearchParams();
   const port = searchParams.get("port");
   const [status, setStatus] = useState<
@@ -69,14 +68,28 @@ export default function CliAuthPage() {
           </div>
         )}
 
-        <Button
+        <button
           onClick={handleAuthorize}
           disabled={status === "loading" || !port}
-          className="w-full"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "loading" ? "Authorizing..." : "Authorize CLI"}
-        </Button>
+        </button>
       </div>
     </div>
+  );
+}
+
+export default function CliAuthPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
+          Loading...
+        </div>
+      }
+    >
+      <AuthForm />
+    </Suspense>
   );
 }
