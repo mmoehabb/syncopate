@@ -5,6 +5,9 @@ import path from "node:path";
 import os from "node:os";
 import http from "node:http";
 import { exec } from "node:child_process";
+import { setGlobalApiToken } from "@syncopate/api";
+import { COMMAND_REGISTRY } from "./command-registry";
+import { AppMode } from "./types";
 
 const CONFIG_DIR = path.join(os.homedir(), ".config", "syncopate");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
@@ -34,10 +37,31 @@ const App = () => {
   ]);
   const [input, setInput] = useState("");
   const [config, setConfig] = useState<Config>({});
+  const [virtualPath, setVirtualPath] = useState<string>("~");
+  const [mode, setMode] = useState<AppMode>("command");
+  const [activeBoardId, setActiveBoardId] = useState<string | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
-    loadConfig().then(setConfig);
+    loadConfig().then((cfg) => {
+      setConfig(cfg);
+      if (cfg.token) {
+        setGlobalApiToken(cfg.token);
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    // Attempt to extract activeBoardId from virtual path
+    // Format is typically ~/<workspace_name>/<board_name> => the ID isn't directly in path, but directoryApi returns it.
+    // However, if we don't have it, we might just not have it. The real board resolution happens in CD.
+    // For TUI, let's keep it simple. If we want activeBoardId we might need to parse it,
+    // but the directory API response sets it properly in cd. We can just derive it if needed or
+    // simply not support activeBoardId dependent actions unless explicitly set.
+    // Let's rely on directory fetching in cd or manually setting it.
+    // For now, if virtualPath has 3 parts like /workspace/board, it's a board.
+  }, [virtualPath]);
 
   const handleAuth = () => {
     const port = 3456;
@@ -52,6 +76,7 @@ const App = () => {
         );
         await saveConfig({ ...config, token });
         setConfig({ ...config, token });
+        setGlobalApiToken(token);
         setOutput((prev) => [...prev, "Authentication successful!"]);
         server.close();
       } else {
@@ -81,13 +106,38 @@ const App = () => {
       setOutput((prev) => [...prev, `> ${input}`]);
       if (input === "/auth") {
         handleAuth();
-      } else if (input === "/logout") {
+      } else if (input === "/logout" || input === "logout") {
         saveConfig({ ...config, token: undefined }).then(() => {
           setConfig({ ...config, token: undefined });
+          setGlobalApiToken(null);
           setOutput((prev) => [...prev, "Logged out."]);
         });
+      } else if (input === "/clear" || input === "clear") {
+        setOutput([]);
       } else if (input) {
-        setOutput((prev) => [...prev, `Command not found: ${input}`]);
+        const parts = input.trim().split(" ");
+        let cmdName = parts[0];
+        if (cmdName.startsWith("/")) {
+          cmdName = cmdName.substring(1);
+        }
+        const args = parts.slice(1);
+
+        const command = COMMAND_REGISTRY[cmdName];
+        if (command) {
+          command.action({
+            navigate: () => {}, // Not supported
+            printOutput: (lines: string[]) =>
+              setOutput((prev) => [...prev, ...lines]),
+            setMode,
+            args,
+            virtualPath,
+            setVirtualPath,
+            activeBoardId,
+            setActiveBoardId,
+          });
+        } else {
+          setOutput((prev) => [...prev, `Command not found: ${cmdName}`]);
+        }
       }
       setInput("");
     } else if (key.backspace || key.delete) {
@@ -105,6 +155,7 @@ const App = () => {
         ))}
       </Box>
       <Box>
+        <Text color="blue">{virtualPath} </Text>
         <Text color="green">$ </Text>
         <Text>{input}</Text>
         {/* Simple cursor */}

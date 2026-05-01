@@ -1,5 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
+let globalApiToken: string | null = null;
+
+export function setGlobalApiToken(token: string | null) {
+  globalApiToken = token;
+}
+
 export abstract class ApiClient {
   protected client: AxiosInstance;
 
@@ -16,6 +22,13 @@ export abstract class ApiClient {
       headers: {
         "Content-Type": "application/json",
       },
+    });
+
+    this.client.interceptors.request.use((config) => {
+      if (globalApiToken) {
+        config.headers.Authorization = `Bearer ${globalApiToken}`;
+      }
+      return config;
     });
 
     // We can add interceptors here if needed (e.g., for error handling)
