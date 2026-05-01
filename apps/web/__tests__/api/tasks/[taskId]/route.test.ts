@@ -22,6 +22,9 @@ mock.module("@syncopate/db", () => ({
 }));
 
 mock.module("@/lib/auth", () => ({
+  getSessionOrPat: mock().mockImplementation(async () => {
+    return "test-user-id";
+  }),
   auth: mock().mockImplementation(async () => {
     return { user: { id: (global as any).testUserId } };
   }),

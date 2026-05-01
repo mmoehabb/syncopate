@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
 import { FREE_MAX_ACTIVE_BOARDS } from "@/lib/constants";
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       where: { id: workspaceId },
       include: {
         members: {
-          where: { userId: session.user.id },
+          where: { userId: userId },
         },
       },
     });
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
     } else {
       const userSubscription = await prisma.subscription.findFirst({
         where: {
-          userId: session.user.id,
+          userId: userId,
           status: "ACTIVE",
           currentPeriodEnd: { gt: new Date() },
         },
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
             isDeleted: false,
             isActive: true,
             members: {
-              some: { userId: session.user.id, role: "ADMIN" },
+              some: { userId: userId, role: "ADMIN" },
             },
           },
         });
@@ -146,7 +146,7 @@ export async function POST(req: Request) {
     await prisma.boardMember.create({
       data: {
         boardId: board.id,
-        userId: session.user.id,
+        userId: userId,
         role: "ADMIN",
       },
     });
@@ -159,13 +159,13 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -189,7 +189,7 @@ export async function DELETE(req: Request) {
         name: workspaceName,
         members: {
           some: {
-            userId: session.user.id,
+            userId: userId,
           },
         },
       },
@@ -216,7 +216,7 @@ export async function DELETE(req: Request) {
       where: {
         boardId_userId: {
           boardId: board.id,
-          userId: session.user.id,
+          userId: userId,
         },
       },
     });
@@ -225,7 +225,7 @@ export async function DELETE(req: Request) {
       where: {
         workspaceId_userId: {
           workspaceId: workspace.id,
-          userId: session.user.id,
+          userId: userId,
         },
       },
     });

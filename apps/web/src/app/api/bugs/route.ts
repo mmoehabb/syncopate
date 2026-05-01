@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { prisma } from "@syncopate/db";
 import { RateLimiter } from "@/lib/api/rate-limit";
@@ -23,10 +23,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const session = await auth();
-
-  // We allow bug reporting even for unauthenticated users, but we log the user ID if available
-  const userId = session?.user?.id;
+  const userId = await getSessionOrPat();
 
   try {
     const body: BugReportPayload = await req.json();

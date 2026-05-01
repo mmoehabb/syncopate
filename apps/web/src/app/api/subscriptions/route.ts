@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function POST() {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getSessionOrPat();
+
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
   try {
     const existingSubscription = await prisma.user.findFirst({
-      where: { id: session.user.id },
+      where: { id: userId },
       include: { subscriptions: { where: { status: "ACTIVE" } } },
     });
 
@@ -32,7 +33,7 @@ export async function POST() {
 
     const subscription = await prisma.subscription.create({
       data: {
-        userId: session.user.id,
+        userId: userId,
         priceId: freePlan.prices[0]?.id || "",
         status: "ACTIVE",
         currentPeriodStart: new Date(),

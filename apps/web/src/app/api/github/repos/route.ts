@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { App } from "@octokit/app";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function GET(request: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     if (workspaceId) {
       workspace = await prisma.workspace.findUnique({
         where: { id: workspaceId },
-        include: { members: { where: { userId: session.user.id } } },
+        include: { members: { where: { userId: userId } } },
       });
 
       if (!workspace || workspace.members.length === 0) {
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       // Find the user's first workspace with a GitHub installation
       const userWorkspace = await prisma.workspaceMember.findFirst({
         where: {
-          userId: session.user.id,
+          userId: userId,
           workspace: {
             githubInstallationId: { not: null },
           },
