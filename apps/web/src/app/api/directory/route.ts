@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import type { DirectoryResponse } from "@syncopate/types";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function GET(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -38,7 +38,7 @@ export async function GET(req: Request) {
       const workspaces = await prisma.workspace.findMany({
         where: {
           members: {
-            some: { userId: session.user.id },
+            some: { userId: userId },
           },
         },
       });
@@ -62,7 +62,7 @@ export async function GET(req: Request) {
     const workspaces = await prisma.workspace.findMany({
       where: {
         members: {
-          some: { userId: session.user.id },
+          some: { userId: userId },
         },
       },
     });
@@ -93,7 +93,7 @@ export async function GET(req: Request) {
         where: {
           workspaceId_userId: {
             workspaceId: workspace.id,
-            userId: session.user.id,
+            userId: userId,
           },
         },
       });
@@ -103,7 +103,7 @@ export async function GET(req: Request) {
         // If not admin, verify board membership
         const boardMemberships = await prisma.boardMember.findMany({
           where: {
-            userId: session.user.id,
+            userId: userId,
             boardId: { in: boards.map((b) => b.id) },
           },
         });
@@ -151,7 +151,7 @@ export async function GET(req: Request) {
       where: {
         workspaceId_userId: {
           workspaceId: workspace.id,
-          userId: session.user.id,
+          userId: userId,
         },
       },
     });
@@ -161,7 +161,7 @@ export async function GET(req: Request) {
         where: {
           boardId_userId: {
             boardId: board.id,
-            userId: session.user.id,
+            userId: userId,
           },
         },
       });

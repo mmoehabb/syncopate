@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function GET(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
         where: {
           isDeleted: false,
           members: {
-            some: { userId: session.user.id },
+            some: { userId: userId },
           },
         },
         include: {
@@ -41,7 +41,7 @@ export async function GET(req: Request) {
       where: {
         isDeleted: false,
         members: {
-          some: { userId: session.user.id },
+          some: { userId: userId },
         },
       },
       select: {
@@ -58,13 +58,13 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
     // Check user's subscription limits
     const userSubscription = await prisma.subscription.findFirst({
       where: {
-        userId: session.user.id,
+        userId: userId,
         status: "ACTIVE",
       },
       include: {
@@ -115,7 +115,7 @@ export async function POST(req: Request) {
       where: {
         isDeleted: false,
         members: {
-          some: { userId: session.user.id, role: "ADMIN" },
+          some: { userId: userId, role: "ADMIN" },
         },
       },
     });
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
     await prisma.workspaceMember.create({
       data: {
         workspaceId: workspace.id,
-        userId: session.user.id,
+        userId: userId,
         role: "ADMIN",
       },
     });
@@ -151,13 +151,13 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -179,13 +179,13 @@ export async function DELETE(req: Request) {
         isDeleted: false,
         members: {
           some: {
-            userId: session.user.id,
+            userId: userId,
           },
         },
       },
       include: {
         members: {
-          where: { userId: session.user.id },
+          where: { userId: userId },
         },
       },
     });

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 import { TaskStatus } from "@prisma/client";
@@ -9,13 +9,13 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -55,10 +55,10 @@ export async function PATCH(
         id: BigInt(taskId),
         board: {
           OR: [
-            { members: { some: { userId: session.user.id } } },
+            { members: { some: { userId: userId } } },
             {
               workspace: {
-                members: { some: { userId: session.user.id, role: "ADMIN" } },
+                members: { some: { userId: userId, role: "ADMIN" } },
               },
             },
           ],
@@ -81,7 +81,7 @@ export async function PATCH(
         data: {
           boardId: existingTask.boardId,
           type: "TASK_UPDATE",
-          actorId: session.user.id,
+          actorId: userId,
           taskId: BigInt(taskId),
         },
       });
@@ -101,13 +101,13 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
-  const isValidSubscription = await hasValidSubscription(session.user.id);
+  const isValidSubscription = await hasValidSubscription(userId);
   if (!isValidSubscription) {
     return apiError(API_ERRORS.customForbidden("Active subscription required"));
   }
@@ -125,10 +125,10 @@ export async function DELETE(
         id: BigInt(taskId),
         board: {
           OR: [
-            { members: { some: { userId: session.user.id } } },
+            { members: { some: { userId: userId } } },
             {
               workspace: {
-                members: { some: { userId: session.user.id, role: "ADMIN" } },
+                members: { some: { userId: userId, role: "ADMIN" } },
               },
             },
           ],

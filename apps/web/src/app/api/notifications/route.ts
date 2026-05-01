@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function GET(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
   try {
     const userBoards = await prisma.boardMember.findMany({
-      where: { userId: session.user.id },
+      where: { userId: userId },
       select: { boardId: true },
     });
 
@@ -22,13 +22,10 @@ export async function GET(req: Request) {
     const logs = await prisma.boardActivityLog.findMany({
       where: {
         OR: [
-          { targetUserId: session.user.id },
+          { targetUserId: userId },
           {
             boardId: { in: boardIds },
-            OR: [
-              { type: { not: "INVITATION" } },
-              { targetUserId: session.user.id },
-            ],
+            OR: [{ type: { not: "INVITATION" } }, { targetUserId: userId }],
           },
         ],
       },
@@ -52,9 +49,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return apiError(API_ERRORS.UNAUTHORIZED);
   }
 
@@ -71,11 +68,7 @@ export async function POST(req: Request) {
       include: { board: true },
     });
 
-    if (
-      !log ||
-      log.targetUserId !== session.user.id ||
-      log.type !== "INVITATION"
-    ) {
+    if (!log || log.targetUserId !== userId || log.type !== "INVITATION") {
       return apiError(API_ERRORS.customForbidden("Invalid invitation"));
     }
 
@@ -84,7 +77,7 @@ export async function POST(req: Request) {
         prisma.boardMember.create({
           data: {
             boardId: log.boardId,
-            userId: session.user.id,
+            userId: userId,
             role: "MEMBER",
           },
         }),
@@ -96,7 +89,7 @@ export async function POST(req: Request) {
           data: {
             boardId: log.boardId,
             type: "MEMBER_JOIN",
-            actorId: session.user.id,
+            actorId: userId,
           },
         }),
       ]);

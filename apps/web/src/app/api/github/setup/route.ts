@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionOrPat } from "@/lib/auth";
 import { prisma } from "@syncopate/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 
 export async function GET(request: Request) {
-  const session = await auth();
+  const userId = await getSessionOrPat();
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     // Validate that the user actually has access to this installation_id
     const account = await prisma.account.findFirst({
       where: {
-        userId: session.user.id,
+        userId: userId,
         provider: "github",
       },
     });
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
     // Find the user's first workspace (which should be their default workspace)
     const userWorkspace = await prisma.workspaceMember.findFirst({
       where: {
-        userId: session.user.id,
+        userId: userId,
       },
       include: {
         workspace: true,

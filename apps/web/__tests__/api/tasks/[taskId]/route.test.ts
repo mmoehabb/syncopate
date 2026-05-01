@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, mock } from "bun:test";
 import { PATCH, DELETE } from "@/app/api/tasks/[taskId]/route";
-import { NextRequest } from "next/server";
 
 const mockPrisma = {
   task: {
@@ -22,6 +21,12 @@ mock.module("@syncopate/db", () => ({
 }));
 
 mock.module("@/lib/auth", () => ({
+  getSessionOrPat: mock().mockImplementation(async () => {
+    return "test-user-id";
+  }),
+  getSessionOrPat: mock().mockImplementation(async () => {
+    return "test-user-id";
+  }),
   auth: mock().mockImplementation(async () => {
     return { user: { id: (global as any).testUserId } };
   }),
@@ -57,7 +62,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
     it("should deny task update and return 404 if user has no access", async () => {
       mockPrisma.task.findFirst.mockResolvedValueOnce(null);
 
-      const req = new NextRequest("http://localhost:3000/api/tasks/1", {
+      const req = new Request("http://localhost:3000/api/tasks/1", {
         method: "PATCH",
         body: JSON.stringify({ status: "DONE" }),
       });
@@ -77,7 +82,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         board: { workspaceId: "ws1" },
       });
 
-      const req = new NextRequest("http://localhost:3000/api/tasks/1", {
+      const req = new Request("http://localhost:3000/api/tasks/1", {
         method: "PATCH",
         body: JSON.stringify({ status: "DONE" }),
       });
@@ -93,7 +98,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
     it("should deny task deletion and return 404 if user has no access", async () => {
       mockPrisma.task.findFirst.mockResolvedValueOnce(null);
 
-      const req = new NextRequest("http://localhost:3000/api/tasks/1", {
+      const req = new Request("http://localhost:3000/api/tasks/1", {
         method: "DELETE",
       });
 
@@ -112,7 +117,7 @@ describe("PATCH/DELETE /api/tasks/[taskId] (IDOR Fix)", () => {
         board: { workspaceId: "ws1" },
       });
 
-      const req = new NextRequest("http://localhost:3000/api/tasks/1", {
+      const req = new Request("http://localhost:3000/api/tasks/1", {
         method: "DELETE",
       });
 

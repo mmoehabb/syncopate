@@ -3,6 +3,8 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@syncopate/db";
 
+import { headers } from "next/headers";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -45,3 +47,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
+
+export async function getSessionOrPat() {
+  const session = await auth();
+  if (session?.user?.id) {
+    return session.user.id;
+  }
+
+  const reqHeaders = await headers();
+  const authHeader = reqHeaders.get("authorization");
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+
+    const pat = await prisma.personalAccessToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (pat && (!pat.expiresAt || pat.expiresAt > new Date())) {
+      return pat.userId;
+    }
+  }
+
+  return null;
+}

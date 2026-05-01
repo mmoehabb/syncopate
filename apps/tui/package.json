@@ -1,0 +1,24 @@
+{
+  "name": "tui",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.tsx",
+    "dev": "bun run --watch src/index.tsx"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14"
+  },
+  "peerDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "ink": "^7.0.1",
+    "react": "^19.2.5",
+    "@syncopate/api": "workspace:*",
+    "@syncopate/types": "workspace:*",
+    "@syncopate/utils": "workspace:*"
+  }
+}
