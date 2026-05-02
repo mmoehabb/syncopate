@@ -7,3 +7,4 @@ export * from "./WorkspaceApi";
 export * from "./DirectoryApi";
 export * from "./BugApi";
 export * from "./error";
+export { setGlobalApiToken } from "./ApiClient";
