@@ -11,6 +11,6 @@ Syncopate is a powerful, unified productivity application and toolset built spec
 
 **Why use Syncopate?**
 
-- **Developer-First Design**: Enjoy a focused, distraction-free environment utilizing a custom 'Power User' color palette (Obsidian Night, Void Grey, Neon Pulse, Git Green, Syntax Grey).
-- **Extensible Architecture**: Built as a monorepo, the platform uses shared TypeScript interfaces ensuring type safety from the Next.js frontend to the Prisma-powered backend.
-- **CLI Ready**: Our REST API is built from the ground up to support integration. An upcoming CLI tool will be added directly to the workspace, allowing you to manage your tasks completely from the terminal.
+- **Developer-Centric Experience**: Syncopate is built to feel like a natural extension of your workflow. Its terminal-inspired, distraction-free environment brings the joy back into task management, making staying organized an effortless and genuinely fun part of your day.
+- **Focus on Building, Not Managing**: Say goodbye to context switching and clunky project management tools. Syncopate minimizes friction, bestowing your team with the pure focus needed to implement tasks and write code, rather than endlessly organizing boards.
+- **Seamless CLI Integration**: Manage your workload without ever leaving your terminal. With an API built for integration and a seamless CLI experience, Syncopate keeps you in the zone.
