@@ -47,7 +47,7 @@ export function useCommandBar() {
 
   const handleTabCompletion = async () => {
     const { executeTabCompletion } =
-      await import("../lib/utils/tab-completion");
+      await import("@syncopate/utils");
     const { COMMAND_REGISTRY } = await import("../lib/command-registry");
 
     await executeTabCompletion({

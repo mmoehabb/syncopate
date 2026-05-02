@@ -1,7 +1,7 @@
 import { Command } from "../types/commands";
 import { NORMAL_ACTIONS_REGISTRY } from "./normal-actions-registry";
 
-import { resolvePath } from "./utils/path";
+import { resolvePath } from "@syncopate/utils";
 
 export const COMMAND_REGISTRY: Record<string, Command> = {
   ls: {
