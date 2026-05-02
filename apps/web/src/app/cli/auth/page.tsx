@@ -59,7 +59,7 @@ function AuthForm() {
       <div className="text-center p-8 border border-gray-700 rounded-lg bg-gray-800 max-w-md w-full">
         <h1 className="text-2xl font-bold mb-4">Authorize CLI</h1>
         <p className="text-gray-300 mb-6">
-          Syncopate CLI is requesting access to your account.
+          Syncoboard CLI is requesting access to your account.
         </p>
 
         {status === "error" && (

@@ -9,7 +9,7 @@ import {
 } from "bun:test";
 import { cleanupDeletedEntities } from "../src/cleanup";
 
-// Use relative path for @syncopate/db to bypass resolution issues in some environments
+// Use relative path for @syncoboard/db to bypass resolution issues in some environments
 const DB_PATH = "../../db/index";
 
 const mockPrisma = {
@@ -26,7 +26,7 @@ mock.module(DB_PATH, () => ({
   prisma: mockPrisma,
 }));
 
-mock.module("@syncopate/db", () => ({
+mock.module("@syncoboard/db", () => ({
   prisma: mockPrisma,
 }));
 

@@ -77,11 +77,11 @@ export function CommandProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoaded.current) return;
     try {
-      const storedLog = localStorage.getItem("syncopate_command_log");
+      const storedLog = localStorage.getItem("syncoboard_command_log");
       if (storedLog) {
         setTimeout(() => setCommandLog(JSON.parse(storedLog)), 0);
       }
-      const storedPath = localStorage.getItem("syncopate_virtual_path");
+      const storedPath = localStorage.getItem("syncoboard_virtual_path");
       if (storedPath) {
         setTimeout(() => setVirtualPath(storedPath), 0);
       }
@@ -93,7 +93,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
 
   // Save virtual path to local storage when it changes
   useEffect(() => {
-    localStorage.setItem("syncopate_virtual_path", virtualPath);
+    localStorage.setItem("syncoboard_virtual_path", virtualPath);
   }, [virtualPath]);
 
   const clearHistory = () => setOutputHistory([]);
@@ -116,7 +116,7 @@ export function CommandProvider({ children }: { children: ReactNode }) {
         trimmedCommand,
         ...prev.filter((c) => c !== trimmedCommand),
       ].slice(0, 10);
-      localStorage.setItem("syncopate_command_log", JSON.stringify(newLog));
+      localStorage.setItem("syncoboard_command_log", JSON.stringify(newLog));
       return newLog;
     });
 

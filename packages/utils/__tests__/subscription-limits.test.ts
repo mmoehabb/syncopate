@@ -1,9 +1,9 @@
 import { expect, test, describe, beforeEach, mock, afterEach } from "bun:test";
 import { enforceSubscriptionLimits } from "../src/subscription-limits";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 // Mocking prisma globally
-mock.module("@syncopate/db", () => ({
+mock.module("@syncoboard/db", () => ({
   prisma: {
     subscription: {
       findFirst: mock(),

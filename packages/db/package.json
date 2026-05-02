@@ -1,5 +1,5 @@
 {
-  "name": "@syncopate/db",
+  "name": "@syncoboard/db",
   "version": "0.1.0",
   "private": true,
   "main": "./index.ts",

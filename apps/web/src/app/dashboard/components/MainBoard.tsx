@@ -299,7 +299,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                                                   <div
                                                     key={`u-a-${idx}`}
                                                     className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                                    title={`Assignee: Anonymous (${u.login}) - Not registered on Syncopate`}
+                                                    title={`Assignee: Anonymous (${u.login}) - Not registered on Syncoboard`}
                                                   >
                                                     {u.avatar_url ? (
                                                       // eslint-disable-next-line @next/next/no-img-element
@@ -359,7 +359,7 @@ export function MainBoard({ board }: { board?: MainBoardData | null }) {
                                                     <div
                                                       key={`u-r-${idx}`}
                                                       className="w-5 h-5 rounded-full overflow-hidden border border-void-grey relative group"
-                                                      title={`Reviewer: Anonymous (${u.login}) - Not registered on Syncopate`}
+                                                      title={`Reviewer: Anonymous (${u.login}) - Not registered on Syncoboard`}
                                                     >
                                                       {u.avatar_url ? (
                                                         // eslint-disable-next-line @next/next/no-img-element

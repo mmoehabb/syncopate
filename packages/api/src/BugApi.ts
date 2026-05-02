@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import type { BugReportPayload, BugReportResponse } from "@syncopate/types";
+import type { BugReportPayload, BugReportResponse } from "@syncoboard/types";
 
 export class BugApi extends ApiClient {
   constructor() {

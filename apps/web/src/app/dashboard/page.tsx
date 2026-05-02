@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { redirect } from "next/navigation";
 import {
   subscribeToFreePlan,
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
 
     if (!hasGithubInstallation) {
       const githubAppName =
-        process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate";
+        process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncoboard";
       redirect(`https://github.com/apps/${githubAppName}/installations/new`);
     }
   } else {
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           </h2>
           <p className="text-syntax-grey text-sm font-mono leading-relaxed">
             You do not have an active subscription. Please select a plan to
-            continue using Syncopate.
+            continue using Syncoboard.
           </p>
         </div>
 

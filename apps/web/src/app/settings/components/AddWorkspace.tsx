@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { workspaceApi } from "@syncopate/api";
+import { workspaceApi } from "@syncoboard/api";
 import { useRouter } from "next/navigation";
 
 export function AddWorkspace() {

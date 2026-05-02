@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSessionOrPat } from "@/lib/auth";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { API_ERRORS, apiError } from "@/lib/api/error";
-import type { DirectoryResponse } from "@syncopate/types";
+import type { DirectoryResponse } from "@syncoboard/types";
 import { hasValidSubscription } from "@/lib/api/with-subscription";
 
 export async function GET(req: Request) {

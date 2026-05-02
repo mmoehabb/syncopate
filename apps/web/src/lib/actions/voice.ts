@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "../auth";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 export async function joinVoiceCall(boardId: string, peerId: string) {
   const session = await auth();

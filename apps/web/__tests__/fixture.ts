@@ -1,4 +1,4 @@
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 export async function cleanDatabase() {
   const tablenames = await prisma.$queryRaw<

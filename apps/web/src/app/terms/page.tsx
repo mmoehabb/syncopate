@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata = {
-  title: "Terms of Service | Syncopate",
+  title: "Terms of Service | Syncoboard",
 };
 
 export default function TermsOfServicePage() {
@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
               2. Open Source License
             </h2>
             <p>
-              The Syncopate application is open-source software and its
+              The Syncoboard application is open-source software and its
               underlying source code is licensed under the MIT License. You are
               free to use, modify, and distribute the code subject to the
               conditions of the MIT License provided in the software&apos;s
@@ -57,7 +57,7 @@ export default function TermsOfServicePage() {
               3. Disclaimer of Warranty
             </h2>
             <p>
-              The Syncopate application and its materials are provided &quot;as
+              The Syncoboard application and its materials are provided &quot;as
               is&quot;, without warranty of any kind, express or implied,
               including but not limited to the warranties of merchantability,
               fitness for a particular purpose and noninfringement. We make no
@@ -71,10 +71,10 @@ export default function TermsOfServicePage() {
               4. Limitation of Liability
             </h2>
             <p>
-              In no event shall the authors or copyright holders of Syncopate be
-              liable for any claim, damages, or other liability, whether in an
-              action of contract, tort or otherwise, arising from, out of or in
-              connection with the application or the use or other dealings in
+              In no event shall the authors or copyright holders of Syncoboard
+              be liable for any claim, damages, or other liability, whether in
+              an action of contract, tort or otherwise, arising from, out of or
+              in connection with the application or the use or other dealings in
               the application. This includes, without limitation, damages for
               loss of data, profit, or due to business interruption.
             </p>

@@ -1,10 +1,10 @@
 {
-  "name": "@syncopate/utils",
+  "name": "@syncoboard/utils",
   "version": "1.0.0",
   "private": true,
   "main": "src/index.ts",
   "dependencies": {
-    "@syncopate/db": "workspace:*"
+    "@syncoboard/db": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

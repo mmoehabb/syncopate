@@ -17,7 +17,7 @@ export function Header() {
     <header className="h-14 border-b border-white/10 bg-obsidian-night flex items-center justify-between px-6 z-20 relative">
       <div className="flex items-center gap-2 font-mono font-bold text-white tracking-tight">
         <Logo className="w-8 h-8" />
-        <span>SYNCOPATE</span>
+        <span>SYNCOBOARD</span>
       </div>
 
       {session?.user && (

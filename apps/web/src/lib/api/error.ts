@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { API_ERRORS } from "@syncopate/api";
-import type { ApiErrorDefinition } from "@syncopate/types";
+import { API_ERRORS } from "@syncoboard/api";
+import type { ApiErrorDefinition } from "@syncoboard/types";
 
 export { API_ERRORS };
 export type { ApiErrorDefinition };

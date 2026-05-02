@@ -37,7 +37,7 @@ export function Hero() {
         </AnimatePresence>
       </div>
       <p className="text-syntax-grey text-lg max-w-xl">
-        Stop updating tickets. Just push code. Syncopate automatically syncs
+        Stop updating tickets. Just push code. Syncoboard automatically syncs
         your board state with repository activity to eliminate &quot;stale
         ticket&quot; syndrome.
       </p>

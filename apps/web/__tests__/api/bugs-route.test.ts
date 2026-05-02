@@ -38,7 +38,7 @@ const mockPrisma = {
   },
 };
 
-mock.module("@syncopate/db", () => ({
+mock.module("@syncoboard/db", () => ({
   prisma: mockPrisma,
 }));
 

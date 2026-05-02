@@ -1,6 +1,6 @@
 import { ApiClient } from "./ApiClient";
 import { AxiosRequestConfig } from "axios";
-import type { Subscription } from "@syncopate/db";
+import type { Subscription } from "@syncoboard/db";
 
 export class SubscriptionApi extends ApiClient {
   constructor(baseURL?: string) {

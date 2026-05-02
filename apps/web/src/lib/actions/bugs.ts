@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 export async function reportBugAction(data: {
   message?: string;

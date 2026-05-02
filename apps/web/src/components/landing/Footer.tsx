@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex items-center gap-3">
           <Logo className="w-6 h-6" />
           <span className="text-syntax-grey font-mono text-sm">
-            © {new Date().getFullYear()} Syncopate. All rights reserved.
+            © {new Date().getFullYear()} Syncoboard. All rights reserved.
           </span>
         </div>
         <div className="flex gap-6 font-mono text-sm text-syntax-grey">

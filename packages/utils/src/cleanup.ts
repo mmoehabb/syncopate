@@ -1,4 +1,4 @@
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 /**
  * Permanently deletes workspaces and boards that have been marked as isDeleted

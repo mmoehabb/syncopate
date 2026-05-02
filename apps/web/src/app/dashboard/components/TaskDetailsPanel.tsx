@@ -107,7 +107,7 @@ export function TaskDetailsPanel({
                       <div
                         key={`u-a-${idx}`}
                         className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
-                        title={`Not registered on Syncopate (${u.login})`}
+                        title={`Not registered on Syncoboard (${u.login})`}
                       >
                         <div className="w-5 h-5 rounded-full overflow-hidden">
                           {u.avatar_url ? (
@@ -178,7 +178,7 @@ export function TaskDetailsPanel({
                       <div
                         key={`u-r-${idx}`}
                         className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded border border-white/10"
-                        title={`Not registered on Syncopate (${u.login})`}
+                        title={`Not registered on Syncoboard (${u.login})`}
                       >
                         <div className="w-5 h-5 rounded-full overflow-hidden">
                           {u.avatar_url ? (

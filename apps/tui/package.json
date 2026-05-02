@@ -17,9 +17,9 @@
   "dependencies": {
     "ink": "^7.0.1",
     "react": "^19.2.5",
-    "@syncopate/api": "workspace:*",
-    "@syncopate/types": "workspace:*",
-    "@syncopate/shared": "workspace:*",
-    "@syncopate/utils": "workspace:*"
+    "@syncoboard/api": "workspace:*",
+    "@syncoboard/types": "workspace:*",
+    "@syncoboard/shared": "workspace:*",
+    "@syncoboard/utils": "workspace:*"
   }
 }

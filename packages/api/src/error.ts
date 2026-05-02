@@ -1,4 +1,4 @@
-import type { ApiErrorDefinition } from "@syncopate/types";
+import type { ApiErrorDefinition } from "@syncoboard/types";
 
 export const API_ERRORS = {
   UNAUTHORIZED: { error: "Unauthorized", status: 401 } as ApiErrorDefinition,

@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "../../components/DashboardClient";
 import {
@@ -120,7 +120,7 @@ export default async function BoardPage({
           </h2>
           <p className="text-syntax-grey text-sm font-mono leading-relaxed">
             You do not have an active subscription. Please select a plan to
-            continue using Syncopate.
+            continue using Syncoboard.
           </p>
         </div>
 

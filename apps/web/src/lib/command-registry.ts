@@ -1,7 +1,7 @@
 import { Command } from "../types/commands";
 import { NORMAL_ACTIONS_REGISTRY } from "./normal-actions-registry";
 
-import { resolvePath } from "@syncopate/shared";
+import { resolvePath } from "@syncoboard/shared";
 
 export const COMMAND_REGISTRY: Record<string, Command> = {
   ls: {
@@ -11,7 +11,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       const targetPath = args && args.length > 0 ? args[0] : ".";
       const resolvedPath = resolvePath(virtualPath, targetPath);
 
-      import("@syncopate/api").then(({ directoryApi }) => {
+      import("@syncoboard/api").then(({ directoryApi }) => {
         directoryApi
           .getDirectory(resolvedPath)
           .then((response) => {
@@ -90,7 +90,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
       const targetPath = args && args.length > 0 ? args[0] : "~";
       const resolvedPath = resolvePath(virtualPath, targetPath);
 
-      import("@syncopate/api").then(({ directoryApi }) => {
+      import("@syncoboard/api").then(({ directoryApi }) => {
         directoryApi
           .getDirectory(resolvedPath)
           .then((response) => {
@@ -297,7 +297,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
           isOpen: true,
           message: `Are you sure you want to delete the workspace '${workspaceName}'? This action will perform a soft-delete, and it will be permanently deleted after 3 months.`,
           onConfirm: async () => {
-            const { workspaceApi } = await import("@syncopate/api");
+            const { workspaceApi } = await import("@syncoboard/api");
             try {
               await workspaceApi.deleteWorkspace(workspaceName);
               printOutput([
@@ -343,7 +343,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .restoreBoard(workspaceName.trim(), boardName.trim())
           .then(() => {
@@ -370,7 +370,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
     description:
       "List all soft-deleted boards and time remaining until permanent deletion",
     action: ({ printOutput }) => {
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .getDeletedBoards()
           .then((boards) => {
@@ -427,7 +427,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
           isOpen: true,
           message: `Are you sure you want to delete the board '${boardName.trim()}' from workspace '${workspaceName.trim()}'? This action will perform a soft-delete, and it will be permanently deleted after 3 months.`,
           onConfirm: async () => {
-            const { boardApi } = await import("@syncopate/api");
+            const { boardApi } = await import("@syncoboard/api");
             try {
               await boardApi.deleteBoard(
                 workspaceName.trim(),
@@ -466,7 +466,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const workspaceName = args.join(" ").trim();
 
-      import("@syncopate/api").then(({ workspaceApi }) => {
+      import("@syncoboard/api").then(({ workspaceApi }) => {
         workspaceApi
           .updateWorkspaceStatus(workspaceName, true)
           .then(() => {
@@ -502,7 +502,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const workspaceName = args.join(" ").trim();
 
-      import("@syncopate/api").then(({ workspaceApi }) => {
+      import("@syncoboard/api").then(({ workspaceApi }) => {
         workspaceApi
           .updateWorkspaceStatus(workspaceName, false)
           .then(() => {
@@ -548,7 +548,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .updateBoardStatus(workspaceName.trim(), boardName.trim(), true)
           .then(() => {
@@ -597,7 +597,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .updateBoardStatus(workspaceName.trim(), boardName.trim(), false)
           .then(() => {
@@ -644,7 +644,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .inviteMember(
             workspaceName.trim(),
@@ -692,7 +692,7 @@ export const COMMAND_REGISTRY: Record<string, Command> = {
 
       const [workspaceName, boardName] = parts;
 
-      import("@syncopate/api").then(({ boardApi }) => {
+      import("@syncoboard/api").then(({ boardApi }) => {
         boardApi
           .removeMember(
             workspaceName.trim(),

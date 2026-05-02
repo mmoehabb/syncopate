@@ -9,7 +9,7 @@ const GUIDE_PAGES = [
     content: (
       <div className="space-y-3">
         <p>
-          Syncopate seamlessly integrates with GitHub. When you open a Pull
+          Syncoboard seamlessly integrates with GitHub. When you open a Pull
           Request, a linked task is automatically generated in the appropriate
           board.
         </p>
@@ -25,7 +25,7 @@ const GUIDE_PAGES = [
     content: (
       <div className="space-y-3">
         <p>
-          Syncopate features a built-in Command Line Interface (CLI) and
+          Syncoboard features a built-in Command Line Interface (CLI) and
           Vim-like navigation for maximum productivity.
         </p>
         <ul className="list-disc pl-4 space-y-1">
@@ -80,7 +80,7 @@ export function AppGuide({ userCreatedAt }: { userCreatedAt?: string | Date }) {
       const oneDayInMs = 24 * 60 * 60 * 1000;
       const isNewUser =
         new Date().getTime() - createdDate.getTime() < oneDayInMs;
-      const hasOpened = localStorage.getItem("syncopate_guide_opened");
+      const hasOpened = localStorage.getItem("syncoboard_guide_opened");
 
       if (isNewUser && !hasOpened) {
         setTimeout(() => setShouldPulse(true), 0);
@@ -92,7 +92,7 @@ export function AppGuide({ userCreatedAt }: { userCreatedAt?: string | Date }) {
     setIsOpen(!isOpen);
     if (!isOpen && shouldPulse) {
       setShouldPulse(false);
-      localStorage.setItem("syncopate_guide_opened", "true");
+      localStorage.setItem("syncoboard_guide_opened", "true");
     }
   };
 

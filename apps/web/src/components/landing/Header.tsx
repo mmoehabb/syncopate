@@ -8,7 +8,7 @@ export function Header() {
       <div className="flex items-center gap-3">
         <Logo className="w-8 h-8" />
         <h1 className="text-xl font-bold text-white tracking-tight">
-          Syncopate
+          Syncoboard
         </h1>
       </div>
       <nav className="flex gap-4 font-mono text-sm">

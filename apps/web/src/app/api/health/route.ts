@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { HealthResponse } from "@syncopate/types";
+import type { HealthResponse } from "@syncoboard/types";
 
 export async function GET() {
   // Test DB connection implicitly via Prisma (optional health check)
@@ -9,7 +9,7 @@ export async function GET() {
     status: "ok",
     timestamp: new Date().toISOString(),
     version: "0.1.0",
-    message: "Syncopate API is operational",
+    message: "Syncoboard API is operational",
   };
 
   return NextResponse.json(response);
