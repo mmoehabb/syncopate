@@ -37,7 +37,7 @@ const App = () => {
   ]);
   const [input, setInput] = useState("");
   const [config, setConfig] = useState<Config>({});
-  const [virtualPath, setVirtualPath] = useState<string>("~");
+  const [virtualPath, setVirtualPath] = useState<string>("");
   const [mode, setMode] = useState<AppMode>("command");
   const [activeBoardId, setActiveBoardId] = useState<string | undefined>(
     undefined,

@@ -1,3 +1,17 @@
+/**
+ * Resolves a target path relative to the current path.
+ *
+ * It handles absolute paths, home paths ('~'), and relative navigation ('.' and '..').
+ *
+ * @example
+ * resolvePath("/workspace", "board-1") // returns "/workspace/board-1"
+ * resolvePath("/workspace/board-1", "..") // returns "/workspace"
+ * resolvePath("/workspace/board-1", "~") // returns "/"
+ *
+ * @param currentPath The base path from which to resolve.
+ * @param targetPath The destination path to resolve.
+ * @returns The new absolute resolved path.
+ */
 export function resolvePath(currentPath: string, targetPath: string): string {
   // If absolute path or home
   if (targetPath.startsWith("/")) {
