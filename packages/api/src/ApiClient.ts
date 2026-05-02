@@ -14,7 +14,7 @@ export abstract class ApiClient {
     const isServer = typeof window === "undefined";
     const resolvedBaseURL =
       isServer && baseURL.startsWith("/")
-        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost"}${baseURL}`
+        ? `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost"}${baseURL}`
         : baseURL;
 
     this.client = axios.create({
