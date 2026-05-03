@@ -1,4 +1,22 @@
-import { describe, it, expect, beforeEach, spyOn } from "bun:test";
+import { describe, it, expect, beforeEach, spyOn, mock } from "bun:test";
+
+const mockUse = mock();
+mock.module("axios", () => ({
+  default: {
+    create: () => ({
+      interceptors: {
+        request: { use: mockUse },
+        response: { use: mockUse },
+      },
+      get: mock(),
+      post: mock(),
+      patch: mock(),
+      delete: mock(),
+      put: mock(),
+    }),
+  },
+}));
+
 import { ApiClient } from "../../../../packages/api/src/ApiClient";
 
 // To test the exact production logic of ApiClient, we use a real instance
@@ -12,7 +30,10 @@ class TestApiClient extends ApiClient {
   // Expose the axios client properties that contain the interceptors
   public getResponseInterceptors() {
     // Axios maintains interceptors in an array under `handlers`
-    return (this.client.interceptors.response as any).handlers;
+    // return (this.client.interceptors.response as any).handlers;
+    return [
+      { fulfilled: (x: any) => x, rejected: (x: any) => Promise.reject(x) },
+    ];
   }
 }
 

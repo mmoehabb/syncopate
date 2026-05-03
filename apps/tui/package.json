@@ -19,6 +19,7 @@
     "react": "^19.2.5",
     "@syncopate/api": "workspace:*",
     "@syncopate/types": "workspace:*",
+    "@syncopate/shared": "workspace:*",
     "@syncopate/utils": "workspace:*"
   }
 }

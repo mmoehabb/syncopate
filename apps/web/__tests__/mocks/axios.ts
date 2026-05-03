@@ -7,6 +7,9 @@ export const mockAxiosInstance = {
   patch: mock(),
   delete: mock(),
   interceptors: {
+    request: {
+      use: mock(() => {}),
+    },
     response: {
       use: mock(() => {}),
     },

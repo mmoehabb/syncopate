@@ -12,6 +12,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@syncopate/db": "workspace:*",
     "@syncopate/types": "workspace:*",
+    "@syncopate/shared": "workspace:*",
     "@syncopate/api": "workspace:*",
     "axios": "^1.15.0",
     "date-fns": "^4.1.0",

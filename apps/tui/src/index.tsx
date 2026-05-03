@@ -6,7 +6,7 @@ import os from "node:os";
 import http from "node:http";
 import { exec } from "node:child_process";
 import { setGlobalApiToken, directoryApi } from "@syncopate/api";
-import { executeTabCompletion } from "@syncopate/utils";
+import { executeTabCompletion } from "@syncopate/shared";
 import { COMMAND_REGISTRY } from "./command-registry";
 import { AppMode } from "./types";
 
