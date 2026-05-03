@@ -1,12 +1,12 @@
-# Syncopate: Brand Strategy & Identity
+# Syncoboard: Brand Strategy & Identity
 
-This document outlines the core brand identity and strategic direction for **Syncopate**, a code-driven project management board designed specifically for high-velocity software development teams.
+This document outlines the core brand identity and strategic direction for **Syncoboard**, a code-driven project management board designed specifically for high-velocity software development teams.
 
 ---
 
 ## 1. Core Concept
 
-**Syncopate** occupies the niche between manual task management and the actual codebase. It treats the **Pull Request** as the source of truth, automatically synchronizing board state with repository activity to eliminate "stale ticket" syndrome.
+**Syncoboard** occupies the niche between manual task management and the actual codebase. It treats the **Pull Request** as the source of truth, automatically synchronizing board state with repository activity to eliminate "stale ticket" syndrome.
 
 - **The Name:** A play on "Sync" and the musical term "Syncopation" (off-beat rhythms), suggesting a new, more efficient tempo for development.
 - **The North Star:** If the code moves, the card moves.
@@ -15,7 +15,7 @@ This document outlines the core brand identity and strategic direction for **Syn
 
 ## 2. Brand Strategy: The Power User Path
 
-Syncopate is built for developers, not just project managers. It is positioned as a high-performance utility rather than a corporate collaboration tool.
+Syncoboard is built for developers, not just project managers. It is positioned as a high-performance utility rather than a corporate collaboration tool.
 
 ### Personality & Tone
 

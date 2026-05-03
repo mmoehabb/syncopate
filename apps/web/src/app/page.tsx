@@ -6,7 +6,7 @@ import { Plans } from "@/components/landing/Plans";
 import { Footer } from "@/components/landing/Footer";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 export const dynamic = "force-dynamic";
 

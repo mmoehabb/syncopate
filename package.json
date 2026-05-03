@@ -1,5 +1,5 @@
 {
-  "name": "syncopate-monorepo",
+  "name": "syncoboard-monorepo",
   "private": true,
   "engines": {
     "node": ">=18"
@@ -14,17 +14,17 @@
     "start": "bun run --filter \"*\" start",
     "start:pm2": "pm2 start ecosystem.config.js",
     "start:web": "bun run --filter web start",
-    "start:cron": "bun run --filter @syncopate/cron start",
+    "start:cron": "bun run --filter @syncoboard/cron start",
     "build": "bun run --filter \"*\" generate && bun run --filter \"*\" build",
     "lint": "bun run --filter \"*\" lint",
     "format": "bun prettier --write .",
     "check": "bun prettier --check .",
-    "db:push": "bun run --filter @syncopate/db push",
-    "db:generate": "bun run --filter @syncopate/db generate",
-    "db:migrate:dev": "bun run --filter @syncopate/db migrate:dev",
-    "db:migrate:deploy": "bun run --filter @syncopate/db migrate:deploy",
-    "db:migrate:reset": "bun run --filter @syncopate/db migrate:reset",
-    "db:seed": "bun run --filter @syncopate/db seed",
+    "db:push": "bun run --filter @syncoboard/db push",
+    "db:generate": "bun run --filter @syncoboard/db generate",
+    "db:migrate:dev": "bun run --filter @syncoboard/db migrate:dev",
+    "db:migrate:deploy": "bun run --filter @syncoboard/db migrate:deploy",
+    "db:migrate:reset": "bun run --filter @syncoboard/db migrate:reset",
+    "db:seed": "bun run --filter @syncoboard/db seed",
     "test": "export $(cat packages/db/.env.test | xargs) && bun run db:push && bun test"
   },
   "packageManager": "bun@1.3.11",

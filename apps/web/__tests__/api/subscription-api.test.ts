@@ -3,13 +3,13 @@ import { mockAxiosInstance } from "../mocks/axios";
 import type { AxiosInstance } from "axios";
 
 describe("SubscriptionApi", () => {
-  let subscriptionApi: import("@syncopate/api").SubscriptionApi;
+  let subscriptionApi: import("@syncoboard/api").SubscriptionApi;
 
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();
 
     const { SubscriptionApi: SubscriptionApiClass } =
-      await import("@syncopate/api");
+      await import("@syncoboard/api");
     subscriptionApi = new SubscriptionApiClass();
     subscriptionApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });

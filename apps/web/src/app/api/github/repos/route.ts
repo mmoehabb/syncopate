@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionOrPat } from "@/lib/auth";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { App } from "@octokit/app";
 import { API_ERRORS, apiError } from "@/lib/api/error";
 

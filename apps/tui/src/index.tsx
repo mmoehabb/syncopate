@@ -5,12 +5,12 @@ import path from "node:path";
 import os from "node:os";
 import http from "node:http";
 import { exec } from "node:child_process";
-import { setGlobalApiToken, directoryApi } from "@syncopate/api";
-import { executeTabCompletion } from "@syncopate/shared";
+import { setGlobalApiToken, directoryApi } from "@syncoboard/api";
+import { executeTabCompletion } from "@syncoboard/shared";
 import { COMMAND_REGISTRY } from "./command-registry";
 import { AppMode } from "./types";
 
-const CONFIG_DIR = path.join(os.homedir(), ".config", "syncopate");
+const CONFIG_DIR = path.join(os.homedir(), ".config", "syncoboard");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
 
 interface Config {
@@ -33,7 +33,7 @@ async function saveConfig(config: Config) {
 
 const App = () => {
   const [output, setOutput] = useState<string[]>([
-    "Welcome to Syncopate TUI!",
+    "Welcome to Syncoboard TUI!",
     "Type /auth to login.",
   ]);
   const [input, setInput] = useState("");

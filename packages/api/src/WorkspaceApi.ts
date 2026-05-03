@@ -1,10 +1,10 @@
 import { ApiClient } from "./ApiClient";
 import { AxiosRequestConfig } from "axios";
-import type { Workspace } from "@syncopate/db";
+import type { Workspace } from "@syncoboard/db";
 import type {
   WorkspaceWithBoards,
   CreateWorkspacePayload,
-} from "@syncopate/types";
+} from "@syncoboard/types";
 
 export class WorkspaceApi extends ApiClient {
   constructor(baseURL?: string) {

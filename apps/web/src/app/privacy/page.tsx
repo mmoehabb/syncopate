@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata = {
-  title: "Privacy Policy | Syncopate",
+  title: "Privacy Policy | Syncoboard",
 };
 
 export default function PrivacyPolicyPage() {
@@ -29,11 +29,11 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold text-white">1. Introduction</h2>
             <p>
-              Welcome to Syncopate. This Privacy Policy explains how we collect,
-              use, disclose, and safeguard your information when you visit our
-              website or use our application. Please read this privacy policy
-              carefully. If you do not agree with the terms of this privacy
-              policy, please do not access the application.
+              Welcome to Syncoboard. This Privacy Policy explains how we
+              collect, use, disclose, and safeguard your information when you
+              visit our website or use our application. Please read this privacy
+              policy carefully. If you do not agree with the terms of this
+              privacy policy, please do not access the application.
             </p>
           </section>
 

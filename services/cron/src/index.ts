@@ -1,9 +1,9 @@
 import cron from "node-cron";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import {
   enforceSubscriptionLimits,
   cleanupDeletedEntities,
-} from "@syncopate/utils";
+} from "@syncoboard/utils";
 
 /**
  * Runs every day at 01:00 AM.

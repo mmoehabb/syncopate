@@ -1,6 +1,6 @@
 # Entity Relationship Diagrams (ERD)
 
-This document provides a high-level overview of the database schema for the Syncopate application. The schema is defined using Prisma and can be logically divided into four main domains: Authentication, Workspaces & Boards, Tasks & Labels, and Billing & Subscriptions.
+This document provides a high-level overview of the database schema for the Syncoboard application. The schema is defined using Prisma and can be logically divided into four main domains: Authentication, Workspaces & Boards, Tasks & Labels, and Billing & Subscriptions.
 
 ## 1. Authentication
 

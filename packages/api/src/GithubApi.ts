@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import type { GithubRepo } from "@syncopate/types";
+import type { GithubRepo } from "@syncoboard/types";
 
 export class GithubApi extends ApiClient {
   constructor() {

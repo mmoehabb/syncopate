@@ -46,7 +46,7 @@ export function useCommandBar() {
   }, [outputHistory, mode]);
 
   const handleTabCompletion = async () => {
-    const { executeTabCompletion } = await import("@syncopate/shared");
+    const { executeTabCompletion } = await import("@syncoboard/shared");
     const { COMMAND_REGISTRY } = await import("../lib/command-registry");
 
     await executeTabCompletion({
@@ -54,7 +54,7 @@ export function useCommandBar() {
       virtualPath,
       commandRegistryKeys: Object.keys(COMMAND_REGISTRY),
       getDirectoryEntries: async (path) => {
-        const { directoryApi } = await import("@syncopate/api");
+        const { directoryApi } = await import("@syncoboard/api");
         return directoryApi.getDirectory(path);
       },
       setInputValue,

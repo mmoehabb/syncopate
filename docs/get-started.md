@@ -1,6 +1,6 @@
-# Getting Started with Syncopate
+# Getting Started with Syncoboard
 
-Welcome to the Syncopate monorepo! Follow these steps to get your local development environment up and running.
+Welcome to the Syncoboard monorepo! Follow these steps to get your local development environment up and running.
 
 ## Prerequisites
 

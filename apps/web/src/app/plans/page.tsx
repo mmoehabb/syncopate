@@ -3,12 +3,12 @@ import { PlansHero } from "@/components/landing/PlansHero";
 import { MatrixBackground } from "@/components/landing/MatrixBackground";
 import { Plans } from "@/components/landing/Plans";
 import { Footer } from "@/components/landing/Footer";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 export const metadata = {
-  title: "Pricing | Syncopate",
+  title: "Pricing | Syncoboard",
   description:
-    "View Syncopate plans and pricing. Start for free, upgrade when you need to collaborate.",
+    "View Syncoboard plans and pricing. Start for free, upgrade when you need to collaborate.",
 };
 
 export const dynamic = "force-dynamic";

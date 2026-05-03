@@ -37,7 +37,7 @@ export function PlansHero() {
       </div>
       <p className="text-syntax-grey text-lg max-w-2xl">
         Whether you are a solo developer looking for a clean workflow or a large
-        enterprise needing to coordinate across hundreds of boards, Syncopate
+        enterprise needing to coordinate across hundreds of boards, Syncoboard
         has a plan tailored to your velocity.
       </p>
     </section>

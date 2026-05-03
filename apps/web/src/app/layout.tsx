@@ -15,7 +15,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Syncopate | Code-First Coordination",
+  title: "Syncoboard | Code-First Coordination",
   description:
     "Your board, on autopilot. Stop updating tickets. Just push code.",
 };

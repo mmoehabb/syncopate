@@ -9,7 +9,7 @@ export function Idea() {
             Your board, on autopilot.
           </h3>
           <p className="text-syntax-grey text-lg leading-relaxed">
-            Syncopate occupies the niche between manual task management and the
+            Syncoboard occupies the niche between manual task management and the
             actual codebase. It treats the Pull Request as the source of truth.
             If the code moves, the card moves. Built for developers who value a
             clean Git workflow and zero fluff.
@@ -22,15 +22,15 @@ export function Idea() {
           <div className="font-mono text-sm text-git-green space-y-2">
             <p>{">"} git commit -m &quot;feat: implement auth&quot;</p>
             <p className="text-syntax-grey">
-              [Syncopate] Card #42 moved to &apos;In Progress&apos;
+              [Syncoboard] Card #42 moved to &apos;In Progress&apos;
             </p>
             <p>{">"} gh pr create --fill</p>
             <p className="text-syntax-grey">
-              [Syncopate] PR linked to Card #42
+              [Syncoboard] PR linked to Card #42
             </p>
             <p>{">"} gh pr merge</p>
             <p className="text-syntax-grey">
-              [Syncopate] Card #42 moved to &apos;Done&apos;
+              [Syncoboard] Card #42 moved to &apos;Done&apos;
             </p>
           </div>
         </div>

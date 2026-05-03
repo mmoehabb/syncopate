@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: syncopate_test
+          POSTGRES_DB: syncoboard_test
         ports:
           - 5432:5432
         options: >-
@@ -52,12 +52,12 @@ jobs:
 
       - name: Build
         env:
-          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/syncopate"
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/syncoboard"
         run: bun run build
 
       - name: Setup test environment
         run: |
-          echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/syncopate_test"' > packages/db/.env.test
+          echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/syncoboard_test"' > packages/db/.env.test
 
       - name: Test
         run: bun run test

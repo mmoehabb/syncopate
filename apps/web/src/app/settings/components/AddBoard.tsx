@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { githubApi } from "@syncopate/api";
-import type { GithubRepo } from "@syncopate/types";
-import { boardApi } from "@syncopate/api";
+import { githubApi } from "@syncoboard/api";
+import type { GithubRepo } from "@syncoboard/types";
+import { boardApi } from "@syncoboard/api";
 import { useRouter } from "next/navigation";
 
 interface AddBoardProps {
@@ -141,7 +141,7 @@ export function AddBoard({ workspaces }: AddBoardProps) {
                 ))}
               </select>
               <a
-                href={`https://github.com/apps/${process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncopate"}/installations/new`}
+                href={`https://github.com/apps/${process.env.NEXT_PUBLIC_GITHUB_APP_NAME || "syncoboard"}/installations/new`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-3 py-2 bg-white/5 border border-white/10 text-white font-mono text-sm hover:bg-white/10 hover:border-git-green transition-colors whitespace-nowrap text-center sm:text-left cmd-selectable [&.cmd-selected]:border-git-green [&.cmd-selected]:bg-white/10"

@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { mockAxiosInstance } from "../mocks/axios";
 import type { AxiosInstance } from "axios";
-import { DirectoryApi } from "@syncopate/api";
-import type { DirectoryResponse } from "@syncopate/types";
+import { DirectoryApi } from "@syncoboard/api";
+import type { DirectoryResponse } from "@syncoboard/types";
 
 describe("DirectoryApi", () => {
   let directoryApi: DirectoryApi;

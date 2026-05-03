@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import type { DirectoryResponse } from "@syncopate/types";
+import type { DirectoryResponse } from "@syncoboard/types";
 
 export class DirectoryApi extends ApiClient {
   constructor(baseURL?: string) {

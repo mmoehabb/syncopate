@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { auth } from "@/lib/auth";
 import { TaskStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";

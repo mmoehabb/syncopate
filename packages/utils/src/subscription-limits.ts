@@ -1,4 +1,4 @@
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 
 /**
  * Revokes excess perks (workspaces, boards) when a user's subscription changes

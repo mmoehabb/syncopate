@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import type { CreateBoardPayload, DeletedBoard } from "@syncopate/types";
+import type { CreateBoardPayload, DeletedBoard } from "@syncoboard/types";
 
 export class BoardApi extends ApiClient {
   constructor() {

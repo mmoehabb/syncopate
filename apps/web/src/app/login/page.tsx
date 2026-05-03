@@ -27,7 +27,7 @@ export default async function LoginPage(props: {
           </div>
 
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Syncopate
+            Syncoboard
           </h1>
           <p className="text-syntax-grey text-sm font-mono">
             If the code moves, the card moves.

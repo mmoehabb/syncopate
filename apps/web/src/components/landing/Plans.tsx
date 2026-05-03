@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Plan, Price } from "@syncopate/db";
+import { Plan, Price } from "@syncoboard/db";
 
 export type PlanWithPrices = Plan & { prices: Price[] };
 

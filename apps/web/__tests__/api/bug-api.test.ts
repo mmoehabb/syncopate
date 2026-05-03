@@ -4,7 +4,7 @@ import type { AxiosInstance } from "axios";
 import { BugApi as BugApiClass } from "../../../../packages/api/src/BugApi";
 
 describe("BugApi", () => {
-  let bugApi: import("@syncopate/api").BugApi;
+  let bugApi: import("@syncoboard/api").BugApi;
 
   beforeEach(async () => {
     mockAxiosInstance.post.mockReset();

@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: syncopate
+      POSTGRES_DB: syncoboard
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +24,7 @@ services:
       AUTH_TRUST_HOST: "true"
 
       # Database Connection
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/syncopate?schema=public"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/syncoboard?schema=public"
 
       # OAuth Providers
       AUTH_GITHUB_ID: "your-github-oauth-app-id"
@@ -49,7 +49,7 @@ services:
     command: ["bun", "run", "start:cron"]
     environment:
       # Database Connection
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/syncopate?schema=public"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/syncoboard?schema=public"
     depends_on:
       - postgres
 

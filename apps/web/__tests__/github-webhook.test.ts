@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from "bun:test";
 import { POST } from "@/app/api/github/hook/route";
 import { NextRequest } from "next/server";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { seedTestDatabase } from "./fixture";
 import crypto from "crypto";
 

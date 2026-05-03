@@ -1,4 +1,4 @@
-import { Prisma } from "@syncopate/db";
+import { Prisma } from "@syncoboard/db";
 
 export type UnregisteredUser = {
   login: string;

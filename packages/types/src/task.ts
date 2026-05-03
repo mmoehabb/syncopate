@@ -1,4 +1,4 @@
-import type { TaskStatus } from "@syncopate/db";
+import type { TaskStatus } from "@syncoboard/db";
 
 export interface CreateTaskPayload {
   boardId: string;

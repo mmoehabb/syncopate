@@ -3,12 +3,12 @@ import { mockAxiosInstance } from "../mocks/axios";
 import type { AxiosInstance } from "axios";
 
 describe("WorkspaceApi", () => {
-  let workspaceApi: import("@syncopate/api").WorkspaceApi;
+  let workspaceApi: import("@syncoboard/api").WorkspaceApi;
 
   beforeEach(async () => {
     mockAxiosInstance.get.mockReset();
 
-    const { WorkspaceApi: WorkspaceApiClass } = await import("@syncopate/api");
+    const { WorkspaceApi: WorkspaceApiClass } = await import("@syncoboard/api");
     workspaceApi = new WorkspaceApiClass();
     workspaceApi["client"] = mockAxiosInstance as unknown as AxiosInstance;
   });

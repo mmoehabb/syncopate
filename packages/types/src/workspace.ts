@@ -1,4 +1,4 @@
-import type { Workspace, Board } from "@syncopate/db";
+import type { Workspace, Board } from "@syncoboard/db";
 
 export type WorkspaceWithBoards = Workspace & { boards: Board[] };
 

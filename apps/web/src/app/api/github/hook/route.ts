@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import stringSimilarity from "string-similarity";
 import { TaskStatus } from "@prisma/client";
 import { SIMILARITY_THRESHOLD } from "@/lib/constants";

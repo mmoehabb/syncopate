@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSessionOrPat } from "@/lib/auth";
 import { API_ERRORS, apiError } from "@/lib/api/error";
-import { prisma } from "@syncopate/db";
+import { prisma } from "@syncoboard/db";
 import { RateLimiter } from "@/lib/api/rate-limit";
-import type { BugReportPayload, BugReportResponse } from "@syncopate/types";
+import type { BugReportPayload, BugReportResponse } from "@syncoboard/types";
 
 // Limit to 5 requests per minute per IP
 const rateLimiter = new RateLimiter(60 * 1000, 5);
