@@ -1,5 +1,5 @@
 import { Command } from "./types";
-import { resolvePath } from "./utils/path";
+import { resolvePath } from "@syncopate/shared";
 
 export const COMMAND_REGISTRY: Record<string, Command> = {
   ls: {

@@ -5,7 +5,8 @@ import path from "node:path";
 import os from "node:os";
 import http from "node:http";
 import { exec } from "node:child_process";
-import { setGlobalApiToken } from "@syncopate/api";
+import { setGlobalApiToken, directoryApi } from "@syncopate/api";
+import { executeTabCompletion } from "@syncopate/shared";
 import { COMMAND_REGISTRY } from "./command-registry";
 import { AppMode } from "./types";
 
@@ -101,7 +102,7 @@ const App = () => {
     });
   };
 
-  useInput((char, key) => {
+  useInput(async (char, key) => {
     if (key.return) {
       setOutput((prev) => [...prev, `> ${input}`]);
       if (input === "/auth") {
@@ -140,9 +141,22 @@ const App = () => {
         }
       }
       setInput("");
+    } else if (key.tab) {
+      await executeTabCompletion({
+        inputValue: input,
+        virtualPath,
+        commandRegistryKeys: Object.keys(COMMAND_REGISTRY),
+        getDirectoryEntries: async (path) => {
+          return directoryApi.getDirectory(path);
+        },
+        setInputValue: setInput,
+        printOutput: (lines: string[]) => {
+          setOutput((prev) => [...prev, ...lines]);
+        },
+      });
     } else if (key.backspace || key.delete) {
       setInput((prev) => prev.slice(0, -1));
-    } else {
+    } else if (char) {
       setInput((prev) => prev + char);
     }
   });

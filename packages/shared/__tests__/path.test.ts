@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { resolvePath } from "../src/lib/utils/path";
+import { resolvePath } from "../src/path";
 
 test("resolvePath works correctly", () => {
   expect(resolvePath("/", "workspace")).toBe("/workspace");

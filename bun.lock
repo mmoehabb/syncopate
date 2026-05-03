@@ -27,6 +27,7 @@
       "name": "tui",
       "dependencies": {
         "@syncopate/api": "workspace:*",
+        "@syncopate/shared": "workspace:*",
         "@syncopate/types": "workspace:*",
         "@syncopate/utils": "workspace:*",
         "ink": "^7.0.1",
@@ -47,6 +48,7 @@
         "@auth/prisma-adapter": "^2.11.1",
         "@syncopate/api": "workspace:*",
         "@syncopate/db": "workspace:*",
+        "@syncopate/shared": "workspace:*",
         "@syncopate/types": "workspace:*",
         "axios": "^1.15.0",
         "date-fns": "^4.1.0",
@@ -95,6 +97,14 @@
       "devDependencies": {
         "@types/pg": "^8.11.0",
         "prisma": "^7.7.0",
+        "typescript": "^5.0.0",
+      },
+    },
+    "packages/shared": {
+      "name": "@syncopate/shared",
+      "version": "1.0.0",
+      "devDependencies": {
+        "@types/node": "^20.19.39",
         "typescript": "^5.0.0",
       },
     },
@@ -471,6 +481,8 @@
     "@syncopate/cron": ["@syncopate/cron@workspace:services/cron"],
 
     "@syncopate/db": ["@syncopate/db@workspace:packages/db"],
+
+    "@syncopate/shared": ["@syncopate/shared@workspace:packages/shared"],
 
     "@syncopate/types": ["@syncopate/types@workspace:packages/types"],
 

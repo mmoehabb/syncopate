@@ -1,5 +1,5 @@
 import { describe, it, expect, mock } from "bun:test";
-import { executeTabCompletion } from "../src/lib/utils/tab-completion";
+import { executeTabCompletion } from "../src/tab-completion";
 
 describe("executeTabCompletion", () => {
   const defaultCommandRegistryKeys = [
