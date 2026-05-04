@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { signInWithGithub } from "./actions";
 
-export function LoginForm() {
+export function LoginForm({ redirectPath }: { redirectPath?: string }) {
   const [agreed, setAgreed] = useState(false);
 
   return (
@@ -38,6 +38,9 @@ export function LoginForm() {
       </div>
 
       <form action={signInWithGithub}>
+        {redirectPath && (
+          <input type="hidden" name="redirectTo" value={redirectPath} />
+        )}
         <ProviderButton
           provider="GitHub"
           disabled={!agreed}

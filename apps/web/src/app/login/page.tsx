@@ -10,8 +10,16 @@ export default async function LoginPage(props: {
   const session = await auth();
   const searchParams = await props.searchParams;
 
+  const redirectPath =
+    typeof searchParams.redirect === "string" &&
+    searchParams.redirect !== "false" &&
+    searchParams.redirect.startsWith("/") &&
+    !searchParams.redirect.startsWith("//")
+      ? searchParams.redirect
+      : undefined;
+
   if (session?.user && searchParams.redirect !== "false") {
-    redirect("/dashboard");
+    redirect(redirectPath || "/dashboard");
   }
 
   return (
@@ -34,7 +42,7 @@ export default async function LoginPage(props: {
           </p>
         </div>
 
-        <LoginForm />
+        <LoginForm redirectPath={redirectPath} />
       </main>
     </div>
   );
