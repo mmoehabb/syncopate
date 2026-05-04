@@ -36,15 +36,31 @@ cron.schedule("0 1 * * *", async () => {
       console.log(
         `[CRON] Found ${expiredSubscriptions.length} expired subscriptions. Enforcing limits.`,
       );
-      for (const sub of expiredSubscriptions) {
-        await enforceSubscriptionLimits(sub.userId);
 
-        // We should also mark the subscription as expired.
-        await prisma.subscription.update({
-          where: { id: sub.id },
-          data: { status: "EXPIRED" },
-        });
+      // 1. Extract unique user IDs to avoid redundant enforcement calls.
+      const uniqueUserIds = [
+        ...new Set(expiredSubscriptions.map((sub) => sub.userId)),
+      ];
+
+      // 2. Enforce subscription limits.
+      // We use a simple chunking approach to limit concurrency and avoid exhausting DB connections.
+      const CHUNK_SIZE = 10;
+      for (let i = 0; i < uniqueUserIds.length; i += CHUNK_SIZE) {
+        const chunk = uniqueUserIds.slice(i, i + CHUNK_SIZE);
+        await Promise.allSettled(
+          chunk.map((userId) => enforceSubscriptionLimits(userId)),
+        );
       }
+
+      // 3. Batch update the status of all expired subscriptions to "EXPIRED" in one query.
+      await prisma.subscription.updateMany({
+        where: {
+          id: {
+            in: expiredSubscriptions.map((sub) => sub.id),
+          },
+        },
+        data: { status: "EXPIRED" },
+      });
     } else {
       console.log("[CRON] No expired subscriptions found.");
     }
