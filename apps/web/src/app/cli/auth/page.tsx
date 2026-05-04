@@ -2,6 +2,8 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { ParticleNetwork } from "@/components/ui/ParticleNetwork";
+import { Logo } from "@/components/Logo";
 
 function AuthForm() {
   const searchParams = useSearchParams();
@@ -43,27 +45,43 @@ function AuthForm() {
 
   if (status === "success") {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
-        <div className="text-center p-8 border border-gray-700 rounded-lg bg-gray-800">
-          <h1 className="text-2xl font-bold mb-4">CLI Authorized!</h1>
-          <p className="text-gray-300">
-            You can safely close this page and return to your terminal.
-          </p>
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center h-screen w-full p-8 bg-obsidian-night relative overflow-hidden font-mono">
+        <ParticleNetwork />
+        <main className="w-full max-w-md z-10 flex flex-col gap-8 surface-panel p-8 bg-void-grey/80 backdrop-blur-md border border-git-green/20 rounded-md shadow-2xl text-center items-center">
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="w-16 h-16 rounded bg-obsidian-night border border-git-green/30 flex items-center justify-center text-git-green font-bold text-4xl mb-2">
+              <Logo />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              CLI Authorized!
+            </h1>
+            <p className="text-syntax-grey text-sm">
+              You can safely close this page and return to your terminal.
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
-      <div className="text-center p-8 border border-gray-700 rounded-lg bg-gray-800 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-4">Authorize CLI</h1>
-        <p className="text-gray-300 mb-6">
-          Syncoboard CLI is requesting access to your account.
-        </p>
+    <div className="flex-1 flex flex-col items-center justify-center h-screen w-full p-8 bg-obsidian-night relative overflow-hidden font-mono">
+      <ParticleNetwork />
+      <main className="w-full max-w-md z-10 flex flex-col gap-8 surface-panel p-8 bg-void-grey/80 backdrop-blur-md border border-white/10 rounded-md shadow-2xl text-center items-center">
+        <div className="flex flex-col items-center text-center gap-4">
+          <div className="w-16 h-16 rounded bg-obsidian-night border border-white/10 flex items-center justify-center text-neon-pulse font-bold text-4xl mb-2">
+            <Logo />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Authorize CLI
+          </h1>
+          <p className="text-syntax-grey text-sm">
+            Syncoboard CLI is requesting access to your account.
+          </p>
+        </div>
 
         {status === "error" && (
-          <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 rounded text-sm">
+          <div className="w-full p-3 bg-red-900/20 border border-red-500/50 text-red-400 rounded text-sm text-left">
             {errorMsg}
           </div>
         )}
@@ -71,11 +89,11 @@ function AuthForm() {
         <button
           onClick={handleAuthorize}
           disabled={status === "loading" || !port}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-git-green hover:bg-opacity-90 text-obsidian-night font-bold py-3 px-4 rounded transition-all focus:outline-none focus:ring-2 focus:ring-git-green focus:ring-offset-2 focus:ring-offset-obsidian-night disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "loading" ? "Authorizing..." : "Authorize CLI"}
         </button>
-      </div>
+      </main>
     </div>
   );
 }
@@ -84,7 +102,7 @@ export default function CliAuthPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
+        <div className="flex-1 flex h-screen w-full items-center justify-center bg-obsidian-night text-syntax-grey font-mono">
           Loading...
         </div>
       }
