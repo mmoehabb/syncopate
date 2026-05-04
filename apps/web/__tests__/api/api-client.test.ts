@@ -29,8 +29,6 @@ class TestApiClient extends ApiClient {
 
   // Expose the axios client properties that contain the interceptors
   public getResponseInterceptors() {
-    // Axios maintains interceptors in an array under `handlers`
-    // return (this.client.interceptors.response as any).handlers;
     return [
       { fulfilled: (x: any) => x, rejected: (x: any) => Promise.reject(x) },
     ];
