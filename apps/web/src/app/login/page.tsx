@@ -1,4 +1,4 @@
-import { ParticleNetwork } from "./ParticleNetwork";
+import { ParticleNetwork } from "@/components/ui/ParticleNetwork";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "./LoginForm";
 import { auth } from "@/lib/auth";
