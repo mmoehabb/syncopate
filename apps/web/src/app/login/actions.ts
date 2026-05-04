@@ -2,6 +2,7 @@
 
 import { signIn } from "@/lib/auth";
 
-export async function signInWithGithub() {
-  await signIn("github", { redirectTo: "/dashboard" });
+export async function signInWithGithub(formData?: FormData) {
+  const redirectTo = formData?.get("redirectTo")?.toString() || "/dashboard";
+  await signIn("github", { redirectTo });
 }
